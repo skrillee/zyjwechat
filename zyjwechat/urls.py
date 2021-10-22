@@ -14,14 +14,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.conf.urls import url, include
-from django.conf import settings
+# from django.conf import settings
 # from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^api/', include('wechat.urls')),
 ]
-if settings.DEBUG:
-    import debug_toolbar
-    urlpatterns = [
-        url(r'^__debug__/', include(debug_toolbar.urls))
-    ] + urlpatterns

@@ -25,13 +25,13 @@ SECRET_KEY = 'django-insecure-geknhmnp_+9p0k!%k^veba@wsfcrtv!2you_y$290ps%4y4+8&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['47.92.85.245']
+ALLOWED_HOSTS = ['47.92.85.245', '127.0.0.1', 'localhost ',]
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -39,12 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'wechat',
-    'debug_toolbar',
 ]
 
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -136,13 +134,5 @@ REST_FRAMEWORK = {
     "UNAUTHENTICATED_USER": None,  # 匿名：request.user = None
     "UNAUTHENTICATED_TOKEN": None,  # 匿名：request.auth = None
 }
-MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
-
-DEBUG_TOOLBAR_CONFIG = {
-        'JQUERY_URL': '//cdn.bootcss.com/jquery/2.1.4/jquery.min.js',
-        # 或把jquery下载到本地然后取消下面这句的注释, 并把上面那句删除或注释掉
-        # 'JQUERY_URL': '/static/jquery/2.1.4/jquery.min.js',
-        'SHOW_COLLAPSED': True,
-        'SHOW_TOOLBAR_CALLBACK': lambda x: True,
-}
