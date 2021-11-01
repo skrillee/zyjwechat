@@ -136,7 +136,7 @@ class Manufactor(APIView):
 
 def user_directory_path(filename):
     filename = filename.replace("_", "/")
-    image_path = os.path.join(settings.BASE_DIR, "static/media/manufactor/{}".format(filename))
+    image_path = os.path.join(settings.BASE_DIR, "wechat/static/media/manufactor/{}".format(filename))
     return image_path
 
 

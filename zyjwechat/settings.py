@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-geknhmnp_+9p0k!%k^veba@wsfcrtv!2you_y$290ps%4y4+8&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['47.92.85.245', '127.0.0.1', 'localhost ',]
 
@@ -79,12 +79,9 @@ WSGI_APPLICATION = 'zyjwechat.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': str(BASE_DIR / 'db.sqlite3'),
     }
 }
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-]
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -134,5 +131,10 @@ REST_FRAMEWORK = {
     "UNAUTHENTICATED_USER": None,  # 匿名：request.user = None
     "UNAUTHENTICATED_TOKEN": None,  # 匿名：request.auth = None
 }
-MEDIA_ROOT = os.path.join(BASE_DIR, 'static')
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
+# BASE_DIR 是项目的绝对地址
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "/static/"),
+]

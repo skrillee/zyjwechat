@@ -68,3 +68,19 @@ class ZyjWechatEdition(models.Model):
         verbose_name = '版本'
         verbose_name_plural = '版本集合'
 
+
+class ZyjWechatModel(models.Model):
+    name = models.CharField('型号名称', unique=True, max_length=128)
+    Edition = models.ForeignKey(ZyjWechatEdition, on_delete=models.CASCADE, null=True)
+    scene = models.CharField('场景', max_length=128)
+    date = models.CharField('上线日期', max_length=128)
+    model_sample = models.CharField('宣传图', max_length=1024)
+    model_unit = models.CharField('单元图', max_length=1024)
+    VR_address = models.CharField('实景图链接', max_length=1024)
+    reference_price = models.FloatField('参考价格', max_length=64)
+    size = models.CharField('规格尺寸', max_length=64)
+    details = models.CharField('详情介绍', max_length=1024)
+
+    class Meta:
+        verbose_name = '型号'
+        verbose_name_plural = '型号集合'
