@@ -134,7 +134,8 @@ REST_FRAMEWORK = {
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
 # BASE_DIR 是项目的绝对地址
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "/static/"),
+    os.path.join(BASE_DIR, "/zhuangyuanjie/zyjwechat/wechat/static/"),
 ]
