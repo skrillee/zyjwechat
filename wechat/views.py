@@ -49,6 +49,9 @@ class AuthVIew(APIView):
                     if time_state:
                         responses['token'] = token
                         models.CodeToken.objects.update_or_create(defaults={'token': token, 'token_effective_time': effective_time}, code=invitation_code_object)
+                    #     return manufactor_id and edition_id string
+                    #     manufactor = request.user.Retail.Product.filter()
+                    #     edition_objects = models.ZyjWechatEdition.objects.filter(Manufactor=manufactor_id)
                     else:
                         responses['code'] = 2001
                         responses['message'] = "邀请码过期，请填写可用的邀请码"
@@ -103,7 +106,14 @@ class Manufactor(APIView):
         try:
             manufactor = request.user.Retail.Product.filter()
             manufactor_message = {}
+            edition_id_string = ''
             for single_manufactor in manufactor:
+                manufactor_edition_id_string = ''
+                edition_objects = single_manufactor.zyjwechatedition_set.all()
+                for edition_object in edition_objects:
+                    edition_id = edition_object.id
+                    edition_id_string += str(edition_id)+','
+                    manufactor_edition_id_string += str(edition_id)+','
                 manufactor_id = single_manufactor.id
                 name = single_manufactor.name
                 manufactor_introduction = single_manufactor.manufactor_introduction
@@ -125,9 +135,11 @@ class Manufactor(APIView):
                     "manufactor_introduction": manufactor_introduction,
                     "manufactor_logo_dict": manufactor_logo_dict,
                     "manufactor_sample_dict": manufactor_sample_dict,
+                    "manufactor_edition_id_string": manufactor_edition_id_string
                 }
                 manufactor_message[single_manufactor.name] = single_manufactor_message
             responses['data'] = manufactor_message
+            responses['edition_id_string'] = edition_id_string
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"
@@ -201,3 +213,44 @@ class Edition(APIView):
             responses['message'] = "请求异常"
         return JsonResponse(responses)
 
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class Model(APIView):
+    """
+        Receive a parameter：manufactor_ids
+        This parameter is limited to your own brand
+        Return the Edition corresponding to the invitation code
+    """
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            editions = request._request.POST.get('edition_ids')
+            manufactor_edition_list = editions.split(",")
+            scene = request._request.POST.get('scene')
+            model_objects = models.ZyjWechatModel.objects.filter(scene=scene).select_related("Edition")
+            model_object_list = []
+            sample_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/"
+            for model_object in model_objects:
+                model_object_dict = {}
+                name = model_object.name
+                scene = model_object.scene
+                date = model_object.date
+                model_sample = model_object.model_sample
+                edition_id = model_object.Edition.id
+                edition_sample = model_object.Edition.edition_sample
+                if str(edition_id) in manufactor_edition_list and model_sample:
+                    model_object_dict['name'] = name
+                    model_object_dict['scene'] = scene
+                    model_object_dict['date'] = date
+                    model_object_dict['model_sample'] = sample_url+edition_sample+model_sample
+                    model_object_dict['edition_name'] = model_object.Edition.name
+                    model_object_dict['edition_style'] = model_object.Edition.style
+                model_object_list.append(model_object_dict)
+            responses['data'] = model_object_list
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
