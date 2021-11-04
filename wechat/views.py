@@ -241,14 +241,16 @@ class Model(APIView):
                 model_sample = model_object.model_sample
                 edition_id = model_object.Edition.id
                 edition_sample = model_object.Edition.edition_sample
+                model_vr = model_object.VR_address
                 if str(edition_id) in manufactor_edition_list and model_sample:
                     model_object_dict['name'] = name
                     model_object_dict['scene'] = scene
                     model_object_dict['date'] = date
+                    model_object_dict['vr_address'] = model_vr
                     model_object_dict['model_sample'] = sample_url+edition_sample+model_sample
                     model_object_dict['edition_name'] = model_object.Edition.name
                     model_object_dict['edition_style'] = model_object.Edition.style
-                model_object_list.append(model_object_dict)
+                    model_object_list.append(model_object_dict)
             responses['data'] = model_object_list
         except Exception as e:
             responses['code'] = 3002
