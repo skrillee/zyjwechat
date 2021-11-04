@@ -238,6 +238,7 @@ class Model(APIView):
                 name = model_object.name
                 scene = model_object.scene
                 date = model_object.date
+                model_unit = model_object.model_unit
                 model_sample = model_object.model_sample
                 edition_id = model_object.Edition.id
                 edition_sample = model_object.Edition.edition_sample
