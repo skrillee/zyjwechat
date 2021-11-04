@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^v1/manufactor_picture/(\w+\.(?:png|jpg|gif|bmp))/$', views.ManufactorPicture.as_view()),
     url(r'^v1/edition/(\w+)/$', views.Edition.as_view()),
     url(r'^v1/model/$', views.Model.as_view()),
+    url(r'^v1/model/sample/$', views.Sample.as_view())
 ]
 
 

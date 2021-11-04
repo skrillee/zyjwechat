@@ -256,3 +256,39 @@ class Model(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class Sample(APIView):
+    """
+        Receive a parameter：manufactor_ids
+        This parameter is limited to your own brand
+        Return the Edition corresponding to the invitation code
+    """
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            sample_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/"
+            model_object_dict = {}
+            model_unit = request._request.POST.get('model_unit')
+            model_object = models.ZyjWechatModel.objects.filter(name=model_unit).select_related("Edition").first()
+            model_unit_list = model_object.model_unit.split(",")
+            edition_sample = model_object.Edition.edition_sample
+            model_unit_url_list = []
+            for model_unit in model_unit_list:
+                model_unit_url_list.append(sample_url+edition_sample+model_unit)
+            model_object_dict['name'] = model_object.name
+            model_object_dict['scene'] = model_object.scene
+            model_object_dict['date'] = model_object.date
+            model_object_dict['model_unit_list'] = model_unit_url_list
+            model_object_dict['reference_price'] = model_object.reference_price
+            model_object_dict['size'] = model_object.size
+            model_object_dict['detail'] = model_object.details
+            responses['data'] = model_object_dict
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
