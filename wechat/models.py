@@ -80,6 +80,7 @@ class ZyjWechatModel(models.Model):
     reference_price = models.FloatField('参考价格', max_length=64)
     size = models.CharField('规格尺寸', max_length=64)
     details = models.CharField('详情介绍', max_length=1024)
+    VR_QR = models.CharField('实景图二维码', max_length=1024, null=True)
 
     class Meta:
         verbose_name = '型号'

@@ -243,11 +243,13 @@ class Model(APIView):
                 edition_id = model_object.Edition.id
                 edition_sample = model_object.Edition.edition_sample
                 model_vr = model_object.VR_address
+                model_VrQr = model_object.VR_QR
                 if str(edition_id) in manufactor_edition_list and model_sample:
                     model_object_dict['name'] = name
                     model_object_dict['scene'] = scene
                     model_object_dict['date'] = date
-                    model_object_dict['vr_address'] = sample_url+edition_sample+model_vr
+                    model_object_dict['model_VrQr'] = sample_url+edition_sample+model_VrQr
+                    model_object_dict['model_vr'] = model_vr
                     model_object_dict['model_unit'] = model_unit
                     model_object_dict['model_sample'] = sample_url+edition_sample+model_sample
                     model_object_dict['edition_name'] = model_object.Edition.name
