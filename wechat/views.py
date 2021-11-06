@@ -247,7 +247,7 @@ class Model(APIView):
                     model_object_dict['name'] = name
                     model_object_dict['scene'] = scene
                     model_object_dict['date'] = date
-                    model_object_dict['vr_address'] = model_vr
+                    model_object_dict['vr_address'] = sample_url+edition_sample+model_vr
                     model_object_dict['model_unit'] = model_unit
                     model_object_dict['model_sample'] = sample_url+edition_sample+model_sample
                     model_object_dict['edition_name'] = model_object.Edition.name
