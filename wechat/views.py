@@ -296,3 +296,61 @@ class Sample(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class Artificial(APIView):
+    """
+        Receive a parameter：retailretail
+        This parameter is limited to your own brand
+        Return the Edition corresponding to the invitation code
+    """
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            retail = request.user.Retail
+            retail_id = retail.id
+            artificial_object = models.ZyjWechatArtificial.objects.filter(Retail=retail_id).all()
+            artificial_object_list = []
+            for artificial in artificial_object:
+                artificial_object_dict = {'name': artificial.name, 'number': artificial.number,
+                                          'reference_price': artificial.reference_price, 'experience': artificial.experience}
+                artificial_object_list.append(artificial_object_dict)
+            responses['data'] = artificial_object_list
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class Ingredients(APIView):
+    """
+        Receive a parameter：retailretail
+        This parameter is limited to your own brand
+        Return the Edition corresponding to the invitation code
+    """
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            retail = request.user.Retail
+            retail_id = retail.id
+            ingredients_object = models.ZyjWechatIngredients.objects.filter(Retail=retail_id).all()
+            ingredients_object_list = []
+            for ingredients in ingredients_object:
+                ingredients_object_dict = {'name': ingredients.name, 'specification': ingredients.specification,
+                                           'reference_price': ingredients.reference_price, 'area_size': ingredients.area_size,
+                                           'product_name': ingredients.product_name, 'images': ingredients.images,
+                                           'explain':ingredients.explain}
+                ingredients_object_list.append(ingredients_object_dict)
+            responses['data'] = ingredients_object_list
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)

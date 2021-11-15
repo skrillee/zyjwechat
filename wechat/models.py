@@ -57,6 +57,18 @@ class ZyjWechatManufactor(models.Model):
         verbose_name_plural = '生产商集合'
 
 
+class ZyjWechatArtificial(models.Model):
+    name = models.CharField('施工组名称', unique=True, max_length=128)
+    Retail = models.ForeignKey(ZyjWechatRetail, on_delete=models.CASCADE, null=True)
+    number = models.CharField('人数', max_length=64)
+    reference_price = models.FloatField('参考价格', max_length=64)
+    experience = models.CharField('工作经验', max_length=64)
+
+    class Meta:
+        verbose_name = '施工'
+        verbose_name_plural = '施工集合'
+
+
 class ZyjWechatEdition(models.Model):
     name = models.CharField('版本名称', unique=True, max_length=128)
     Manufactor = models.ForeignKey(ZyjWechatManufactor, on_delete=models.CASCADE, null=True)
@@ -85,3 +97,18 @@ class ZyjWechatModel(models.Model):
     class Meta:
         verbose_name = '型号'
         verbose_name_plural = '型号集合'
+
+
+class ZyjWechatIngredients (models.Model):
+    name = models.CharField('辅料名称', unique=True, max_length=128, null=True)
+    product_name = models.CharField('品牌名称', max_length=128, null=True)
+    images = models.CharField('图片', max_length=1024, null=True)
+    Retail = models.ForeignKey(ZyjWechatRetail, on_delete=models.CASCADE, null=True)
+    specification = models.CharField('规格', max_length=128, null=True)
+    reference_price = models.FloatField('参考价格', max_length=64, null=True)
+    area_size = models.CharField('可用面积', max_length=1024, null=True)
+    explain = models.CharField('使用说明', max_length=1024, null=True)
+
+    class Meta:
+        verbose_name = '辅料'
+        verbose_name_plural = '辅料集合'
