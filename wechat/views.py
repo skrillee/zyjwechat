@@ -339,6 +339,7 @@ class Ingredients(APIView):
             'message': None
         }
         try:
+            ingredients_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/ingredients/"
             retail = request.user.Retail
             retail_id = retail.id
             ingredients_object = models.ZyjWechatIngredients.objects.filter(Retail=retail_id).all()
@@ -346,8 +347,8 @@ class Ingredients(APIView):
             for ingredients in ingredients_object:
                 ingredients_object_dict = {'name': ingredients.name, 'specification': ingredients.specification,
                                            'reference_price': ingredients.reference_price, 'area_size': ingredients.area_size,
-                                           'product_name': ingredients.product_name, 'images': ingredients.images,
-                                           'explain':ingredients.explain}
+                                           'product_name': ingredients.product_name, 'images': ingredients_url+ingredients.images,
+                                           'explain': ingredients.explain}
                 ingredients_object_list.append(ingredients_object_dict)
             responses['data'] = ingredients_object_list
         except Exception as e:
