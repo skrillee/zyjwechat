@@ -378,15 +378,14 @@ class Classification(APIView):
             classification_object_list = []
             if name:
                 classification = models.Classification.objects.filter(name=name).first()
-                if classification.characteristic == characteristic:
-                    classification_object_dict = {'name': classification.name, 'product_name': classification.product_name,
-                                                  'reference_price': classification.reference_price, 'images_big': classification_url+classification.images_big,
-                                                  'characteristic': classification.characteristic, 'discount': classification.discount,
-                                                  'original_price': classification.original_price, 'manual_price': classification.manual_price,
-                                                  'size': classification.size, 'details': classification.details,
-                                                  'evaluate': classification.evaluate
-                                                  }
-                    classification_object_list.append(classification_object_dict)
+                classification_object_dict = {'name': classification.name, 'product_name': classification.product_name,
+                                              'reference_price': classification.reference_price, 'images_big': classification_url+classification.images_big,
+                                              'characteristic': classification.characteristic, 'discount': classification.discount,
+                                              'original_price': classification.original_price, 'manual_price': classification.manual_price,
+                                              'size': classification.size, 'details': classification.details,
+                                              'evaluate': classification.evaluate
+                                              }
+                classification_object_list.append(classification_object_dict)
             else:
                 classification_object = models.Classification.objects.filter(Retail=retail_id).all()
                 for classification in classification_object:
