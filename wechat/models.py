@@ -99,7 +99,7 @@ class ZyjWechatModel(models.Model):
         verbose_name_plural = '型号集合'
 
 
-class ZyjWechatIngredients (models.Model):
+class ZyjWechatIngredients(models.Model):
     name = models.CharField('辅料名称', unique=True, max_length=128, null=True)
     product_name = models.CharField('品牌名称', max_length=128, null=True)
     images = models.CharField('图片', max_length=1024, null=True)
@@ -112,3 +112,36 @@ class ZyjWechatIngredients (models.Model):
     class Meta:
         verbose_name = '辅料'
         verbose_name_plural = '辅料集合'
+
+
+class Classification(models.Model):
+    name = models.CharField('名称', unique=True, max_length=128, null=True)
+    product_name = models.CharField('品牌名称', max_length=128, null=True)
+    images_small = models.CharField('图片', max_length=1024, null=True)
+    images_big = models.CharField('图片', max_length=1024, null=True)
+    Retail = models.ForeignKey(ZyjWechatRetail, on_delete=models.CASCADE, null=True)
+    reference_price = models.FloatField('参考价格-不包贴', max_length=64, null=True)
+    original_price = models.FloatField('原价', max_length=64, null=True)
+    manual_price = models.FloatField('参考价格-包贴', max_length=64, null=True)
+    characteristic = models.FloatField('图案类型', max_length=64, null=True)
+    discount = models.BooleanField('折扣商品', null=True)
+
+    class Meta:
+        verbose_name = '种类'
+        verbose_name_plural = '种类集合'
+
+
+class Voucher(models.Model):
+    name = models.CharField('名称', unique=True, max_length=128, null=True)
+    phone = models.CharField('客服手机号码', max_length=32)
+    address = models.CharField('店铺地址', max_length=128)
+    reduction = models.CharField('满减', max_length=128, null=True)
+    images_small = models.CharField('图片', max_length=1024, null=True)
+    Retail = models.ForeignKey(ZyjWechatRetail, on_delete=models.CASCADE, null=True)
+    remaining = models.FloatField('剩余个数', max_length=64, null=True)
+    state = models.FloatField('状态', max_length=64, null=True)
+    verification = models.FloatField('验证码', max_length=64, null=True)
+
+    class Meta:
+        verbose_name = '满减券'
+        verbose_name_plural = '满减券'

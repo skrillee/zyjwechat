@@ -13,4 +13,6 @@ urlpatterns = [
     url(r'^v1/model/sample/$', views.Sample.as_view()),
     url(r'^v1/retail/artificial/$', views.Artificial.as_view()),
     url(r'^v1/retail/ingredients/$', views.Ingredients.as_view()),
+    url(r'^v1/retail/classification/$', views.Classification.as_view()),
+    url(r'^v1/retail/voucher/$', views.Voucher.as_view()),
 ]

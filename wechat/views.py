@@ -355,3 +355,67 @@ class Ingredients(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class Classification(APIView):
+    """
+        Receive a parameter：retailretail
+        This parameter is limited to your own brand
+        Return the Edition corresponding to the invitation code
+    """
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            classification_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/classification/"
+            retail = request.user.Retail
+            retail_id = retail.id
+            classification_object = models.Classification.objects.filter(Retail=retail_id).all()
+            classification_object_list = []
+            for classification in classification_object:
+                classification_object_dict = {'name': classification.name, 'product_name': classification.product_name,
+                                              'images_small': classification_url+classification.images_small,
+                                              'reference_price': classification.reference_price, 'images_big': classification_url+classification.images_big,
+                                              'characteristic': classification.characteristic, 'discount': classification.discount,
+                                              'original_price': classification.original_price, 'manual_price': classification.manual_price
+                                              }
+                classification_object_list.append(classification_object_dict)
+            responses['data'] = classification_object_list
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class Voucher(APIView):
+    """
+        Receive a parameter：retailretail
+        This parameter is limited to your own brand
+        Return the Edition corresponding to the invitation code
+    """
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            voucher_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/voucher/"
+            retail = request.user.Retail
+            retail_id = retail.id
+            voucher_object = models.Voucher.objects.filter(Retail=retail_id).all()
+            voucher_object_list = []
+            for voucher in voucher_object:
+                voucher_object_dict = {'name': voucher.name, 'phone': voucher.phone,
+                                       'address': voucher.address, 'reduction': voucher.reduction,
+                                       'state': voucher.state, 'images_small': voucher_url+voucher.images_small,
+                                       'remaining': voucher.remaining, 'verification': voucher.verification}
+                voucher_object_list.append(voucher_object_dict)
+            responses['data'] = voucher_object_list
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
