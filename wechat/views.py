@@ -372,6 +372,7 @@ class Classification(APIView):
         try:
             characteristic = request._request.POST.get('characteristic')
             name = request._request.POST.get('name')
+            discount = request._request.POST.get('discount')
             classification_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/classification/"
             retail = request.user.Retail
             retail_id = retail.id
@@ -386,6 +387,18 @@ class Classification(APIView):
                                               'evaluate': classification.evaluate
                                               }
                 classification_object_list.append(classification_object_dict)
+            elif discount:
+                classification_object = models.Classification.objects.filter(discount=discount).all()
+                for classification in classification_object:
+                    if classification.discount == discount:
+                        classification_object_dict = {'name': classification.name, 'product_name': classification.product_name,
+                                                      'images_small': classification_url+classification.images_small,
+                                                      'reference_price': classification.reference_price,
+                                                      'characteristic': classification.characteristic, 'discount': classification.discount,
+                                                      'original_price': classification.original_price,
+                                                      'size': classification.size,
+                                                      }
+                        classification_object_list.append(classification_object_dict)
             else:
                 classification_object = models.Classification.objects.filter(Retail=retail_id).all()
                 for classification in classification_object:
