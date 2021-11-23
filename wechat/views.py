@@ -380,7 +380,9 @@ class Classification(APIView):
                                               'images_small': classification_url+classification.images_small,
                                               'reference_price': classification.reference_price, 'images_big': classification_url+classification.images_big,
                                               'characteristic': classification.characteristic, 'discount': classification.discount,
-                                              'original_price': classification.original_price, 'manual_price': classification.manual_price
+                                              'original_price': classification.original_price, 'manual_price': classification.manual_price,
+                                              'size': classification.size, 'details': classification.details,
+                                              'evaluate': classification.evaluate
                                               }
                 classification_object_list.append(classification_object_dict)
             responses['data'] = classification_object_list

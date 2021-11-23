@@ -125,6 +125,9 @@ class Classification(models.Model):
     manual_price = models.FloatField('参考价格-包贴', max_length=64, null=True)
     characteristic = models.FloatField('图案类型', max_length=64, null=True)
     discount = models.BooleanField('折扣商品', null=True)
+    size = models.CharField('规格尺寸', max_length=64, null=True)
+    details = models.CharField('详情介绍', max_length=1024, null=True)
+    evaluate = models.CharField('30平米包工包料价格', max_length=64, null=True)
 
     class Meta:
         verbose_name = '种类'
