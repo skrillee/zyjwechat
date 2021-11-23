@@ -370,21 +370,35 @@ class Classification(APIView):
             'message': None
         }
         try:
+            characteristic = request._request.POST.get('characteristic')
+            name = request._request.POST.get('name')
             classification_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/classification/"
             retail = request.user.Retail
             retail_id = retail.id
-            classification_object = models.Classification.objects.filter(Retail=retail_id).all()
             classification_object_list = []
-            for classification in classification_object:
-                classification_object_dict = {'name': classification.name, 'product_name': classification.product_name,
-                                              'images_small': classification_url+classification.images_small,
-                                              'reference_price': classification.reference_price, 'images_big': classification_url+classification.images_big,
-                                              'characteristic': classification.characteristic, 'discount': classification.discount,
-                                              'original_price': classification.original_price, 'manual_price': classification.manual_price,
-                                              'size': classification.size, 'details': classification.details,
-                                              'evaluate': classification.evaluate
-                                              }
-                classification_object_list.append(classification_object_dict)
+            if name:
+                classification = models.Classification.objects.filter(name=name).first()
+                if classification.characteristic == characteristic:
+                    classification_object_dict = {'name': classification.name, 'product_name': classification.product_name,
+                                                  'reference_price': classification.reference_price, 'images_big': classification_url+classification.images_big,
+                                                  'characteristic': classification.characteristic, 'discount': classification.discount,
+                                                  'original_price': classification.original_price, 'manual_price': classification.manual_price,
+                                                  'size': classification.size, 'details': classification.details,
+                                                  'evaluate': classification.evaluate
+                                                  }
+                    classification_object_list.append(classification_object_dict)
+            else:
+                classification_object = models.Classification.objects.filter(Retail=retail_id).all()
+                for classification in classification_object:
+                    if classification.characteristic == characteristic:
+                        classification_object_dict = {'name': classification.name, 'product_name': classification.product_name,
+                                                      'images_small': classification_url+classification.images_small,
+                                                      'reference_price': classification.reference_price,
+                                                      'characteristic': classification.characteristic, 'discount': classification.discount,
+                                                      'original_price': classification.original_price,
+                                                      'size': classification.size,
+                                                      }
+                        classification_object_list.append(classification_object_dict)
             responses['data'] = classification_object_list
         except Exception as e:
             responses['code'] = 3002
@@ -408,7 +422,7 @@ class Voucher(APIView):
             voucher_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/voucher/"
             retail = request.user.Retail
             retail_id = retail.id
-            voucher_object = models.Voucher.objects.filter(Retail=retail_id).all()
+            voucher_object = models.Voucher.objects.filter(Q(Retail=retail_id)).all()
             voucher_object_list = []
             for voucher in voucher_object:
                 voucher_object_dict = {'name': voucher.name, 'phone': voucher.phone,
