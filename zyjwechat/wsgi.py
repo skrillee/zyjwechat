@@ -10,8 +10,7 @@ https://docs.djangoproject.com/en/3.2/howto/deployment/wsgi/
 import os
 
 from django.core.wsgi import get_wsgi_application
-from zyjwechat import mqtt_functions
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'zyjwechat.settings')
 
 application = get_wsgi_application()
-mqtt_functions.mqtt_run()
+
