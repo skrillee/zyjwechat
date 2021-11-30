@@ -447,3 +447,22 @@ class Voucher(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+from zyjwechat import mqtt_functions
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class Methanal(APIView):
+    def get(self):
+        responses = {
+                'code': 1000,
+                'message': None
+            }
+        try:
+            mqtt_functions.mqtt_run()
+            responses['data'] = edition_message
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)

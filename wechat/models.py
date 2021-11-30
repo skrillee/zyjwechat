@@ -148,3 +148,16 @@ class Voucher(models.Model):
     class Meta:
         verbose_name = '满减券'
         verbose_name_plural = '满减券'
+
+
+class Methanal(models.Model):
+    number = models.CharField('设备编号', unique=True, max_length=128, null=True)
+    name = models.CharField('设备名称', max_length=128, null=True)
+    password = models.CharField('密码', max_length=128, null=True)
+    type = models.CharField('类型', max_length=128, null=True)
+    state = models.CharField('状态', max_length=32, null=True)
+    time = models.CharField('创建时间', max_length=32, null=True)
+
+    class Meta:
+        verbose_name = '甲醛检测'
+        verbose_name_plural = '甲醛检测'
