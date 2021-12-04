@@ -5,11 +5,13 @@ from rest_framework.views import APIView
 from django.http import JsonResponse
 from zyjwechat import settings
 from wechat import models
+import socket
 import datetime
 import hashlib
 import time
 import pytz
 import os
+import json
 
 
 def md5(invitation_code) -> object:
@@ -449,19 +451,70 @@ class Voucher(APIView):
         return JsonResponse(responses)
 
 
-from zyjwechat import mqtt_functions
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class Methanal(APIView):
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            invitation_code = request.user.invitation_code
+            value = request._request.POST.get('value')
+            equipment_obj = models.Equipment.objects.filter(invitation_code=invitation_code).first()
+            if equipment_obj:
+                equipment_number = equipment_obj.number
+
+                # 建立链接,服务器为客户端，硬件为服务端
+                address_ip = equipment_obj.ip
+                address_port = equipment_obj.port
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                ip_port = ('47.92.85.245', 3367)
+                sock.connect(ip_port)
+                send_data_dict = {
+                    "address_ip": address_ip,
+                    "address_port": address_port,
+                    "value": value,
+                    "number": equipment_number
+                }
+                send_data_str = json.dumps(send_data_dict)
+                data = bytes(send_data_str, 'utf-8')
+                sock.send(data)
+                sock.close()
+            else:
+                responses['message'] = "该验证码无可用设备"
+                responses['data'] = []
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
 
 
 # noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
-class Methanal(APIView):
-    def get(self):
+class Result(APIView):
+
+    def post(self, request):
         responses = {
-                'code': 1000,
-                'message': None
-            }
+            'code': 1000,
+            'message': None
+        }
         try:
-            mqtt_functions.mqtt_run()
-            responses['data'] = edition_message
+            invitation_code = request.user.invitation_code
+            methanal_obj = models.Methanal.objects.filter(invitation_code=invitation_code).order_by('-id').first()
+            if methanal_obj:
+                methanal_time_list = methanal_obj.time.split(',')
+                methanal_value_list = methanal_obj.methanal_value.split(',')
+                methanal_time_list.pop()
+                methanal_value_list.pop()
+                methanal_dict = {
+                    "methanal_time": methanal_time_list,
+                    "methanal_value": methanal_value_list
+                }
+                responses['data'] = methanal_dict
+            else:
+                responses['message'] = "该验证码无可用设备"
+                responses['data'] = []
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"
