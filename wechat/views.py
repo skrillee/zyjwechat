@@ -495,29 +495,30 @@ class Methanal(APIView):
 # noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
 class Result(APIView):
 
-    def post(self, request):
-        responses = {
-            'code': 1000,
-            'message': None
-        }
-        try:
-            invitation_code = request.user.invitation_code
-            methanal_obj = models.Methanal.objects.filter(invitation_code=invitation_code).order_by('-id').first()
-            if methanal_obj:
-                methanal_time_list = methanal_obj.time.split(',')
-                methanal_value_list = methanal_obj.methanal_value.split(',')
-                methanal_time_list.pop()
-                methanal_value_list.pop()
-                methanal_dict = {
-                    "methanal_time": methanal_time_list,
-                    "methanal_value": methanal_value_list
+            def post(self, request):
+                responses = {
+                    'code': 1000,
+                    'message': None
                 }
-                responses['data'] = methanal_dict
-            else:
-                responses['code'] = 3003
-                responses['message'] = "该验证码无可用设备"
-                responses['data'] = []
-        except Exception as e:
-            responses['code'] = 3002
-            responses['message'] = "请求异常"
-        return JsonResponse(responses)
+                try:
+                    invitation_code = request.user.invitation_code
+                    methanal_obj = models.Methanal.objects.filter(invitation_code=invitation_code).order_by('-id').first()
+                    if methanal_obj:
+                        methanal_time_list = methanal_obj.time.split(',')
+                        methanal_value_list = methanal_obj.methanal_value.split(',')
+                        methanal_time_list.pop()
+                        methanal_value_list.pop()
+                        methanal_dict = {
+                            "methanal_time": methanal_time_list,
+                            "methanal_value": methanal_value_list
+                        }
+                        responses['data'] = methanal_dict
+                    else:
+                        responses['code'] = 3003
+                        responses['message'] = "该验证码无可用设备"
+                        responses['data'] = []
+                except Exception as e:
+                    responses['code'] = 3002
+                    responses['message'] = "请求异常"
+                return JsonResponse(responses)
+

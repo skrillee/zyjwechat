@@ -26,8 +26,8 @@ class MyServer(socketserver.BaseRequestHandler):
         time = ''
         try:
             while True:
-                self.request.settimeout(5)
                 receive_data_encode = conn.recv(6144)
+                self.request.settimeout(600)
                 receive_data_decode = receive_data_encode.decode()
                 if receive_data_decode:
                     receive_data_json = json.loads(receive_data_decode)
@@ -49,7 +49,7 @@ class MyServer(socketserver.BaseRequestHandler):
                         methanal_value += receive_data_json['value'] + ','
                         time += receive_data_json['time'] + ','
         except OSError as e:
-            pass
+            conn.close()
 
     def finish(self):
         pass
