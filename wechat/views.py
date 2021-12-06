@@ -483,6 +483,7 @@ class Methanal(APIView):
                 sock.send(data)
                 sock.close()
             else:
+                responses['code'] = 3003
                 responses['message'] = "该验证码无可用设备"
                 responses['data'] = []
         except Exception as e:
@@ -513,6 +514,7 @@ class Result(APIView):
                 }
                 responses['data'] = methanal_dict
             else:
+                responses['code'] = 3003
                 responses['message'] = "该验证码无可用设备"
                 responses['data'] = []
         except Exception as e:
