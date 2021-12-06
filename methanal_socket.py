@@ -26,6 +26,7 @@ class MyServer(socketserver.BaseRequestHandler):
         time = ''
         try:
             while True:
+                self.request.settimeout(5)
                 receive_data_encode = conn.recv(6144)
                 receive_data_decode = receive_data_encode.decode()
                 if receive_data_decode:
@@ -55,5 +56,5 @@ class MyServer(socketserver.BaseRequestHandler):
 
 
 if __name__ == '__main__':
-    server = socketserver.ThreadingTCPServer(('127.0.0.1', 3368), MyServer)
+    server = socketserver.ThreadingTCPServer(('0.0.0.0', 3367), MyServer)
     server.serve_forever()

@@ -6,7 +6,7 @@ import socket
 import sys
 
 
-ip_port = ('127.0.0.1', 3368)
+ip_port = ('127.0.0.1', 3367)
 sk = socket.socket()
 sk.connect(ip_port)
 
