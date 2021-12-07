@@ -51,7 +51,8 @@ class MyServer(socketserver.BaseRequestHandler):
                             defaults={'port': address_port, 'ip': address_ip},
                             number=number)
                     else:
-                        methanal_value += receive_data_json['value'] + ','
+                        receive_data_json_value = json.dumps(receive_data_json['value'])
+                        methanal_value += receive_data_json_value + ';'
                         times += receive_data_json['time'] + ','
         except OSError as e:
             conn.close()
@@ -61,5 +62,5 @@ class MyServer(socketserver.BaseRequestHandler):
 
 
 if __name__ == '__main__':
-    server = socketserver.ThreadingTCPServer(('0.0.0.0', 3367), MyServer)
+    server = socketserver.ThreadingTCPServer(('127.0.0.1', 3367), MyServer)
     server.serve_forever()

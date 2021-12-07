@@ -505,12 +505,22 @@ class Result(APIView):
                     methanal_obj = models.Methanal.objects.filter(invitation_code=invitation_code).order_by('-id').first()
                     if methanal_obj:
                         methanal_time_list = methanal_obj.time.split(',')
-                        methanal_value_list = methanal_obj.methanal_value.split(',')
+                        methanal_value_str = methanal_obj.methanal_value
                         methanal_time_list.pop()
+                        value_CO2_list = []
+                        value_methanal_list = []
+                        methanal_value_list = methanal_value_str.split(';')
                         methanal_value_list.pop()
+                        for methanal_value in methanal_value_list:
+                            methanal_value_dict = json.loads(methanal_value)
+                            value_CO2 = methanal_value_dict['CO2']
+                            value_methanal = methanal_value_dict['methanal']
+                            value_CO2_list.append(value_CO2)
+                            value_methanal_list.append(value_methanal)
                         methanal_dict = {
                             "methanal_time": methanal_time_list,
-                            "methanal_value": methanal_value_list
+                            "methanal_value": value_methanal_list,
+                            "CO2_value": value_CO2_list
                         }
                         responses['data'] = methanal_dict
                     else:
