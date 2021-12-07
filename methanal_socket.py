@@ -26,7 +26,8 @@ class MyServer(socketserver.BaseRequestHandler):
         methanal_value = ''
         times = ''
         try:
-            while True:
+            flag = True
+            while flag:
                 receive_data_encode = conn.recv(6144)
                 receive_data_decode = receive_data_encode.decode()
                 if receive_data_decode:
@@ -37,12 +38,14 @@ class MyServer(socketserver.BaseRequestHandler):
                         models.Methanal.objects.create(number=number, time=times, invitation_code=invitation_code,
                                                        methanal_value=methanal_value, ip=address_ip, port=address_port)
                         conn.close()
+                        flag = False
                     elif receive_data_json['value'] == 'start':
                         client_address_ip = receive_data_json['address_ip']
                         client_address_port = receive_data_json['address_port']
                         self.request.sendto('start'.encode(), (client_address_ip, int(client_address_port)))
                         time.sleep(610)
                         conn.close()
+                        flag = False
                     elif receive_data_json['value'] == 'bind':
                         models.Equipment.objects.update_or_create(
                             defaults={'port': address_port, 'ip': address_ip},
