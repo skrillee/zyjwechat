@@ -10,6 +10,7 @@ from wechat import models
 import time
 # from django.shortcuts import HttpResponse
 # from rest_framework.views import APIView
+socket_hashMap = {}
 
 
 class MyServer(socketserver.BaseRequestHandler):
@@ -40,9 +41,11 @@ class MyServer(socketserver.BaseRequestHandler):
                         conn.close()
                         flag = False
                     elif receive_data_json['value'] == 'start':
-                        client_address_ip = receive_data_json['address_ip']
-                        client_address_port = receive_data_json['address_port']
-                        self.request.sendto('start'.encode(), (client_address_ip, int(client_address_port)))
+                        # client_address_ip = receive_data_json['address_ip']
+                        # client_address_port = receive_data_json['address_port']
+                        receive_number = receive_data_json['number']
+                        hash_map_request = socket_hashMap[receive_number]
+                        hash_map_request.send('start'.encode(),)
                         time.sleep(610)
                         conn.close()
                         flag = False
@@ -50,6 +53,8 @@ class MyServer(socketserver.BaseRequestHandler):
                         models.Equipment.objects.update_or_create(
                             defaults={'port': address_port, 'ip': address_ip},
                             number=number)
+                        receive_number = receive_data_json['number']
+                        socket_hashMap[receive_number] = self.request
                     else:
                         receive_data_json_value = json.dumps(receive_data_json['value'])
                         methanal_value += receive_data_json_value + ';'

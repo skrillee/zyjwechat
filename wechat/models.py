@@ -158,6 +158,7 @@ class Methanal(models.Model):
     port = models.CharField('端口', max_length=32, null=True)
     time = models.CharField('时间', max_length=32, null=True)
 
+
     class Meta:
         verbose_name = '甲醛检测'
         verbose_name_plural = '甲醛检测'
@@ -168,3 +169,4 @@ class Equipment(models.Model):
     port = models.CharField('端口', max_length=32, null=True)
     number = models.CharField('设备编号', max_length=128, null=True, unique=True)
     invitation_code = models.CharField('邀请码', max_length=128, null=True)
+    status = models.CharField('状态', max_length=32, null=True)
