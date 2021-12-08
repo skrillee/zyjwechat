@@ -8,6 +8,7 @@ import socketserver
 import json
 from wechat import models
 import time
+import datetime
 # from django.shortcuts import HttpResponse
 # from rest_framework.views import APIView
 socket_hashMap = {}
@@ -43,11 +44,17 @@ class MyServer(socketserver.BaseRequestHandler):
                     elif receive_data_json['value'] == 'start':
                         # client_address_ip = receive_data_json['address_ip']
                         # client_address_port = receive_data_json['address_port']
+                        local_time = datetime.datetime.now()
+                        local_time_month = str(local_time.month)
+                        local_time_day = str(local_time.day)
+                        local_time_hour = str(local_time.hour)
+                        local_time_minute = str(local_time.minute)
+                        local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour + ':' + local_time_minute
                         receive_number = receive_data_json['number']
                         hash_map_request = socket_hashMap[receive_number]
-                        hash_map_request.send('start'.encode(),)
-                        time.sleep(610)
+                        hash_map_request.send(('start,' + local_time_result).encode(),)
                         conn.close()
+                        time.sleep(610)
                         flag = False
                     elif receive_data_json['value'] == 'bind':
                         models.Equipment.objects.update_or_create(
@@ -67,5 +74,5 @@ class MyServer(socketserver.BaseRequestHandler):
 
 
 if __name__ == '__main__':
-    server = socketserver.ThreadingTCPServer(('127.0.0.1', 3367), MyServer)
+    server = socketserver.ThreadingTCPServer(('0.0.0.0', 3367), MyServer)
     server.serve_forever()
