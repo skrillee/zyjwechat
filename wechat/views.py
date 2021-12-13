@@ -375,6 +375,7 @@ class Classification(APIView):
             characteristic = request._request.POST.get('characteristic')
             name = request._request.POST.get('name')
             discount = request._request.POST.get('discount')
+            discount = request._request.POST.get('discount')
             classification_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/classification/"
             retail = request.user.Retail
             retail_id = retail.id
@@ -548,14 +549,14 @@ class Banner(APIView):
             if banners_obj:
                 for banner_obj in banners_obj:
                     banner_object_dict = {'location': banner_obj.location, 'images': banner_obj.images,
-                                          'describe': banner_obj.describe, 'images_big': banners_url+banner_obj.images_big,
+                                          'describe': banner_obj.describe, 'images_big': banners_url+banner_obj.images,
                                           'category': banner_obj.category,
                                           }
                     banner_object_list.append(banner_object_dict)
                 responses['data'] = banner_object_list
             else:
                 responses['code'] = 3003
-                responses['message'] = "该验证码无可用设备"
+                responses['message'] = "请求异常"
                 responses['data'] = []
         except Exception as e:
             responses['code'] = 3002
