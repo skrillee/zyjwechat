@@ -465,7 +465,6 @@ class Methanal(APIView):
             equipment_obj = models.Equipment.objects.filter(invitation_code=invitation_code).first()
             if equipment_obj:
                 equipment_number = equipment_obj.number
-
                 # 建立链接,服务器为客户端，硬件为服务端
                 address_ip = equipment_obj.ip
                 address_port = equipment_obj.port
@@ -495,40 +494,70 @@ class Methanal(APIView):
 # noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
 class Result(APIView):
 
-            def post(self, request):
-                responses = {
-                    'code': 1000,
-                    'message': None
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            invitation_code = request.user.invitation_code
+            methanal_obj = models.Methanal.objects.filter(invitation_code=invitation_code).order_by('-id').first()
+            if methanal_obj:
+                methanal_time_list = methanal_obj.time.split(',')
+                methanal_value_str = methanal_obj.methanal_value
+                methanal_time_list.pop()
+                value_CO2_list = []
+                value_methanal_list = []
+                methanal_value_list = methanal_value_str.split(';')
+                methanal_value_list.pop()
+                for methanal_value in methanal_value_list:
+                    methanal_value_dict = json.loads(methanal_value)
+                    value_CO2 = methanal_value_dict['CO2']
+                    value_methanal = methanal_value_dict['methanal']
+                    value_CO2_list.append(value_CO2)
+                    value_methanal_list.append(value_methanal)
+                methanal_dict = {
+                    "methanal_time": methanal_time_list,
+                    "methanal_value": value_methanal_list,
+                    "CO2_value": value_CO2_list
                 }
-                try:
-                    invitation_code = request.user.invitation_code
-                    methanal_obj = models.Methanal.objects.filter(invitation_code=invitation_code).order_by('-id').first()
-                    if methanal_obj:
-                        methanal_time_list = methanal_obj.time.split(',')
-                        methanal_value_str = methanal_obj.methanal_value
-                        methanal_time_list.pop()
-                        value_CO2_list = []
-                        value_methanal_list = []
-                        methanal_value_list = methanal_value_str.split(';')
-                        methanal_value_list.pop()
-                        for methanal_value in methanal_value_list:
-                            methanal_value_dict = json.loads(methanal_value)
-                            value_CO2 = methanal_value_dict['CO2']
-                            value_methanal = methanal_value_dict['methanal']
-                            value_CO2_list.append(value_CO2)
-                            value_methanal_list.append(value_methanal)
-                        methanal_dict = {
-                            "methanal_time": methanal_time_list,
-                            "methanal_value": value_methanal_list,
-                            "CO2_value": value_CO2_list
-                        }
-                        responses['data'] = methanal_dict
-                    else:
-                        responses['code'] = 3003
-                        responses['message'] = "该验证码无可用设备"
-                        responses['data'] = []
-                except Exception as e:
-                    responses['code'] = 3002
-                    responses['message'] = "请求异常"
-                return JsonResponse(responses)
+                responses['data'] = methanal_dict
+            else:
+                responses['code'] = 3003
+                responses['message'] = "该验证码无可用设备"
+                responses['data'] = []
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
 
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class Banner(APIView):
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            location = request._request.POST.get('location')
+            banners_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/banner/"
+            banner_object_list = []
+            banners_obj = models.Banner.objects.filter(location=location).all()
+            if banners_obj:
+                for banner_obj in banners_obj:
+                    banner_object_dict = {'location': banner_obj.location, 'images': banner_obj.images,
+                                          'describe': banner_obj.describe, 'images_big': banners_url+banner_obj.images_big,
+                                          'category': banner_obj.category,
+                                          }
+                    banner_object_list.append(banner_object_dict)
+                responses['data'] = banner_object_list
+            else:
+                responses['code'] = 3003
+                responses['message'] = "该验证码无可用设备"
+                responses['data'] = []
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)

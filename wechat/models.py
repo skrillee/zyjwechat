@@ -158,7 +158,6 @@ class Methanal(models.Model):
     port = models.CharField('端口', max_length=32, null=True)
     time = models.CharField('时间', max_length=32, null=True)
 
-
     class Meta:
         verbose_name = '甲醛检测'
         verbose_name_plural = '甲醛检测'
@@ -170,3 +169,11 @@ class Equipment(models.Model):
     number = models.CharField('设备编号', max_length=128, null=True, unique=True)
     invitation_code = models.CharField('邀请码', max_length=128, null=True)
     status = models.CharField('状态', max_length=32, null=True)
+
+
+class Banner(models.Model):
+    location = models.CharField('位置', max_length=128, null=True)
+    images = models.CharField('图片', max_length=1024, null=True)
+    describe = models.CharField('描述', max_length=128, null=True)
+    category = models.CharField('品类', max_length=128, null=True)
+    remark = models.CharField('备注', max_length=128, null=True)

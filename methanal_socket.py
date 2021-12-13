@@ -47,7 +47,7 @@ class MyServer(socketserver.BaseRequestHandler):
                         local_time = datetime.datetime.now()
                         local_time_month = str(local_time.month)
                         local_time_day = str(local_time.day)
-                        local_time_hour = str(local_time.hour)
+                        local_time_hour = str(local_time.hour+8)
                         local_time_minute = str(local_time.minute)
                         local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour + ':' + local_time_minute
                         receive_number = receive_data_json['number']
@@ -74,5 +74,5 @@ class MyServer(socketserver.BaseRequestHandler):
 
 
 if __name__ == '__main__':
-    server = socketserver.ThreadingTCPServer(('0.0.0.0', 3367), MyServer)
+    server = socketserver.ThreadingTCPServer(('47.92.85.245', 3367), MyServer)
     server.serve_forever()
