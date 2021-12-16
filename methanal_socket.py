@@ -41,6 +41,20 @@ class MyServer(socketserver.BaseRequestHandler):
                                                        methanal_value=methanal_value, ip=address_ip, port=address_port)
                         conn.close()
                         flag = False
+                    elif 'wifi' in receive_data_json['value']:
+                        local_time = datetime.datetime.now()
+                        local_time_month = str(local_time.month)
+                        local_time_day = str(local_time.day)
+                        local_time_hour = str(local_time.hour+8)
+                        local_time_minute = str(local_time.minute)
+                        local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour + ':' + local_time_minute
+                        receive_number = receive_data_json['number']
+                        hash_map_request = socket_hashMap[receive_number]
+                        wifi_data = receive_data_json['value']
+                        hash_map_request.send((wifi_data+',' + local_time_result).encode(),)
+                        conn.close()
+                        time.sleep(610)
+                        flag = False
                     elif receive_data_json['value'] == 'start':
                         # client_address_ip = receive_data_json['address_ip']
                         # client_address_port = receive_data_json['address_port']
@@ -74,5 +88,5 @@ class MyServer(socketserver.BaseRequestHandler):
 
 
 if __name__ == '__main__':
-    server = socketserver.ThreadingTCPServer(('47.92.85.245', 3367), MyServer)
+    server = socketserver.ThreadingTCPServer(('127.0.0.1', 3367), MyServer)
     server.serve_forever()
