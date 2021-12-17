@@ -88,5 +88,5 @@ class MyServer(socketserver.BaseRequestHandler):
 
 
 if __name__ == '__main__':
-    server = socketserver.ThreadingTCPServer(('127.0.0.1', 3367), MyServer)
+    server = socketserver.ThreadingTCPServer(('0.0.0.0', 3367), MyServer)
     server.serve_forever()
