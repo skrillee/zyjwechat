@@ -4,18 +4,15 @@
 
 import socket
 
-
-ip_port = ('127.0.0.1', 3368)
+ip_port = ('127.0.0.1', 3367)
 sk = socket.socket()
 sk.connect(ip_port)
-
+inp = input('')
+sk.sendall(inp.encode())
 while True:
+    data = sk.recv(1024)
+    print(data)
 
-    inp = input('')
-    sk.sendall(inp.encode())
-    # data = sk.recv(1024)
-    # print(data)
-
-    if inp == 'exit':
-        break
-sk.close()
+    # if inp == 'exit':
+    #     break
+# sk.close()
