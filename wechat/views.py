@@ -460,35 +460,31 @@ class Methanal(APIView):
             'code': 1000,
             'message': None
         }
-        try:
-            invitation_code = request.user.invitation_code
-            value = request._request.POST.get('value')
-            equipment_obj = models.Equipment.objects.filter(invitation_code=invitation_code).first()
-            if equipment_obj:
-                equipment_number = equipment_obj.number
+        invitation_code = request.user.invitation_code
+        value = request._request.POST.get('value')
+        equipment_obj = models.Equipment.objects.filter(invitation_code=invitation_code).first()
+        if equipment_obj:
+            equipment_number = equipment_obj.number
                 # 建立链接,服务器为客户端，硬件为服务端
-                address_ip = equipment_obj.ip
-                address_port = equipment_obj.port
-                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                ip_port = ('127.0.0.1', 3367)
-                sock.connect(ip_port)
-                send_data_dict = {
+            address_ip = equipment_obj.ip
+            address_port = equipment_obj.port
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            ip_port = ('0.0.0.0', 3368)
+            sock.connect(ip_port)
+            send_data_dict = {
                     "address_ip": address_ip,
                     "address_port": address_port,
                     "value": value,
                     "number": equipment_number
                 }
-                send_data_str = json.dumps(send_data_dict)
-                data = bytes(send_data_str, 'utf-8')
-                sock.send(data)
-                sock.close()
-            else:
-                responses['code'] = 3003
-                responses['message'] = "该验证码无可用设备"
-                responses['data'] = []
-        except Exception as e:
-            responses['code'] = 3002
-            responses['message'] = "请求异常"
+            send_data_str = json.dumps(send_data_dict)
+            data = bytes(send_data_str, 'utf-8')
+            sock.send(data)
+            sock.close()
+        else:
+            responses['code'] = 3003
+            responses['message'] = "该验证码无可用设备"
+            responses['data'] = []
         return JsonResponse(responses)
 
 
