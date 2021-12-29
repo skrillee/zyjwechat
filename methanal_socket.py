@@ -18,13 +18,16 @@ socket_hashMap = {}
 
 def heartbeat_wifi():
     for socket_object in socket_hashMap:
-        local_time = datetime.datetime.now()
-        local_time_month = str(local_time.month)
-        local_time_day = str(local_time.day)
-        local_time_hour = str(local_time.hour + 8)
-        local_time_minute = str(local_time.minute)
-        local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour + ':' + local_time_minute
-        socket_hashMap[socket_object].send(('connected,' + local_time_result).encode(),)
+        try:
+            local_time = datetime.datetime.now()
+            local_time_month = str(local_time.month)
+            local_time_day = str(local_time.day)
+            local_time_hour = str(local_time.hour + 8)
+            local_time_minute = str(local_time.minute)
+            local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour + ':' + local_time_minute
+            socket_hashMap[socket_object].send(('connected,' + local_time_result).encode(),)
+        except:
+            pass
 
 
 schedule.every(5).seconds.do(heartbeat_wifi)
@@ -54,57 +57,61 @@ class MyServer(socketserver.BaseRequestHandler):
             flag = True
             threading.Thread(target=start_heartbeat).start()
             while flag:
-                receive_data_encode = conn.recv(6144)
-                receive_data_decode = receive_data_encode.decode()
-                if receive_data_decode:
-                    time.sleep(0.1)
-                    receive_data_json = json.loads(receive_data_decode)
-                    number = receive_data_json['number']
-                    if receive_data_json['value'] == 'close':
-                        invitation_code = models.Equipment.objects.filter(number=number).first().invitation_code
-                        models.Methanal.objects.create(number=number, time=times, invitation_code=invitation_code,
-                                                       methanal_value=methanal_value, ip=address_ip, port=address_port)
-                        conn.close()
-                        flag = False
-                    elif 'wifi' in receive_data_json['value']:
-                        local_time = datetime.datetime.now()
-                        local_time_month = str(local_time.month)
-                        local_time_day = str(local_time.day)
-                        local_time_hour = str(local_time.hour+8)
-                        local_time_minute = str(local_time.minute)
-                        local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour + ':' + local_time_minute
-                        receive_number = receive_data_json['number']
-                        hash_map_request = socket_hashMap[receive_number]
-                        wifi_data = receive_data_json['value']
-                        hash_map_request.send((wifi_data+',' + local_time_result).encode(),)
-                        conn.close()
-                        time.sleep(610)
-                        flag = False
-                    elif receive_data_json['value'] == 'start':
-                        # client_address_ip = receive_data_json['address_ip']
-                        # client_address_port = receive_data_json['address_port']
-                        local_time = datetime.datetime.now()
-                        local_time_month = str(local_time.month)
-                        local_time_day = str(local_time.day)
-                        local_time_hour = str(local_time.hour+8)
-                        local_time_minute = str(local_time.minute)
-                        local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour + ':' + local_time_minute
-                        receive_number = receive_data_json['number']
-                        hash_map_request = socket_hashMap[receive_number]
-                        hash_map_request.send(('start,' + local_time_result).encode(),)
-                        # conn.close()
-                        # time.sleep(610)
-                        # flag = False
-                    elif receive_data_json['value'] == 'bind':
-                        models.Equipment.objects.update_or_create(
-                            defaults={'port': address_port, 'ip': address_ip},
-                            number=number)
-                        receive_number = receive_data_json['number']
-                        socket_hashMap[receive_number] = self.request
-                    else:
-                        receive_data_json_value = json.dumps(receive_data_json['value'])
-                        methanal_value += receive_data_json_value + ';'
-                        times += receive_data_json['time'] + ','
+                try:
+                    receive_data_encode = conn.recv(256)
+                    receive_data_decode = receive_data_encode.decode()
+                    if receive_data_decode:
+                        time.sleep(0.1)
+                        receive_data_json = json.loads(receive_data_decode)
+                        number = receive_data_json['number']
+                        if receive_data_json['value'] == 'close':
+                            invitation_code = models.Equipment.objects.filter(number=number).first().invitation_code
+                            models.Methanal.objects.create(number=number, time=times, invitation_code=invitation_code,
+                                                           methanal_value=methanal_value, ip=address_ip, port=address_port)
+                            conn.close()
+                            flag = False
+                        elif 'wifi' in receive_data_json['value']:
+                            local_time = datetime.datetime.now()
+                            local_time_month = str(local_time.month)
+                            local_time_day = str(local_time.day)
+                            local_time_hour = str(local_time.hour+8)
+                            local_time_minute = str(local_time.minute)
+                            local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour + ':' + local_time_minute
+                            receive_number = receive_data_json['number']
+                            hash_map_request = socket_hashMap[receive_number]
+                            wifi_data = receive_data_json['value']
+                            hash_map_request.send((wifi_data+',' + local_time_result).encode(),)
+                            conn.close()
+                            time.sleep(610)
+                            flag = False
+                        elif receive_data_json['value'] == 'start':
+                            # client_address_ip = receive_data_json['address_ip']
+                            # client_address_port = receive_data_json['address_port']
+                            local_time = datetime.datetime.now()
+                            local_time_month = str(local_time.month)
+                            local_time_day = str(local_time.day)
+                            local_time_hour = str(local_time.hour+8)
+                            local_time_minute = str(local_time.minute)
+                            local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour + ':' + local_time_minute
+                            receive_number = receive_data_json['number']
+                            hash_map_request = socket_hashMap[receive_number]
+                            hash_map_request.send(('start,' + local_time_result).encode(),)
+                            # conn.close()
+                            # time.sleep(610)
+                            # flag = False
+                        elif receive_data_json['value'] == 'bind':
+                            models.Equipment.objects.update_or_create(
+                                defaults={'port': address_port, 'ip': address_ip},
+                                number=number)
+                            receive_number = receive_data_json['number']
+                            socket_hashMap[receive_number] = self.request
+                        else:
+                            receive_data_json_value = json.dumps(receive_data_json['value'])
+                            methanal_value += receive_data_json_value + ';'
+                            times += receive_data_json['time'] + ','
+                except:
+                    flag = False
+                    conn.close()
         except OSError as e:
             conn.close()
 
