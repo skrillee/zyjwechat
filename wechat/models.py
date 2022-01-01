@@ -128,6 +128,7 @@ class Classification(models.Model):
     size = models.CharField('规格尺寸', max_length=64, null=True)
     details = models.CharField('详情介绍', max_length=1024, null=True)
     evaluate = models.CharField('30平米包工包料价格', max_length=64, null=True)
+    images_parameter = models.CharField('图片', max_length=1024, null=True)
 
     class Meta:
         verbose_name = '种类'

@@ -375,7 +375,6 @@ class Classification(APIView):
             characteristic = request._request.POST.get('characteristic')
             name = request._request.POST.get('name')
             discount = request._request.POST.get('discount')
-            discount = request._request.POST.get('discount')
             classification_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/classification/"
             retail = request.user.Retail
             retail_id = retail.id
@@ -385,6 +384,7 @@ class Classification(APIView):
                 classification_object_dict = {'name': classification.name, 'product_name': classification.product_name,
                                               'reference_price': classification.reference_price, 'images_big': classification_url+classification.images_big,
                                               'characteristic': classification.characteristic, 'discount': classification.discount,
+                                              'images_parameter': classification_url+classification.images_parameter,
                                               'original_price': classification.original_price, 'manual_price': classification.manual_price,
                                               'size': classification.size, 'details': classification.details,
                                               'evaluate': classification.evaluate
