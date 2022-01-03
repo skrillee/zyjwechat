@@ -469,7 +469,7 @@ class Methanal(APIView):
             address_ip = equipment_obj.ip
             address_port = equipment_obj.port
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            ip_port = ('0.0.0.0', 3368)
+            ip_port = ('0.0.0.0', 3367)
             sock.connect(ip_port)
             send_data_dict = {
                     "address_ip": address_ip,

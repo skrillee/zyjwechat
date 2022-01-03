@@ -36,8 +36,11 @@ schedule.every(5).seconds.do(heartbeat_wifi)
 
 def start_heartbeat():
     while True:
-        schedule.run_pending()
-        time.sleep(1)
+        try:
+            schedule.run_pending()
+            time.sleep(1)
+        except:
+            break
 
 
 class MyServer(socketserver.BaseRequestHandler):
@@ -121,6 +124,6 @@ class MyServer(socketserver.BaseRequestHandler):
 
 if __name__ == '__main__':
     # start_heartbeat()
-    server = socketserver.ThreadingTCPServer(('0.0.0.0', 3368), MyServer)
+    server = socketserver.ThreadingTCPServer(('0.0.0.0', 3367), MyServer)
     server.serve_forever()
 
