@@ -99,9 +99,9 @@ class MyServer(socketserver.BaseRequestHandler):
                             receive_number = receive_data_json['number']
                             hash_map_request = socket_hashMap[receive_number]
                             hash_map_request.send(('start,' + local_time_result).encode(),)
-                            # conn.close()
-                            # time.sleep(610)
-                            # flag = False
+
+                            time.sleep(15)
+
                         elif receive_data_json['value'] == 'bind':
                             models.Equipment.objects.update_or_create(
                                 defaults={'port': address_port, 'ip': address_ip},
@@ -124,6 +124,8 @@ class MyServer(socketserver.BaseRequestHandler):
 
 if __name__ == '__main__':
     # start_heartbeat()
-    server = socketserver.ThreadingTCPServer(('0.0.0.0', 3367), MyServer)
-    server.serve_forever()
-
+    try:
+        server = socketserver.ThreadingTCPServer(('0.0.0.0', 3367), MyServer)
+        server.serve_forever()
+    except:
+        pass
