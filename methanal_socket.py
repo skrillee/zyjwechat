@@ -123,15 +123,20 @@ class MyServer(socketserver.BaseRequestHandler):
         pass
 
 
-def main():
-    with socketserver.ThreadingTCPServer(('0.0.0.0', 3367), MyServer, False) as server:
-        # 防止端口占用
-        server.socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-        server.server_bind()  # 自己绑定
-        server.server_activate()  # 自己激活
-        server.serve_forever()
+# def main():
+#     with socketserver.ThreadingTCPServer(('127.0.0.1', 3367), MyServer, False) as server:
+#         # 防止端口占用
+#         server.socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+#         server.server_bind()  # 自己绑定
+#         server.server_activate()  # 自己激活
+#         server.serve_forever()
 
 
 if __name__ == '__main__':
     # start_heartbeat()
-    main()
+    # main()
+    try:
+        server = socketserver.ThreadingTCPServer(('0.0.0.0', 3367), MyServer)
+        server.serve_forever()
+    except:
+        pass
