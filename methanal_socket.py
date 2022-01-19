@@ -28,10 +28,11 @@ def heartbeat_wifi():
             local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour + ':' + local_time_minute
             socket_hashMap[socket_object].send(('connected,' + local_time_result).encode(),)
         except:
-            pass
+            socket_hashMap.pop(socket_object)
 
 
-schedule.every(5).seconds.do(heartbeat_wifi)
+if socket_hashMap:
+    schedule.every(5).seconds.do(heartbeat_wifi)
 # schedule.every().hour.do(heartbeat_wifi)
 
 
@@ -101,6 +102,7 @@ class MyServer(socketserver.BaseRequestHandler):
                             hash_map_request = socket_hashMap[receive_number]
                             hash_map_request.send(('start,' + local_time_result).encode(),)
 
+
                             time.sleep(15)
 
                         elif receive_data_json['value'] == 'bind':
@@ -136,7 +138,7 @@ if __name__ == '__main__':
     # start_heartbeat()
     # main()
     try:
-        server = socketserver.ThreadingTCPServer(('0.0.0.0', 3367), MyServer)
+        server = socketserver.ThreadingTCPServer(('127.0.0.1', 3367), MyServer)
         server.serve_forever()
     except:
         pass
