@@ -18,21 +18,22 @@ socket_hashMap = {}
 
 
 def heartbeat_wifi():
-    for socket_object in socket_hashMap:
-        try:
-            local_time = datetime.datetime.now()
-            local_time_month = str(local_time.month)
-            local_time_day = str(local_time.day)
-            local_time_hour = str(local_time.hour + 8)
-            local_time_minute = str(local_time.minute)
-            local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour + ':' + local_time_minute
-            socket_hashMap[socket_object].send(('connected,' + local_time_result).encode(),)
-        except:
-            socket_hashMap.pop(socket_object)
+    if socket_hashMap:
+        for socket_object in socket_hashMap:
+            try:
+                local_time = datetime.datetime.now()
+                local_time_month = str(local_time.month)
+                local_time_day = str(local_time.day)
+                local_time_hour = str(local_time.hour + 8)
+                local_time_minute = str(local_time.minute)
+                local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour + ':' + local_time_minute
+                socket_hashMap[socket_object].send(('connected,' + local_time_result).encode(),)
+            except:
+                socket_hashMap.pop(socket_object)
 
 
-if socket_hashMap:
-    schedule.every(5).seconds.do(heartbeat_wifi)
+# if socket_hashMap:
+schedule.every(5).seconds.do(heartbeat_wifi)
 # schedule.every().hour.do(heartbeat_wifi)
 
 
