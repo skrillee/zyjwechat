@@ -28,8 +28,11 @@ def heartbeat_wifi():
                 local_time_minute = str(local_time.minute)
                 local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour + ':' + local_time_minute
                 socket_hashMap[socket_object].send(('connected,' + local_time_result).encode(),)
+                return True
             except:
                 socket_hashMap.pop(socket_object)
+    else:
+        time.sleep(5)
 
 
 # if socket_hashMap:
@@ -38,6 +41,7 @@ schedule.every(5).seconds.do(heartbeat_wifi)
 
 
 def start_heartbeat():
+    # flag = True
     while True:
         try:
             schedule.run_pending()
@@ -139,7 +143,7 @@ if __name__ == '__main__':
     # start_heartbeat()
     # main()
     try:
-        server = socketserver.ThreadingTCPServer(('127.0.0.1', 3367), MyServer)
+        server = socketserver.ThreadingTCPServer(('0.0.0.0', 3367), MyServer)
         server.serve_forever()
     except:
         pass
