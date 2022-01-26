@@ -120,6 +120,8 @@ class MyServer(socketserver.BaseRequestHandler):
                             receive_data_json_value = json.dumps(receive_data_json['value'])
                             methanal_value += receive_data_json_value + ';'
                             times += receive_data_json['time'] + ','
+                    else:
+                        flag = False
                 except:
                     flag = False
                     conn.close()
