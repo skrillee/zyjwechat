@@ -123,8 +123,8 @@ class MyServer(socketserver.BaseRequestHandler):
                             invitation_code = models.Equipment.objects.filter(number=number).first().invitation_code
                             models.Methanal.objects.create(number=number, time=times, invitation_code=invitation_code,
                                                            methanal_value=methanal_value, ip=address_ip, port=address_port)
-                            conn.close()
-                            flag = False
+                            # conn.close()
+                            # flag = False
                     else:
                         flag = False
                 except:
@@ -150,7 +150,7 @@ if __name__ == '__main__':
     # start_heartbeat()
     # main()
     try:
-        server = socketserver.ThreadingTCPServer(('0.0.0.0', 3367), MyServer)
+        server = socketserver.ThreadingTCPServer(('127.0.0.1', 3367), MyServer)
         server.serve_forever()
     except:
         pass
