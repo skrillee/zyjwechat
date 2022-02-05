@@ -120,6 +120,11 @@ class MyServer(socketserver.BaseRequestHandler):
                             receive_data_json_value = json.dumps(receive_data_json['value'])
                             methanal_value += receive_data_json_value + ';'
                             times += receive_data_json['time'] + ','
+                            invitation_code = models.Equipment.objects.filter(number=number).first().invitation_code
+                            models.Methanal.objects.create(number=number, time=times, invitation_code=invitation_code,
+                                                           methanal_value=methanal_value, ip=address_ip, port=address_port)
+                            conn.close()
+                            flag = False
                     else:
                         flag = False
                 except:
