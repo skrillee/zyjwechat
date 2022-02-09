@@ -61,7 +61,7 @@ class MyServer(socketserver.BaseRequestHandler):
         conn = self.request
         address_ip = self.client_address[0]
         address_port = self.client_address[1]
-        methanal_value = ''
+        # methanal_value = ''
         times = ''
         try:
             flag = True
@@ -75,11 +75,11 @@ class MyServer(socketserver.BaseRequestHandler):
                         receive_data_json = json.loads(receive_data_decode)
                         number = receive_data_json['number']
                         if receive_data_json['value'] == 'close':
-                            invitation_code = models.Equipment.objects.filter(number=number).first().invitation_code
-                            models.Methanal.objects.create(number=number, time=times, invitation_code=invitation_code,
-                                                           methanal_value=methanal_value, ip=address_ip, port=address_port)
-                            conn.close()
-                            flag = False
+                            # invitation_code = models.Equipment.objects.filter(number=number).first().invitation_code
+                            # models.Methanal.objects.create(number=number, time=times, invitation_code=invitation_code, methanal_value=methanal_value, ip=address_ip, port=address_port)
+                            # conn.close()
+                            # flag = False
+                            pass
                         elif 'wifi' in receive_data_json['value']:
                             local_time = datetime.datetime.now()
                             local_time_month = str(local_time.month)
@@ -106,8 +106,6 @@ class MyServer(socketserver.BaseRequestHandler):
                             receive_number = receive_data_json['number']
                             hash_map_request = socket_hashMap[receive_number]
                             hash_map_request.send(('start,' + local_time_result).encode(),)
-
-
                             time.sleep(15)
 
                         elif receive_data_json['value'] == 'bind':
@@ -118,11 +116,17 @@ class MyServer(socketserver.BaseRequestHandler):
                             socket_hashMap[receive_number] = self.request
                         else:
                             receive_data_json_value = json.dumps(receive_data_json['value'])
-                            methanal_value += receive_data_json_value + ';'
+                            # methanal_value += receive_data_json_value + ';'
                             times += receive_data_json['time'] + ','
                             invitation_code = models.Equipment.objects.filter(number=number).first().invitation_code
-                            models.Methanal.objects.create(number=number, time=times, invitation_code=invitation_code,
-                                                           methanal_value=methanal_value, ip=address_ip, port=address_port)
+                            models.Methanal.objects.update_or_create(
+                                defaults={'number': number,
+                                          'invitation_code': invitation_code,
+                                          'methanal_value': receive_data_json_value,
+                                          'ip': address_ip,
+                                          'port': address_port
+                                          },
+                                time=times, )
                             # conn.close()
                             # flag = False
                     else:
@@ -150,7 +154,7 @@ if __name__ == '__main__':
     # start_heartbeat()
     # main()
     try:
-        server = socketserver.ThreadingTCPServer(('127.0.0.1', 3367), MyServer)
+        server = socketserver.ThreadingTCPServer(('0.0.0.0', 3367), MyServer)
         server.serve_forever()
     except:
         pass

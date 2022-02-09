@@ -558,3 +558,49 @@ class Banner(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+import collections
+AirContent = collections.namedtuple('AirContent', ('tvoc', 'co2'))
+
+
+class AirQuality(object):
+    def __init__(self):
+        self._contents = []
+
+    def report_content(self, tvoc, co2):
+        self._contents.append(AirContent(tvoc, co2))
+
+    def average_content(self):
+        average = {
+            'tvoc': '',
+            'co2': ''
+        }
+        tvoc_total, co2_total = 0, 0
+        quantity = len(self._contents)
+        for content in self._contents:
+            tvoc_total += content.tvoc
+            co2_total += content.co2
+        average['tvoc'] = tvoc_total / quantity
+        average['co2'] = co2_total / quantity
+        return average
+
+
+class Equipment(object):
+    def __init__(self):
+        self._equipments = {}
+
+    def subject(self, name):
+        if name not in self._equipments:
+            self._equipments[name] = AirQuality()
+        return self._equipments[name]
+
+
+class CustomerData(object):
+    def __init__(self):
+        self._customers = {}
+
+    def customer(self, equipment_number):
+        if equipment_number not in self._customers:
+            self._customers[equipment_number] = Equipment()
+        return self._customers[equipment_number]
