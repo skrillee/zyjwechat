@@ -24,7 +24,7 @@ def heartbeat_wifi():
                 local_time = datetime.datetime.now()
                 local_time_month = str(local_time.month)
                 local_time_day = str(local_time.day)
-                local_time_hour = str(local_time.hour + 8)
+                local_time_hour = str(local_time.hour)
                 local_time_minute = str(local_time.minute)
                 local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour + ':' + local_time_minute
                 socket_hashMap[socket_object].send(('connected,' + local_time_result).encode(),)
@@ -61,7 +61,7 @@ class MyServer(socketserver.BaseRequestHandler):
         conn = self.request
         address_ip = self.client_address[0]
         address_port = self.client_address[1]
-        # methanal_value = ''
+        methanal_value = ''
         times = ''
         try:
             flag = True
@@ -75,16 +75,16 @@ class MyServer(socketserver.BaseRequestHandler):
                         receive_data_json = json.loads(receive_data_decode)
                         number = receive_data_json['number']
                         if receive_data_json['value'] == 'close':
-                            # invitation_code = models.Equipment.objects.filter(number=number).first().invitation_code
-                            # models.Methanal.objects.create(number=number, time=times, invitation_code=invitation_code, methanal_value=methanal_value, ip=address_ip, port=address_port)
-                            # conn.close()
-                            # flag = False
-                            pass
+                            invitation_code = models.Equipment.objects.filter(number=number).first().invitation_code
+                            models.Methanal.objects.create(number=number, time=times, invitation_code=invitation_code,
+                                                           methanal_value=methanal_value, ip=address_ip, port=address_port)
+                            conn.close()
+                            flag = False
                         elif 'wifi' in receive_data_json['value']:
                             local_time = datetime.datetime.now()
                             local_time_month = str(local_time.month)
                             local_time_day = str(local_time.day)
-                            local_time_hour = str(local_time.hour+8)
+                            local_time_hour = str(local_time.hour)
                             local_time_minute = str(local_time.minute)
                             local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour + ':' + local_time_minute
                             receive_number = receive_data_json['number']
@@ -100,7 +100,7 @@ class MyServer(socketserver.BaseRequestHandler):
                             local_time = datetime.datetime.now()
                             local_time_month = str(local_time.month)
                             local_time_day = str(local_time.day)
-                            local_time_hour = str(local_time.hour+8)
+                            local_time_hour = str(local_time.hour)
                             local_time_minute = str(local_time.minute)
                             local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour + ':' + local_time_minute
                             receive_number = receive_data_json['number']
@@ -115,20 +115,28 @@ class MyServer(socketserver.BaseRequestHandler):
                             receive_number = receive_data_json['number']
                             socket_hashMap[receive_number] = self.request
                         else:
-                            receive_data_json_value = json.dumps(receive_data_json['value'])
+                            # receive_data_json_value = json.dumps(receive_data_json['value'])
                             # methanal_value += receive_data_json_value + ';'
-                            times += receive_data_json['time'] + ','
+                            #
+                            # times += receive_data_json['time'] + ','
+                            #
+                            # invitation_code = models.Equipment.objects.filter(number=number).first().invitation_code
+                            # models.Methanal.objects.create(number=number, time=times, invitation_code=invitation_code,
+                            #                                methanal_value=methanal_value, ip=address_ip, port=address_port)
+                            # conn.close()
+                            # flag = False
+                            receive_data_json_value = json.dumps(receive_data_json['value'])
+                            methanal_value = receive_data_json_value + ';'
+                            times = receive_data_json['time'] + ','
                             invitation_code = models.Equipment.objects.filter(number=number).first().invitation_code
                             models.Methanal.objects.update_or_create(
                                 defaults={'number': number,
                                           'invitation_code': invitation_code,
-                                          'methanal_value': receive_data_json_value,
+                                          'methanal_value': methanal_value,
                                           'ip': address_ip,
                                           'port': address_port
                                           },
                                 time=times, )
-                            # conn.close()
-                            # flag = False
                     else:
                         flag = False
                 except:
