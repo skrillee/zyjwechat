@@ -497,7 +497,12 @@ class Methanal(APIView):
             send_data_str = json.dumps(send_data_dict)
             data = bytes(send_data_str, 'utf-8')
             # 建立链接,服务器为客户端，硬件为服务端
-            connect_send_start_message(data, equipment_number)
+            try:
+                connect_send_start_message(data, equipment_number)
+            except:
+                responses['code'] = 3004
+                responses['message'] = "设备正在联网，请稍后(尝试断开设备电源重新接入)"
+                responses['data'] = []
         else:
             responses['code'] = 3003
             responses['message'] = "该验证码无可用设备"
