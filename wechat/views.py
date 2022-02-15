@@ -460,20 +460,17 @@ def connect_send_start_message(data, equipment_number):
         if equipment_number in [key for key, value in socket_hashMap.items()]:
             sock = socket_hashMap[equipment_number]
             sock.send(data)
-            sock.close()
         else:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             ip_port = ('0.0.0.0', 3367)
             sock.connect(ip_port)
             sock.send(data)
-            sock.close()
             socket_hashMap[equipment_number] = sock
     else:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         ip_port = ('0.0.0.0', 3367)
         sock.connect(ip_port)
         sock.send(data)
-        sock.close()
         socket_hashMap[equipment_number] = sock
 
 
