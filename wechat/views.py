@@ -469,9 +469,10 @@ class Methanal(APIView):
             address_ip = equipment_obj.ip
             address_port = equipment_obj.port
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            l_onoff = 1
-            l_linger = 0
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack('ii', l_onoff, l_linger))
+            # l_onoff = 1
+            # l_linger = 0
+            # sock.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack('ii', l_onoff, l_linger))
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             ip_port = ('0.0.0.0', 3367)
             sock.connect(ip_port)
             send_data_dict = {
