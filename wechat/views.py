@@ -469,6 +469,9 @@ class Methanal(APIView):
             address_ip = equipment_obj.ip
             address_port = equipment_obj.port
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            l_onoff = 1
+            l_linger = 0
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack('ii', l_onoff, l_linger))
             ip_port = ('0.0.0.0', 3367)
             sock.connect(ip_port)
             send_data_dict = {
@@ -480,7 +483,7 @@ class Methanal(APIView):
             send_data_str = json.dumps(send_data_dict)
             data = bytes(send_data_str, 'utf-8')
             sock.send(data)
-            # sock.close()
+            sock.close()
         else:
             responses['code'] = 3003
             responses['message'] = "该验证码无可用设备"
