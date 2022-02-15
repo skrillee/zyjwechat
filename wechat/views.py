@@ -479,7 +479,7 @@ class Voucher(APIView):
 def connect_send_start_message(data, equipment_number):
     equipment_number_start = equipment_number + 'start'
     if socket_hashMap:
-        if equipment_number in [key for key, value in socket_hashMap.items()]:
+        if equipment_number_start in [key for key, value in socket_hashMap.items()]:
             sock = socket_hashMap[equipment_number_start]
             sock.send(data)
         else:
