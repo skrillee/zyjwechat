@@ -480,7 +480,7 @@ def connect_send_start_message(data, equipment_number):
     equipment_number_start = equipment_number + 'start'
     if socket_hashMap:
         if equipment_number in [key for key, value in socket_hashMap.items()]:
-            sock = socket_hashMap[equipment_number]
+            sock = socket_hashMap[equipment_number_start]
             sock.send(data)
         else:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
