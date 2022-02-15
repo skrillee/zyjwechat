@@ -106,7 +106,7 @@ class MyServer(socketserver.BaseRequestHandler):
                             receive_number = receive_data_json['number']
                             hash_map_request = socket_hashMap[receive_number]
                             hash_map_request.send(('start,' + local_time_result).encode(),)
-                            time.sleep(15)
+                            # time.sleep(15)
 
                         elif receive_data_json['value'] == 'bind':
                             models.Equipment.objects.update_or_create(

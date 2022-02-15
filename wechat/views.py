@@ -452,6 +452,27 @@ class Voucher(APIView):
         return JsonResponse(responses)
 
 
+socket_hashMap = {}
+
+
+def connect_send_start_message(data, equipment_number):
+    if socket_hashMap:
+        if equipment_number in [key for key, value in socket_hashMap.items()]:
+            sock = socket_hashMap[equipment_number]
+            sock.send(data)
+            sock.close()
+        else:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            ip_port = ('0.0.0.0', 3367)
+            sock.connect(ip_port)
+            socket_hashMap[equipment_number] = sock
+    else:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        ip_port = ('0.0.0.0', 3367)
+        sock.connect(ip_port)
+        socket_hashMap[equipment_number] = sock
+
+
 # noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
 class Methanal(APIView):
 
@@ -465,22 +486,18 @@ class Methanal(APIView):
         equipment_obj = models.Equipment.objects.filter(invitation_code=invitation_code).first()
         if equipment_obj:
             equipment_number = equipment_obj.number
-                # 建立链接,服务器为客户端，硬件为服务端
             address_ip = equipment_obj.ip
             address_port = equipment_obj.port
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            ip_port = ('0.0.0.0', 3367)
-            sock.connect(ip_port)
             send_data_dict = {
-                    "address_ip": address_ip,
-                    "address_port": address_port,
-                    "value": value,
-                    "number": equipment_number
-                }
+                "address_ip": address_ip,
+                "address_port": address_port,
+                "value": value,
+                "number": equipment_number
+            }
             send_data_str = json.dumps(send_data_dict)
             data = bytes(send_data_str, 'utf-8')
-            sock.send(data)
-            sock.close()
+            # 建立链接,服务器为客户端，硬件为服务端
+            connect_send_start_message(data, equipment_number)
         else:
             responses['code'] = 3003
             responses['message'] = "该验证码无可用设备"
