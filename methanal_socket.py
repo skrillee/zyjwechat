@@ -65,7 +65,7 @@ class MyServer(socketserver.BaseRequestHandler):
         times = ''
         try:
             flag = True
-            if address_ip is not '127.0.0.1':
+            if address_ip != '0.0.0.0':
                 threading.Thread(target=start_heartbeat).start()
             while flag:
                 try:
