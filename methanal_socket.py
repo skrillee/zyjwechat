@@ -65,7 +65,8 @@ class MyServer(socketserver.BaseRequestHandler):
         times = ''
         try:
             flag = True
-            threading.Thread(target=start_heartbeat).start()
+            if address_ip is not '127.0.0.1':
+                threading.Thread(target=start_heartbeat).start()
             while flag:
                 try:
                     receive_data_encode = conn.recv(256)
@@ -108,7 +109,7 @@ class MyServer(socketserver.BaseRequestHandler):
                             hash_map_request.send(('start,' + local_time_result).encode(),)
                             # time.sleep(15)
                             conn.close()
-                            time.sleep(610)
+                            # time.sleep(610)
                             flag = False
                         elif receive_data_json['value'] == 'bind':
                             models.Equipment.objects.update_or_create(
