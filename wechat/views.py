@@ -3,8 +3,6 @@ __author__ = 'Yan.zhe 2021.09.28'
 from django.shortcuts import HttpResponse
 from rest_framework.views import APIView
 from django.http import JsonResponse
-
-from methanal_socket import socket_hashMap
 from zyjwechat import settings
 from wechat import models
 import socket
@@ -454,48 +452,6 @@ class Voucher(APIView):
         return JsonResponse(responses)
 
 
-# socket_hashMap = {}
-# import socketserver
-#
-#
-# class ConnectServer(socketserver.BaseRequestHandler):
-#     def __init__(self, request: '', client_address: '', server: ''):
-#         super().__init__(request, client_address, server)
-#
-#     def setup(self):
-#         pass
-#
-#     def handle(self):
-#         pass
-#
-#     def finish(self):
-#         pass
-#
-#
-# server = socketserver.ThreadingTCPServer(('0.0.0.0', 3368), ConnectServer)
-# server.serve_forever()
-
-
-def connect_send_start_message(data, equipment_number):
-    equipment_number_start = equipment_number + 'start'
-    if socket_hashMap:
-        if equipment_number_start in [key for key, value in socket_hashMap.items()]:
-            sock = socket_hashMap[equipment_number_start]
-            sock.send(data)
-        else:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            ip_port = ('0.0.0.0', 3367)
-            sock.connect(ip_port)
-            sock.send(data)
-            socket_hashMap[equipment_number_start] = sock
-    else:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        ip_port = ('0.0.0.0', 3367)
-        sock.connect(ip_port)
-        sock.send(data)
-        socket_hashMap[equipment_number_start] = sock
-
-
 # noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
 class Methanal(APIView):
 
@@ -509,23 +465,22 @@ class Methanal(APIView):
         equipment_obj = models.Equipment.objects.filter(invitation_code=invitation_code).first()
         if equipment_obj:
             equipment_number = equipment_obj.number
+                # 建立链接,服务器为客户端，硬件为服务端
             address_ip = equipment_obj.ip
             address_port = equipment_obj.port
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            ip_port = ('0.0.0.0', 3367)
+            sock.connect(ip_port)
             send_data_dict = {
-                "address_ip": address_ip,
-                "address_port": address_port,
-                "value": value,
-                "number": equipment_number
-            }
+                    "address_ip": address_ip,
+                    "address_port": address_port,
+                    "value": value,
+                    "number": equipment_number
+                }
             send_data_str = json.dumps(send_data_dict)
             data = bytes(send_data_str, 'utf-8')
-            # 建立链接,服务器为客户端，硬件为服务端
-            try:
-                connect_send_start_message(data, equipment_number)
-            except:
-                responses['code'] = 3004
-                responses['message'] = "设备正在联网，请稍后(尝试断开设备电源重新接入)"
-                responses['data'] = []
+            sock.send(data)
+            # sock.close()
         else:
             responses['code'] = 3003
             responses['message'] = "该验证码无可用设备"
