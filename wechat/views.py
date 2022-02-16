@@ -480,7 +480,17 @@ def connect_send_start_message(data, equipment_number):
     if socket_hashMap:
         if equipment_number_start in [key for key, value in socket_hashMap.items()]:
             sock = socket_hashMap[equipment_number_start]
-            sock.send(data)
+            try:
+                sock.send(data)
+            except:
+                """ 
+                    防止服务端出现问题后（如并发问题）倒置此连接关闭，关闭后重新连接
+                """
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                ip_port = ('0.0.0.0', 3367)
+                sock.connect(ip_port)
+                sock.send(data)
+                socket_hashMap[equipment_number_start] = sock
         else:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             ip_port = ('0.0.0.0', 3367)
