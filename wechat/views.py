@@ -559,7 +559,7 @@ class Result(APIView):
             if methanal_obj:
                 methanal_time = methanal_obj.time
                 methanal_time_list.append(methanal_time)
-                methanal_value_dict = json.loads(methanal_obj)
+                methanal_value_dict = json.loads(methanal_obj.methanal_value)
                 value_CO2_list.append(methanal_value_dict['CO2'])
                 value_methanal_list.append(methanal_value_dict['methanal'])
                 methanal_dict = {
