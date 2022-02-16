@@ -553,20 +553,15 @@ class Result(APIView):
         try:
             invitation_code = request.user.invitation_code
             methanal_obj = models.Methanal.objects.filter(invitation_code=invitation_code).order_by('-id').first()
+            methanal_time_list = []
+            value_methanal_list = []
+            value_CO2_list = []
             if methanal_obj:
-                methanal_time_list = methanal_obj.time.split(',')
-                methanal_value_str = methanal_obj.methanal_value
-                methanal_time_list.pop()
-                value_CO2_list = []
-                value_methanal_list = []
-                methanal_value_list = methanal_value_str.split(';')
-                methanal_value_list.pop()
-                for methanal_value in methanal_value_list:
-                    methanal_value_dict = json.loads(methanal_value)
-                    value_CO2 = methanal_value_dict['CO2']
-                    value_methanal = methanal_value_dict['methanal']
-                    value_CO2_list.append(value_CO2)
-                    value_methanal_list.append(value_methanal)
+                methanal_time = methanal_obj.time
+                methanal_time_list.append(methanal_time)
+                methanal_value_dict = json.loads(methanal_obj)
+                value_CO2_list.append(methanal_value_dict['CO2'])
+                value_methanal_list.append(methanal_value_dict['methanal'])
                 methanal_dict = {
                     "methanal_time": methanal_time_list,
                     "methanal_value": value_methanal_list,
@@ -576,7 +571,6 @@ class Result(APIView):
             else:
                 responses['code'] = 3003
                 responses['message'] = "该验证码无可用设备"
-                responses['data'] = []
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"
