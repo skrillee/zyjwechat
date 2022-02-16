@@ -658,3 +658,34 @@ class CustomerData(object):
         if equipment_number not in self._customers:
             self._customers[equipment_number] = Equipment()
         return self._customers[equipment_number]
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class History(APIView):
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            invitation_code = request.user.invitation_code
+            history_obj = models.Methanal.objects.filter(invitation_code=invitation_code).order_by('id')
+            history_time_list = []
+            history_co2_list = []
+            history_tvoc_list = []
+            for history_data in history_obj:
+                history_time_list.append(history_data.time)
+                history_co2_tvoc = json.loads(history_data.methanal_value)
+                history_co2_list.append(history_co2_tvoc['CO2'])
+                history_tvoc_list.append(history_co2_tvoc['methanal'])
+            methanal_dict = {
+                "methanal_time": history_time_list,
+                "methanal_value": history_tvoc_list,
+                "CO2_value": history_co2_list
+            }
+            responses['data'] = methanal_dict
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)

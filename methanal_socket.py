@@ -120,19 +120,18 @@ class MyServer(socketserver.BaseRequestHandler):
                             receive_number = receive_data_json['number']
                             socket_hashMap[receive_number] = self.request
                         else:
-                            # receive_data_json_value = json.dumps(receive_data_json['value'])
-                            # methanal_value += receive_data_json_value + ';'
-                            #
-                            # times += receive_data_json['time'] + ','
-                            #
-                            # invitation_code = models.Equipment.objects.filter(number=number).first().invitation_code
-                            # models.Methanal.objects.create(number=number, time=times, invitation_code=invitation_code,
-                            #                                methanal_value=methanal_value, ip=address_ip, port=address_port)
-                            # conn.close()
-                            # flag = False
                             receive_data_json_value = json.dumps(receive_data_json['value'])
-                            methanal_value = receive_data_json_value + ';'
-                            times = receive_data_json['time'] + ','
+                            # methanal_value = receive_data_json_value + ';'
+                            methanal_value = receive_data_json_value
+                            # times = receive_data_json['time'] + ','
+
+                            local_time = datetime.datetime.now()
+                            local_time_month = str(local_time.month)
+                            local_time_day = str(local_time.day)
+                            local_time_hour = str(local_time.hour)
+                            local_time_minute = str(local_time.minute)
+                            local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour + ':' + local_time_minute
+
                             invitation_code = models.Equipment.objects.filter(number=number).first().invitation_code
                             models.Methanal.objects.update_or_create(
                                 defaults={'number': number,
@@ -141,7 +140,7 @@ class MyServer(socketserver.BaseRequestHandler):
                                           'ip': address_ip,
                                           'port': address_port
                                           },
-                                time=times, )
+                                time=local_time_result, )
                     else:
                         flag = False
                 except:
