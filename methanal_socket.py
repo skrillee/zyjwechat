@@ -126,11 +126,11 @@ class MyServer(socketserver.BaseRequestHandler):
                             # times = receive_data_json['time'] + ','
 
                             local_time = datetime.datetime.now()
-                            local_time_month = str(local_time.month)
-                            local_time_day = str(local_time.day)
+                            # local_time_month = str(local_time.month)
+                            # local_time_day = str(local_time.day)
                             local_time_hour = str(local_time.hour)
                             local_time_minute = str(local_time.minute)
-                            local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour + ':' + local_time_minute
+                            local_time_result = local_time_hour + ':' + local_time_minute
 
                             invitation_code = models.Equipment.objects.filter(number=number).first().invitation_code
                             models.Methanal.objects.update_or_create(
