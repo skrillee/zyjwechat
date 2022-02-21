@@ -749,7 +749,7 @@ import xmltodict
 import time
 import random
 import string
-import sys
+
 # 生成一个以当前文件名为名字的logger实例
 
 class Login(APIView):
@@ -785,14 +785,9 @@ class Login(APIView):
         # xml 2 dict
         msg = response.text
         xmlmsg = xmltodict.parse(msg)
-
         return xmlmsg
 
     def post(self, request):
-        stdout_backup = sys.stdout
-        log_file = open("error.txt", "w")
-        sys.stdout = log_file
-        logger = print('11111111111')
         responses = {
             'code': 1000,
             'message': None
@@ -805,13 +800,10 @@ class Login(APIView):
                                 'wxc9ccd41f17a1fa42', 'bc8f9ad106f0975fedc5e83182c06d8a', wechat_code
             )
             data = requests.get(url_code_session)
-            print('22222222222222')
             if data.status_code == 200:
                 data_content = json.loads(data.content)
                 if "openid" in data_content:
                     openid = data_content.get('openid')
-                    print(openid)
-
                     url = "https://api.mch.weixin.qq.com/pay/unifiedorder"
                     nonce_str = generate_randomStr()  # 订单中加nonce_str字段记录（回调判断使用）
                     out_trade_no = '20226782122391'  # 支付单号，只能使用一次，不可重复支付
@@ -833,10 +825,6 @@ class Login(APIView):
                     param["sign"] = sign  # 加入签名
                     # 3. 调用接口
                     xmlmsg = send_xml_request(url, param)
-                    print('33333333333333333')
-                    print(xmlmsg)
-                    log_file.close()
-                    sys.stdout = stdout_backup
                     # 4. 获取prepay_id
                     if xmlmsg['xml']['return_code'] == 'SUCCESS':
                         if xmlmsg['xml']['result_code'] == 'SUCCESS':
