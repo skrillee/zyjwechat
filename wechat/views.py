@@ -812,7 +812,7 @@ class Login(APIView):
                         "out_trade_no": out_trade_no,  # 自己生成的订单号
                         "total_fee": 1,
                         "spbill_create_ip": '47.92.85.245',  # 发起统一下单的ip
-                        "spbill_create_ip": '47.92.85.245',  # 发起统一下单的ip
+                        # "spbill_create_ip": '47.92.85.245',  # 发起统一下单的ip
                         "notify_url": NOTIFY_URL,
                         "trade_type": 'JSAPI',  # 小程序写JSAPI
                         "openid": openid,
