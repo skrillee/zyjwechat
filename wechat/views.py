@@ -747,6 +747,9 @@ import xmltodict
 import time
 import random
 import string
+import logging
+# 生成一个以当前文件名为名字的logger实例
+logger = logging.getLogger(__name__)
 class Login(APIView):
 
     # 生成nonce_str
@@ -790,20 +793,21 @@ class Login(APIView):
         }
         try:
             wechat_code = request._request.POST.get('code')
-            # wechat_code = "041LHJFa161BGC0o9EFa1IBSez0LHJFT"
+            # wechat_code = "081lOcll2hW7G84wJCml2bhswh1lOcld"
             url_code_session = "https://api.weixin.qq.com/sns/jscode2session" \
                                "?appid={}&secret={}&js_code={}&grant_type=authorization_code".format(
                                 'wxc9ccd41f17a1fa42', 'bc8f9ad106f0975fedc5e83182c06d8a', wechat_code
             )
             data = requests.get(url_code_session)
+            logger.info('22222222222222')
             if data.status_code == 200:
                 data_content = json.loads(data.content)
                 if "openid" in data_content:
                     openid = data_content.get('openid')
-
+                    logger.info(openid)
                     url = "https://api.mch.weixin.qq.com/pay/unifiedorder"
                     nonce_str = generate_randomStr()  # 订单中加nonce_str字段记录（回调判断使用）
-                    out_trade_no = '20226782122390'  # 支付单号，只能使用一次，不可重复支付
+                    out_trade_no = '20226782122391'  # 支付单号，只能使用一次，不可重复支付
                     param = {
                         "appid": APPID,
                         "mch_id": MCHID,  # 商户号
@@ -811,7 +815,7 @@ class Login(APIView):
                         "body": 'TEST_pay',  # 支付说明
                         "out_trade_no": out_trade_no,  # 自己生成的订单号
                         "total_fee": 1,
-                        "spbill_create_ip": '47.92.85.245',  # 发起统一下单的ip
+                        "spbill_create_ip": '127.0.0.1',  # 发起统一下单的ip
                         # "spbill_create_ip": '47.92.85.245',  # 发起统一下单的ip
                         "notify_url": NOTIFY_URL,
                         "trade_type": 'JSAPI',  # 小程序写JSAPI
@@ -822,6 +826,7 @@ class Login(APIView):
                     param["sign"] = sign  # 加入签名
                     # 3. 调用接口
                     xmlmsg = send_xml_request(url, param)
+                    logger.info(xmlmsg)
                     # 4. 获取prepay_id
                     if xmlmsg['xml']['return_code'] == 'SUCCESS':
                         if xmlmsg['xml']['result_code'] == 'SUCCESS':
