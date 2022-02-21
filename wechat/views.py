@@ -12,6 +12,9 @@ import time
 import pytz
 import os
 import json
+import base64
+from Cryptodome.Cipher import AES
+import requests
 
 
 def md5(invitation_code) -> object:
@@ -683,3 +686,275 @@ class History(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+class WXBizDataCrypt:
+    def __init__(self, appId, sessionKey):
+        self.appId = appId
+        self.sessionKey = sessionKey
+
+    def decrypt(self, encryptedData, iv):
+        # base64 decode
+        sessionKey = base64.b64decode(self.sessionKey)
+        encryptedData = base64.b64decode(encryptedData)
+        iv = base64.b64decode(iv)
+
+        cipher = AES.new(sessionKey, AES.MODE_CBC, iv)
+
+        decrypted = json.loads(self._unpad(cipher.decrypt(encryptedData)))
+
+        if decrypted['watermark']['appid'] != self.appId:
+            raise Exception('Invalid Buffer')
+
+        return decrypted
+
+    def _unpad(self, s):
+        return s[:-ord(s[len(s)-1:])]
+
+
+# 解密获取用户信息
+def decrypt_encrypteddata(app_id, session_key, encryptedData, iv):
+    decrypt_data = WXBizDataCrypt(app_id, session_key)
+    decrypt_data = decrypt_data.decrypt(encryptedData, iv)
+    return decrypt_data
+
+# 随机随机字符串
+def get_random_str():
+    import random
+    data = "123456789zxcvbnmasdfghdjklqwertyuiopZXCVBNMASDFGHJKLQWERTYUIOP"
+    nonce_str = ''.join(random.sample(data, 30))
+    return nonce_str
+
+
+# 时间戳
+def get_time():
+    return str(int(time.time()))
+
+
+# class Callback(APIView):
+#     def post(self):
+#         responses = {
+#             'code': 1000,
+#             'message': None
+#         }
+#         return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+import requests
+import hashlib
+import xmltodict
+import time
+import random
+import string
+class Login(APIView):
+
+    # 生成nonce_str
+    def generate_randomStr(self):
+        return ''.join(random.sample(string.ascii_letters + string.digits, 32))
+
+    # 生成签名
+    def generate_sign(param):
+        stringA = ''
+
+        ks = sorted(param.keys())
+        # 参数排序
+        for k in ks:
+            stringA += k + "=" + str(param[k]) + "&"
+        # 拼接商户KEY
+        stringSignTemp = stringA + "key=" + KEY
+
+        # md5加密
+        hash_md5 = hashlib.md5(stringSignTemp.encode('utf8'))
+        sign = hash_md5.hexdigest().upper()
+
+        return sign
+
+    # 发送xml请求
+    def send_xml_request(url, param):
+        # dict 2 xml
+        param = {'root': param}
+        xml = xmltodict.unparse(param)
+
+        response = requests.post(url, data=xml.encode('utf-8'), headers={'Content-Type': 'text/xml'})
+        # xml 2 dict
+        msg = response.text
+        xmlmsg = xmltodict.parse(msg)
+
+        return xmlmsg
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            wechat_code = request._request.POST.get('code')
+            # wechat_code = "0714C2ll2jmJG84JFEnl2iYRJr14C2ln"
+            url_code_session = "https://api.weixin.qq.com/sns/jscode2session" \
+                               "?appid={}&secret={}&js_code={}&grant_type=authorization_code".format(
+                                'wxc9ccd41f17a1fa42', 'bc8f9ad106f0975fedc5e83182c06d8a', wechat_code
+            )
+            data = requests.get(url_code_session)
+            if data.status_code == 200:
+                data_content = json.loads(data.content)
+                if "openid" in data_content:
+                    openid = data_content.get('openid')
+
+                    url = "https://api.mch.weixin.qq.com/pay/unifiedorder"
+                    nonce_str = generate_randomStr()  # 订单中加nonce_str字段记录（回调判断使用）
+                    out_trade_no = '20226782122363'  # 支付单号，只能使用一次，不可重复支付
+                    param = {
+                        "appid": APPID,
+                        "mch_id": MCHID,  # 商户号
+                        "nonce_str": nonce_str,  # 随机字符串
+                        "body": 'TEST_pay',  # 支付说明
+                        "out_trade_no": out_trade_no,  # 自己生成的订单号
+                        "total_fee": 1,
+                        "spbill_create_ip": '127.0.0.1',  # 发起统一下单的ip
+                        "notify_url": NOTIFY_URL,
+                        "trade_type": 'JSAPI',  # 小程序写JSAPI
+                        "openid": openid,
+                    }
+                    # 2. 统一下单签名
+                    sign = generate_sign(param)
+                    param["sign"] = sign  # 加入签名
+                    # 3. 调用接口
+                    xmlmsg = send_xml_request(url, param)
+                    # 4. 获取prepay_id
+                    if xmlmsg['xml']['return_code'] == 'SUCCESS':
+                        if xmlmsg['xml']['result_code'] == 'SUCCESS':
+                            prepay_id = xmlmsg['xml']['prepay_id']
+                            # 时间戳
+                            timeStamp = str(int(time.time()))
+                            # 5. 根据文档，六个参数，否则app提示签名验证失败，https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_12
+                            data = {
+                                "appid": APPID,
+                                "partnerid": MCHID,
+                                "prepayid": prepay_id,
+                                "package": "Sign=WXPay",
+                                "noncestr": nonce_str,
+                                "timestamp": timeStamp,
+                                "total_fee":1
+                            }  # 6. paySign签名
+                            paySign = generate_sign(data)
+                            data["paySign"] = paySign  # 加入签名
+                            # 7. 传给前端的签名后的参数
+                            # return data
+                    data = {
+                        "data": data,
+                    }
+                    responses['data'] = data
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "登陆失败"
+        return JsonResponse(responses)
+
+
+# 统一下单
+
+import requests
+import hashlib
+import xmltodict
+import time
+import random
+import string
+
+# 配置必须参数
+
+APPID = "wxc9ccd41f17a1fa42"  # 小程序ID
+SECRET = "bc8f9ad106f0975fedc5e83182c06d8a"
+MCHID = "1619888204"  # 商户号
+KEY = "iWOwoB8rWkhIUDFBHdjnf93wdwo64Xzq"
+NOTIFY_URL = "https://www.zhuangyuanjie.cn/api/v1/auth/"  # 统一下单后微信回调地址，api demo见notify_view_demo.py
+WX_CERT_PATH = "path/to/apiclient_cert.pem"
+WX_KEY_PATH = "path/to/apiclient_key.pem.unsecure"
+
+
+# 生成nonce_str
+def generate_randomStr():
+    return ''.join(random.sample(string.ascii_letters + string.digits, 32))
+
+
+# 生成签名
+def generate_sign(param):
+    stringA = ''
+
+    ks = sorted(param.keys())
+    # 参数排序
+    for k in ks:
+        stringA += k + "=" + str(param[k]) + "&"
+    # 拼接商户KEY
+    stringSignTemp = stringA + "key=" + KEY
+
+    # md5加密
+    hash_md5 = hashlib.md5(stringSignTemp.encode('utf8'))
+    sign = hash_md5.hexdigest().upper()
+
+    return sign
+
+
+# 发送xml请求
+def send_xml_request(url, param):
+    # dict 2 xml
+    param = {'root': param}
+    xml = xmltodict.unparse(param)
+
+    response = requests.post(url, data=xml.encode('utf-8'), headers={'Content-Type': 'text/xml'})
+    # xml 2 dict
+    msg = response.text
+    xmlmsg = xmltodict.parse(msg)
+
+    return xmlmsg
+
+
+# 统一下单
+def generate_bill(out_trade_no, fee, openid):
+    url = "https://api.mch.weixin.qq.com/pay/unifiedorder"
+    nonce_str = generate_randomStr()  # 订单中加nonce_str字段记录（回调判断使用）
+    out_trade_no = "20226782122363"  # 支付单号，只能使用一次，不可重复支付
+
+    '''
+    order.out_trade_no = out_trade_no
+    order.nonce_str = nonce_str
+    order.save()
+    '''
+
+    # 1. 参数
+    param = {
+        "appid": APPID,
+        "mch_id": MCHID,  # 商户号
+        "nonce_str": nonce_str,  # 随机字符串
+        "body": 'TEST_pay',  # 支付说明
+        "out_trade_no": out_trade_no,  # 自己生成的订单号
+        "total_fee": fee,
+        "spbill_create_ip": '127.0.0.1',  # 发起统一下单的ip
+        "notify_url": NOTIFY_URL,
+        "trade_type": 'JSAPI',  # 小程序写JSAPI
+        "openid": openid,
+    }
+    # 2. 统一下单签名
+    sign = generate_sign(param)
+    param["sign"] = sign  # 加入签名
+    # 3. 调用接口
+    xmlmsg = send_xml_request(url, param)
+    # 4. 获取prepay_id
+    if xmlmsg['xml']['return_code'] == 'SUCCESS':
+        if xmlmsg['xml']['result_code'] == 'SUCCESS':
+            prepay_id = xmlmsg['xml']['prepay_id']
+            # 时间戳
+            timeStamp = str(int(time.time()))
+            # 5. 根据文档，六个参数，否则app提示签名验证失败，https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_12
+            data = {
+                "appid": APPID,
+                "partnerid": MCHID,
+                "prepayid": prepay_id,
+                "package": "Sign=WXPay",
+                "noncestr": nonce_str,
+                "timestamp": timeStamp,
+            }  # 6. paySign签名
+            paySign = generate_sign(data)
+            data["paySign"] = paySign  # 加入签名
+            # 7. 传给前端的签名后的参数
+            return data
+

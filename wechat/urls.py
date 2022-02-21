@@ -19,4 +19,7 @@ urlpatterns = [
     url(r'^v1/retail/methanal_result/$', views.Result.as_view()),
     url(r'^v1/retail/banners/$', views.Banner.as_view()),
     url(r'^v1/retail/history/$', views.History.as_view()),
+    # url(r'^v1/retail/callback/$', views.Callback.as_view()),
+    url(r'^v1/retail/pay/$', views.Login.as_view()),
+    # url(r'^v1/retail/pay/$', views.Login.as_view()),
 ]
