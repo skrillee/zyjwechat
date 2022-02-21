@@ -790,7 +790,7 @@ class Login(APIView):
         }
         try:
             wechat_code = request._request.POST.get('code')
-            # wechat_code = "0714C2ll2jmJG84JFEnl2iYRJr14C2ln"
+            # wechat_code = "041LHJFa161BGC0o9EFa1IBSez0LHJFT"
             url_code_session = "https://api.weixin.qq.com/sns/jscode2session" \
                                "?appid={}&secret={}&js_code={}&grant_type=authorization_code".format(
                                 'wxc9ccd41f17a1fa42', 'bc8f9ad106f0975fedc5e83182c06d8a', wechat_code
@@ -803,7 +803,7 @@ class Login(APIView):
 
                     url = "https://api.mch.weixin.qq.com/pay/unifiedorder"
                     nonce_str = generate_randomStr()  # 订单中加nonce_str字段记录（回调判断使用）
-                    out_trade_no = '20226782122363'  # 支付单号，只能使用一次，不可重复支付
+                    out_trade_no = '20226782122390'  # 支付单号，只能使用一次，不可重复支付
                     param = {
                         "appid": APPID,
                         "mch_id": MCHID,  # 商户号
@@ -811,7 +811,8 @@ class Login(APIView):
                         "body": 'TEST_pay',  # 支付说明
                         "out_trade_no": out_trade_no,  # 自己生成的订单号
                         "total_fee": 1,
-                        "spbill_create_ip": '127.0.0.1',  # 发起统一下单的ip
+                        "spbill_create_ip": '47.92.85.245',  # 发起统一下单的ip
+                        "spbill_create_ip": '47.92.85.245',  # 发起统一下单的ip
                         "notify_url": NOTIFY_URL,
                         "trade_type": 'JSAPI',  # 小程序写JSAPI
                         "openid": openid,
@@ -829,13 +830,14 @@ class Login(APIView):
                             timeStamp = str(int(time.time()))
                             # 5. 根据文档，六个参数，否则app提示签名验证失败，https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_12
                             data = {
-                                "appid": APPID,
-                                "partnerid": MCHID,
-                                "prepayid": prepay_id,
-                                "package": "Sign=WXPay",
-                                "noncestr": nonce_str,
-                                "timestamp": timeStamp,
-                                "total_fee":1
+                                "appId": APPID,
+                                "timeStamp": timeStamp,
+                                "nonceStr": nonce_str,
+                                "package": 'prepay_id=' + prepay_id,
+                                "signType": 'MD5',
+                                # "partnerid": MCHID,
+                                # "prepayid": prepay_id,
+                                # "total_fee":1
                             }  # 6. paySign签名
                             paySign = generate_sign(data)
                             data["paySign"] = paySign  # 加入签名
@@ -949,7 +951,7 @@ def generate_bill(out_trade_no, fee, openid):
                 "appid": APPID,
                 "partnerid": MCHID,
                 "prepayid": prepay_id,
-                "package": "Sign=WXPay",
+                "package": 'prepay_id'+prepay_id,
                 "noncestr": nonce_str,
                 "timestamp": timeStamp,
             }  # 6. paySign签名
@@ -958,3 +960,37 @@ def generate_bill(out_trade_no, fee, openid):
             # 7. 传给前端的签名后的参数
             return data
 
+
+import xmltodict
+
+from django.http import HttpResponse
+
+
+class Payback(APIView):
+    def post(request):
+        msg = request.body.decode('utf-8')
+        xmlmsg = xmltodict.parse(msg)
+
+        return_code = xmlmsg['xml']['return_code']
+
+        if return_code == 'FAIL':
+            # 官方发出错误
+            return HttpResponse("""<xml><return_code><![CDATA[FAIL]]></return_code>
+                                <return_msg><![CDATA[Signature_Error]]></return_msg></xml>""",
+                                content_type='text/xml', status=200)
+
+        elif return_code == 'SUCCESS':
+            # 拿到这次支付的订单号
+            out_trade_no = xmlmsg['xml']['out_trade_no']
+            # order = Order.objects.get(out_trade_no=out_trade_no)
+            if xmlmsg['xml']['nonce_str'] != out_trade_no.nonce_str:
+                # 随机字符串不一致
+                return HttpResponse("""<xml><return_code><![CDATA[FAIL]]></return_code>
+                                            <return_msg><![CDATA[Signature_Error]]></return_msg></xml>""",
+                                    content_type='text/xml', status=200)
+
+            # 根据需要处理业务逻辑
+
+            return HttpResponse("""<xml><return_code><![CDATA[SUCCESS]]></return_code>
+                                <return_msg><![CDATA[OK]]></return_msg></xml>""",
+    content_type='text/xml', status=200)
