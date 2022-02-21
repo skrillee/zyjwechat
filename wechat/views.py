@@ -3,6 +3,8 @@ __author__ = 'Yan.zhe 2021.09.28'
 from django.shortcuts import HttpResponse
 from rest_framework.views import APIView
 from django.http import JsonResponse
+
+import wechat.views
 from zyjwechat import settings
 from wechat import models
 import socket
@@ -749,9 +751,9 @@ import random
 import string
 import logging
 # 生成一个以当前文件名为名字的logger实例
-logger = logging.getLogger(__name__)
-class Login(APIView):
 
+class Login(APIView):
+    logger = logging.getLogger()
     # 生成nonce_str
     def generate_randomStr(self):
         return ''.join(random.sample(string.ascii_letters + string.digits, 32))
