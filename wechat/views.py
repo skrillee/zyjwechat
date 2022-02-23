@@ -1025,9 +1025,9 @@ class Live(APIView):
 
             # 时间戳
             now_time = datetime.datetime.now()
-            start_time = (now_time + datetime.timedelta(minutes=after_hour_start_time)).strftime("%Y-%m-%d %H:%M:%S")
+            start_time = (now_time + datetime.timedelta(hours=after_hour_start_time)).strftime("%Y-%m-%d %H:%M:%S")
             start_time_stamp = time.mktime(time.strptime(start_time, '%Y-%m-%d %H:%M:%S'))
-            close_time = (now_time + datetime.timedelta(minutes=after_hour_start_time) +
+            close_time = (now_time + datetime.timedelta(hours=after_hour_start_time) +
                           datetime.timedelta(hours=duration_time)).strftime("%Y-%m-%d %H:%M:%S")
             close_time_stamp = time.mktime(time.strptime(close_time, '%Y-%m-%d %H:%M:%S'))
 
