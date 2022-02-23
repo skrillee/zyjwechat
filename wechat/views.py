@@ -1086,7 +1086,7 @@ class Room(APIView):
                     room_id = live_room_obj.room_id
                     anchor_name = live_room_obj.anchor_name
                     room_belong = live_room_obj.room_belong
-                    room_name = live_room_obj.room_belong
+                    room_name = live_room_obj.room_name
                     live_room_data = {
                         "room_id": int(room_id),
                         "anchor_name": anchor_name,
