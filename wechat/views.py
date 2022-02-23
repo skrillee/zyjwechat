@@ -1025,9 +1025,9 @@ class Live(APIView):
 
             # 时间戳
             now_time = datetime.datetime.now()
-            start_time = (now_time + datetime.timedelta(hours=after_hour_start_time)).strftime("%Y-%m-%d %H:%M:%S")
+            start_time = (now_time + datetime.timedelta(minutes=after_hour_start_time)).strftime("%Y-%m-%d %H:%M:%S")
             start_time_stamp = time.mktime(time.strptime(start_time, '%Y-%m-%d %H:%M:%S'))
-            close_time = (now_time + datetime.timedelta(hours=after_hour_start_time) +
+            close_time = (now_time + datetime.timedelta(minutes=after_hour_start_time) +
                           datetime.timedelta(hours=duration_time)).strftime("%Y-%m-%d %H:%M:%S")
             close_time_stamp = time.mktime(time.strptime(close_time, '%Y-%m-%d %H:%M:%S'))
 
@@ -1084,8 +1084,14 @@ class Room(APIView):
                 try:
                     live_room_obj = invitation_obj.LiveRoom
                     room_id = live_room_obj.room_id
+                    anchor_name = live_room_obj.anchor_name
+                    room_belong = live_room_obj.room_belong
+                    room_name = live_room_obj.room_belong
                     live_room_data = {
-                        "room_id": int(room_id)
+                        "room_id": int(room_id),
+                        "anchor_name": anchor_name,
+                        "room_belong": room_belong,
+                        "room_name": room_name
                     }
                     responses['data'] = live_room_data
                 except Exception as e:
