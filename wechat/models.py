@@ -19,6 +19,19 @@ class ZyjWechatRetail(models.Model):
         verbose_name_plural = '零售商集合'
 
 
+class LivingRoom(models.Model):
+    anchor_name = models.CharField('主播名称', max_length=64, null=True)
+    anchor_wechat = models.CharField('主播微信', max_length=64, null=True)
+    media_id = models.CharField('媒体标识', max_length=128, null=True)
+    room_belong = models.CharField('直播间所属', max_length=128, null=True)
+    room_id = models.CharField('直播间id', max_length=32, null=True)
+    room_name = models.CharField('直播间名称', max_length=64, null=True)
+
+    class Meta:
+        verbose_name = '直播间'
+        verbose_name_plural = '直播间集合'
+
+
 class ZyjWechatInvitationCode(models.Model):
     code_type_choice = (
         (1, '一级邀请码'),
@@ -29,6 +42,8 @@ class ZyjWechatInvitationCode(models.Model):
     Retail = models.ForeignKey(ZyjWechatRetail, on_delete=models.CASCADE, null=True)
     invitation_code = models.CharField('邀请码', unique=True, max_length=64)
     effective_time = models.IntegerField('有效时间', default=3)
+    # LiveRoom = models.IntegerField('有效时间', default=3)
+    LiveRoom = models.ForeignKey(LivingRoom, on_delete=models.CASCADE, null=True)
 
     class Meta:
         verbose_name = '邀请码'

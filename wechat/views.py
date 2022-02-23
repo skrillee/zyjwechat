@@ -997,3 +997,137 @@ class Payback(APIView):
             return HttpResponse("""<xml><return_code><![CDATA[SUCCESS]]></return_code>
                                 <return_msg><![CDATA[OK]]></return_msg></xml>""",
     content_type='text/xml', status=200)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class Live(APIView):
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            duration_time = int(request._request.POST.get('duration_time'))
+            after_hour_start_time = int(request._request.POST.get('after_hour_start_time'))
+            media_id = request._request.POST.get('media_id')
+            room_name = request._request.POST.get('room_name')
+            anchor_id = request._request.POST.get('anchor_id')
+            anchor_wechat = request._request.POST.get('anchor_wechat')
+            anchor_name = request._request.POST.get('anchor_name')
+            live_type = int(request._request.POST.get('live_type'))
+            screen_type = int(request._request.POST.get('screen_type'))
+            close_like = int(request._request.POST.get('close_like'))
+            close_goods = int(request._request.POST.get('close_goods'))
+            close_comment = int(request._request.POST.get('close_comment'))
+            room_belong = request._request.POST.get('room_belong')
+            access_token = request._request.POST.get('access_token')
+
+            # 时间戳
+            now_time = datetime.datetime.now()
+            start_time = (now_time + datetime.timedelta(hours=after_hour_start_time)).strftime("%Y-%m-%d %H:%M:%S")
+            start_time_stamp = time.mktime(time.strptime(start_time, '%Y-%m-%d %H:%M:%S'))
+            close_time = (now_time + datetime.timedelta(hours=after_hour_start_time) +
+                          datetime.timedelta(hours=duration_time)).strftime("%Y-%m-%d %H:%M:%S")
+            close_time_stamp = time.mktime(time.strptime(close_time, '%Y-%m-%d %H:%M:%S'))
+
+            param_data = {
+                "name": room_name,
+                "coverImg": media_id,
+                "startTime": start_time_stamp,
+                "endTime": close_time_stamp,
+                "anchorName": anchor_name,
+                "anchorWechat": anchor_wechat,
+                "shareImg": media_id,
+                "type": live_type,
+                "screenType": screen_type,
+                "closeLike": close_like,
+                "closeGoods": close_goods,
+                "closeComment": close_comment,
+                "feedsImg": media_id
+            }
+            create_room_url = "https://api.weixin.qq.com/wxaapi/broadcast/room/create?access_token="+access_token
+            headers = {'Content-Type': 'application/json;charset=UTF-8'}
+            create_room_result = requests.request("post", url=create_room_url, json=param_data, headers=headers)
+            room_id = json.loads(create_room_result.text)['roomId']
+            live_data = {
+                "room_id": room_id
+            }
+            responses['data'] = live_data
+            models.LivingRoom.objects.update_or_create(defaults={'anchor_name': anchor_name,
+                                                                 'anchor_wechat': anchor_wechat,
+                                                                 'media_id': media_id,
+                                                                 'room_belong': room_belong,
+                                                                 'room_id': room_id,
+                                                                 'room_name': room_name},
+                                                       id=anchor_id)
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+        # param_data = json.dumps(param_data)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class Room(APIView):
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            invitation_code = request.user.invitation_code
+            invitation_obj = models.ZyjWechatInvitationCode.objects.filter(invitation_code=invitation_code).first()
+            if invitation_obj:
+                try:
+                    live_room_obj = invitation_obj.LiveRoom
+                    room_id = live_room_obj.room_id
+                    live_room_data = {
+                        "room_id": int(room_id)
+                    }
+                    responses['data'] = live_room_data
+                except Exception as e:
+                    responses['code'] = 3006
+                    responses['message'] = "该验证码暂无可用直播间"
+            else:
+                responses['code'] = 3005
+                responses['message'] = "无效验证码，请核对验证码是否正确"
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+        # param_data = json.dumps(param_data)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class Status(APIView):
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            page_position = request._request.POST.get('page_position')
+            history_obj = models.Methanal.objects.filter(invitation_code=invitation_code).order_by('id')
+            history_time_list = []
+            history_co2_list = []
+            history_tvoc_list = []
+            for history_data in history_obj:
+                history_time_list.append(history_data.time)
+                history_co2_tvoc = json.loads(history_data.methanal_value)
+                history_co2_list.append(history_co2_tvoc['CO2'])
+                history_tvoc_list.append(history_co2_tvoc['methanal'])
+            methanal_dict = {
+                "methanal_time": history_time_list,
+                "methanal_value": history_tvoc_list,
+                "CO2_value": history_co2_list
+            }
+            responses['data'] = methanal_dict
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
