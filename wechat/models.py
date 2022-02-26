@@ -12,6 +12,7 @@ class ZyjWechatRetail(models.Model):
     address = models.CharField('店铺地址', max_length=128)
     email = models.CharField('邮箱', max_length=128)
     shop_introduction = models.CharField('店铺简介', max_length=256)
+    advertiser = models.CharField('下游广告商', max_length=128, null=True)
     Product = models.ManyToManyField('ZyjWechatManufactor')
 
     class Meta:
@@ -193,3 +194,14 @@ class Banner(models.Model):
     describe = models.CharField('描述', max_length=128, null=True)
     category = models.CharField('品类', max_length=128, null=True)
     remark = models.CharField('备注', max_length=128, null=True)
+
+
+class Ticket(models.Model):
+    ticket_name = models.CharField('券名', max_length=32, null=True)
+    ticket_image = models.CharField('券缩略图', max_length=128, null=True)
+    ticket_image_detail = models.CharField('券详情图', max_length=128, null=True)
+    ticket_active = models.BooleanField('是否有效', max_length=128, null=True)
+    ticket_type = models.CharField('券类型', max_length=32, null=True)
+    ticket_information = models.CharField('券说明', max_length=1024, null=True)
+    remark = models.CharField('备注', max_length=128, null=True)
+    Retail = models.ForeignKey(ZyjWechatRetail, on_delete=models.CASCADE, null=True)

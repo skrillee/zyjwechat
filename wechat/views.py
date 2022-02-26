@@ -1137,3 +1137,43 @@ class Status(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class Ticket(APIView):
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            invitation_code = request.user.invitation_code
+            advertiser_ids = models.ZyjWechatInvitationCode.objects.filter(
+                invitation_code=invitation_code).first().Retail.advertiser
+            advertiser_ids_list = advertiser_ids.split(",")
+            advertiser_ids_list = [var for var in advertiser_ids_list if var]
+            ticket_objs = models.Ticket.objects.filter(
+                Retail_id__in=advertiser_ids_list).all()
+            # retail_objects = models.ZyjWechatRetail.objects.filter(id=advertiser_ids_list).all()
+            ticket_objs_type_dict = {}
+            ticket_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/ticket/"
+            for ticket_obj in ticket_objs:
+                ticket_dict = {
+                    "ticket_name": ticket_obj.ticket_name,
+                    "ticket_type": ticket_obj.ticket_type,
+                    "ticket_information": ticket_obj.ticket_information,
+                    "ticket_image": ticket_url+ticket_obj.ticket_image,
+                    "ticket_image_detail": ticket_obj.ticket_image_detail,
+                    "ticket_active": ticket_obj.ticket_active,
+                    "ticket_price": ticket_obj.remark,
+                }
+                if ticket_obj.ticket_type in ticket_objs_type_dict.keys():
+                    ticket_objs_type_dict[ticket_obj.ticket_type].append(ticket_dict)
+                else:
+                    ticket_objs_type_dict[ticket_obj.ticket_type] = [ticket_dict]
+            responses['data'] = ticket_objs_type_dict
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
