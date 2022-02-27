@@ -1196,33 +1196,40 @@ class Bill(APIView):
                 invitation_code=invitation_code).first().id
             bill_objects = models.ZyjWechatBill.objects.filter(
                 InvitationCode_id=invitation_code_id).all()
-            bill_object_list = []
-            bill_chart_value_list = []
-            bill_chart_name_list = []
-            bill_chart_color_list = []
-            for bill_object in bill_objects:
-                bill_dict = {
-                    "bill_id": bill_object.id,
-                    "customer_name": bill_object.customer_name,
-                    "cost_name": bill_object.cost_name,
-                    "unit_price": bill_object.unit_price,
-                    "quantity": bill_object.quantity,
-                    "trading_time": bill_object.trading_time,
-                    "chart_color": bill_object.chart_color
-                }
-                bill_chart = {
-                    "name": bill_object.cost_name,
-                    "value": int(bill_object.unit_price)*int(bill_object.quantity)
-                }
+            if bill_objects:
+                bill_object_list = []
+                bill_chart_value_list = []
+                bill_chart_name_list = []
+                bill_chart_color_list = []
+                bill_total = 0
+                for bill_object in bill_objects:
+                    bill_dict = {
+                        "bill_id": bill_object.id,
+                        "customer_name": bill_object.customer_name,
+                        "cost_name": bill_object.cost_name,
+                        "unit_price": bill_object.unit_price,
+                        "quantity": bill_object.quantity,
+                        "trading_time": bill_object.trading_time,
+                        "chart_color": bill_object.chart_color
+                    }
+                    bill_chart = {
+                        "name": bill_object.cost_name,
+                        "value": int(bill_object.unit_price)*int(bill_object.quantity)
+                    }
 
-                bill_object_list.append(bill_dict)
-                bill_chart_value_list.append(bill_chart)
-                bill_chart_name_list.append(bill_object.cost_name)
-                bill_chart_color_list.append(bill_object.chart_color)
-            responses['data'] = bill_object_list
-            responses['chart_value'] = bill_chart_value_list
-            responses['chart_name'] = bill_chart_name_list
-            responses['chart_color'] = bill_chart_color_list
+                    bill_object_list.append(bill_dict)
+                    bill_chart_value_list.append(bill_chart)
+                    bill_chart_name_list.append(bill_object.cost_name)
+                    bill_chart_color_list.append(bill_object.chart_color)
+                    bill_total += int(bill_object.unit_price)*int(bill_object.quantity)
+                responses['data'] = bill_object_list
+                responses['chart_value'] = bill_chart_value_list
+                responses['chart_name'] = bill_chart_name_list
+                responses['chart_color'] = bill_chart_color_list
+                responses['bill_total'] = bill_total
+            else:
+                responses['code'] = 3007
+                responses['message'] = "暂无数据"
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"
