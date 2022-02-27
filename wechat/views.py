@@ -594,9 +594,9 @@ class Banner(APIView):
             location = request._request.POST.get('location')
             banners_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/banner/"
             banner_object_list = []
-            banners_obj = models.Banner.objects.filter(location=location).all()
-            if banners_obj:
-                for banner_obj in banners_obj:
+            banners_objs = models.Banner.objects.filter(location=location).all()
+            if banners_objs:
+                for banner_obj in banners_objs:
                     banner_object_dict = {'location': banner_obj.location, 'images': banner_obj.images,
                                           'describe': banner_obj.describe, 'images_big': banners_url+banner_obj.images,
                                           'category': banner_obj.category,
@@ -1160,6 +1160,7 @@ class Ticket(APIView):
             ticket_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/ticket/"
             for ticket_obj in ticket_objs:
                 ticket_dict = {
+                    "ticket_id": ticket_obj.id,
                     "ticket_name": ticket_obj.ticket_name,
                     "ticket_type": ticket_obj.ticket_type,
                     "ticket_information": ticket_obj.ticket_information,
