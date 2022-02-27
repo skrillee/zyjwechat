@@ -1180,8 +1180,11 @@ class Ticket(APIView):
         return JsonResponse(responses)
 
 
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
 class Bill(APIView):
-
+    """
+     color： #0F375A #F9C03D #BFD0DA #65472F #E9D9BF #D4920A #056E83 #FFAAAA #F0C046 #4B4B4E #E9D9BF #0F375A
+    """
     def post(self, request):
         responses = {
             'code': 1000,
@@ -1194,7 +1197,9 @@ class Bill(APIView):
             bill_objects = models.ZyjWechatBill.objects.filter(
                 InvitationCode_id=invitation_code_id).all()
             bill_object_list = []
-            bill_chart_list = []
+            bill_chart_value_list = []
+            bill_chart_name_list = []
+            bill_chart_color_list = []
             for bill_object in bill_objects:
                 bill_dict = {
                     "bill_id": bill_object.id,
@@ -1203,15 +1208,21 @@ class Bill(APIView):
                     "unit_price": bill_object.unit_price,
                     "quantity": bill_object.quantity,
                     "trading_time": bill_object.trading_time,
+                    "chart_color": bill_object.chart_color
                 }
                 bill_chart = {
                     "name": bill_object.cost_name,
                     "value": int(bill_object.unit_price)*int(bill_object.quantity)
                 }
+
                 bill_object_list.append(bill_dict)
-                bill_chart_list.append(bill_chart)
+                bill_chart_value_list.append(bill_chart)
+                bill_chart_name_list.append(bill_object.cost_name)
+                bill_chart_color_list.append(bill_object.chart_color)
             responses['data'] = bill_object_list
-            responses['chart'] = bill_chart_list
+            responses['chart_value'] = bill_chart_value_list
+            responses['chart_name'] = bill_chart_name_list
+            responses['chart_color'] = bill_chart_color_list
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"
