@@ -1194,6 +1194,7 @@ class Bill(APIView):
             bill_objects = models.ZyjWechatBill.objects.filter(
                 InvitationCode_id=invitation_code_id).all()
             bill_object_list = []
+            bill_chart_list = []
             for bill_object in bill_objects:
                 bill_dict = {
                     "bill_id": bill_object.id,
@@ -1203,8 +1204,14 @@ class Bill(APIView):
                     "quantity": bill_object.quantity,
                     "trading_time": bill_object.trading_time,
                 }
+                bill_chart = {
+                    "name": bill_object.cost_name,
+                    "value": int(bill_object.unit_price)*int(bill_object.quantity)
+                }
                 bill_object_list.append(bill_dict)
+                bill_chart_list.append(bill_chart)
             responses['data'] = bill_object_list
+            responses['chart'] = bill_chart_list
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"
