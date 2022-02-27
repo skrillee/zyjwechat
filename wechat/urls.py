@@ -25,5 +25,6 @@ urlpatterns = [
     url(r'^v1/retail/room/$', views.Room.as_view()),
     url(r'^v1/retail/status/$', views.Status.as_view()),
     url(r'^v1/retail/ticket/$', views.Ticket.as_view()),
+    url(r'^v1/retail/bill/$', views.Bill.as_view()),
     # url(r'^v1/retail/pay/$', views.Login.as_view()),
 ]

@@ -1178,3 +1178,34 @@ class Ticket(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+class Bill(APIView):
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            invitation_code = request.user.invitation_code
+            invitation_code_id = models.ZyjWechatInvitationCode.objects.filter(
+                invitation_code=invitation_code).first().id
+            bill_objects = models.ZyjWechatBill.objects.filter(
+                InvitationCode_id=invitation_code_id).all()
+            bill_object_list = []
+            for bill_object in bill_objects:
+                bill_dict = {
+                    "bill_id": bill_object.id,
+                    "customer_name": bill_object.customer_name,
+                    "cost_name": bill_object.cost_name,
+                    "unit_price": bill_object.unit_price,
+                    "quantity": bill_object.quantity,
+                    "trading_time": bill_object.trading_time,
+                }
+                bill_object_list.append(bill_dict)
+            responses['data'] = bill_object_list
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
