@@ -51,6 +51,19 @@ class ZyjWechatInvitationCode(models.Model):
         verbose_name_plural = '邀请码集合'
 
 
+class ZyjWechatBill(models.Model):
+    customer_name = models.CharField('客户名称', max_length=128, null=True)
+    cost_name = models.CharField('费用名称', max_length=128, null=True)
+    unit_price = models.CharField('单价', max_length=128, null=True)
+    quantity = models.CharField('数量', max_length=128, null=True)
+    trading_time = models.CharField('交易时间', max_length=128, null=True)
+    InvitationCode = models.ForeignKey(ZyjWechatInvitationCode, on_delete=models.CASCADE, null=True)
+
+    class Meta:
+        verbose_name = '账单'
+        verbose_name_plural = '账单集合'
+
+
 class CodeToken(models.Model):
     code = models.OneToOneField(to=ZyjWechatInvitationCode, on_delete=models.CASCADE)
     token = models.CharField(max_length=64)
