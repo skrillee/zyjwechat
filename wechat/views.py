@@ -1192,44 +1192,91 @@ class Bill(APIView):
         }
         try:
             invitation_code = request.user.invitation_code
-            invitation_code_id = models.ZyjWechatInvitationCode.objects.filter(
-                invitation_code=invitation_code).first().id
-            bill_objects = models.ZyjWechatBill.objects.filter(
-                InvitationCode_id=invitation_code_id).all()
-            if bill_objects:
-                bill_object_list = []
-                bill_chart_value_list = []
-                bill_chart_name_list = []
-                bill_chart_color_list = []
-                bill_total = 0
-                for bill_object in bill_objects:
-                    bill_dict = {
-                        "bill_id": bill_object.id,
-                        "customer_name": bill_object.customer_name,
-                        "cost_name": bill_object.cost_name,
-                        "unit_price": bill_object.unit_price,
-                        "quantity": bill_object.quantity,
-                        "trading_time": bill_object.trading_time,
-                        "chart_color": bill_object.chart_color
-                    }
-                    bill_chart = {
-                        "name": bill_object.cost_name,
-                        "value": int(bill_object.unit_price)*int(bill_object.quantity)
-                    }
+            role = request._request.POST.get('role')
+            if role == "customer":
+                invitation_code_id = models.ZyjWechatInvitationCode.objects.filter(
+                    invitation_code=invitation_code).first().id
+                bill_objects = models.ZyjWechatBill.objects.filter(
+                    InvitationCode_id=invitation_code_id).all()
+                if bill_objects:
+                    bill_object_list = []
+                    bill_chart_value_list = []
+                    bill_chart_name_list = []
+                    bill_chart_color_list = []
+                    bill_total = 0
+                    for bill_object in bill_objects:
+                        bill_dict = {
+                            "bill_id": bill_object.id,
+                            "customer_name": bill_object.customer_name,
+                            "cost_name": bill_object.cost_name,
+                            "unit_price": bill_object.unit_price,
+                            "quantity": bill_object.quantity,
+                            "trading_time": bill_object.trading_time,
+                            "chart_color": bill_object.chart_color
+                        }
+                        bill_chart = {
+                            "name": bill_object.cost_name,
+                            "value": int(bill_object.unit_price)*int(bill_object.quantity)
+                        }
 
-                    bill_object_list.append(bill_dict)
-                    bill_chart_value_list.append(bill_chart)
-                    bill_chart_name_list.append(bill_object.cost_name)
-                    bill_chart_color_list.append(bill_object.chart_color)
-                    bill_total += int(bill_object.unit_price)*int(bill_object.quantity)
-                responses['data'] = bill_object_list
-                responses['chart_value'] = bill_chart_value_list
-                responses['chart_name'] = bill_chart_name_list
-                responses['chart_color'] = bill_chart_color_list
-                responses['bill_total'] = bill_total
+                        bill_object_list.append(bill_dict)
+                        bill_chart_value_list.append(bill_chart)
+                        bill_chart_name_list.append(bill_object.cost_name)
+                        bill_chart_color_list.append(bill_object.chart_color)
+                        bill_total += int(bill_object.unit_price)*int(bill_object.quantity)
+                    responses['data'] = bill_object_list
+                    responses['chart_value'] = bill_chart_value_list
+                    responses['chart_name'] = bill_chart_name_list
+                    responses['chart_color'] = bill_chart_color_list
+                    responses['bill_total'] = bill_total
+                else:
+                    responses['code'] = 3007
+                    responses['message'] = "暂无数据"
+            elif role == "business":
+                invitation_code_object = models.ZyjWechatInvitationCode.objects.filter(
+                    invitation_code=invitation_code).first()
+                if invitation_code_object.code_type != 1:
+                    # 判断该账号是否是商家账号,如果是,根据邀请码找到该商铺下所有的客户账单
+                    retail_id = models.ZyjWechatRetail.objects.filter(
+                        id=invitation_code_object.Retail_id).first().id
+                    bill_objects = models.ZyjWechatBill.objects.filter(
+                        InvitationCode_id=retail_id).all()
+                    bill_objs_customer_dict = {}
+                    for bill_object in bill_objects:
+                        bill_dict = {
+                            "customer_name": bill_object.customer_name,
+                            "cost_name": bill_object.cost_name,
+                            "unit_price": bill_object.unit_price,
+                            "quantity": bill_object.quantity,
+                            "trading_time": bill_object.trading_time,
+                            "bill_id": bill_object.id,
+                            "item_total": int(bill_object.unit_price)*int(bill_object.quantity),
+                        }
+                        if bill_object.customer_name in bill_objs_customer_dict.keys():
+                            bill_objs_customer_dict[bill_object.customer_name].append(bill_dict)
+                        else:
+                            bill_objs_customer_dict[bill_object.customer_name] = [bill_dict]
+                    bill_objs_list = []
+                    for bill_obj in bill_objs_customer_dict:
+                        bill_total = 0
+                        bill_data = bill_objs_customer_dict[bill_obj]
+                        bill_objs_dict = {
+                            "name": bill_obj,
+                            "data": bill_data,
+                        }
+                        for bill_item_data in bill_data:
+                            bill_total += bill_item_data['item_total']
+                            trading_time = bill_item_data['trading_time']
+                            bill_objs_dict['trading_time'] = trading_time
+                        bill_objs_dict['bill_total'] = bill_total
+                        bill_objs_list.append(bill_objs_dict)
+                    responses['data'] = bill_objs_list
+                else:
+                    responses['code'] = 3009
+                    responses['message'] = "该账号无权限查看"
             else:
-                responses['code'] = 3007
-                responses['message'] = "暂无数据"
+                responses['code'] = 3008
+                responses['message'] = "角色role参数错误"
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"
