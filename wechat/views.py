@@ -1251,6 +1251,7 @@ class Bill(APIView):
                             "trading_time": bill_object.trading_time,
                             "bill_id": bill_object.id,
                             "item_total": int(bill_object.unit_price)*int(bill_object.quantity),
+                            "remark": bill_object.remark
                         }
                         if bill_object.customer_name in bill_objs_customer_dict.keys():
                             bill_objs_customer_dict[bill_object.customer_name].append(bill_dict)
