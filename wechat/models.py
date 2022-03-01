@@ -59,6 +59,7 @@ class ZyjWechatBill(models.Model):
     trading_time = models.CharField('交易时间', max_length=128, null=True)
     chart_color = models.CharField('图表颜色', max_length=128, null=True)
     InvitationCode = models.ForeignKey(ZyjWechatInvitationCode, on_delete=models.CASCADE, null=True)
+    remark = models.CharField('备注', max_length=128, null=True)
 
     class Meta:
         verbose_name = '账单'
