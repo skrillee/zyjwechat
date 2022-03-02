@@ -17,6 +17,8 @@ import json
 import base64
 from Cryptodome.Cipher import AES
 import requests
+import random
+
 
 
 def md5(invitation_code) -> object:
@@ -722,7 +724,7 @@ def decrypt_encrypteddata(app_id, session_key, encryptedData, iv):
 
 # 随机随机字符串
 def get_random_str():
-    import random
+
     data = "123456789zxcvbnmasdfghdjklqwertyuiopZXCVBNMASDFGHJKLQWERTYUIOP"
     nonce_str = ''.join(random.sample(data, 30))
     return nonce_str
@@ -747,7 +749,6 @@ import requests
 import hashlib
 import xmltodict
 import time
-import random
 import string
 
 # 生成一个以当前文件名为名字的logger实例
@@ -862,7 +863,6 @@ import requests
 import hashlib
 import xmltodict
 import time
-import random
 import string
 
 # 配置必须参数
@@ -1342,6 +1342,67 @@ class BillDetail(APIView):
                 }
                 bill_list.append(bill_dict)
             responses['data'] = bill_list
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class AddBillDetail(APIView):
+    """
+     color： ['#0F375A', ' #F9C03D', ' #BFD0DA', '#65472F', '#E9D9BF', '#D4920A', '#056E83', '#FFAAAA',
+                          '#F0C046', '#4B4B4E', '#E9D9BF', '#0F375A']
+    """
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            invitation_code = request.user.invitation_code
+            invitation_code_obj = models.ZyjWechatInvitationCode.objects.filter(
+                invitation_code=invitation_code).first()
+            retail_id = invitation_code_obj.id
+            invitation_code_name = invitation_code_obj.name
+            color_list = ['#0F375A', ' #F9C03D', ' #BFD0DA', '#65472F', '#E9D9BF', '#D4920A', '#056E83', '#FFAAAA',
+                          '#F0C046', '#4B4B4E', '#E9D9BF', '#0F375A']
+            color_random = random.sample(color_list, 1)[0]
+            remark = request._request.POST.get('remark')
+            unit_price = request._request.POST.get('unit_price')
+            quantity = request._request.POST.get('quantity')
+            cost_name = request._request.POST.get('cost_name')
+            invitation_id = request._request.POST.get('invitation_id')
+            local_time = datetime.datetime.now()
+            local_time_month = str(local_time.month)
+            local_time_day = str(local_time.day)
+            local_time_hour = str(local_time.hour)
+            local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour
+            models.ZyjWechatBill.objects.create(
+                customer_name=invitation_code_name, cost_name=cost_name, unit_price=unit_price, quantity=quantity,
+                trading_time=local_time_result, chart_color=color_random, InvitationCode_id=invitation_id,
+                remark=remark, Retail_id=retail_id
+            )
+            responses['data'] = "更新成功"
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class DelBillDetail(APIView):
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+
+            bill_id = request._request.POST.get('bill_id')
+            models.ZyjWechatBill.objects.filter(
+                id=bill_id).first().delete()
+            responses['data'] = "删除成功"
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"
