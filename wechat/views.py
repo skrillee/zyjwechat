@@ -1348,6 +1348,13 @@ class BillDetail(APIView):
         return JsonResponse(responses)
 
 
+def select_different_color(selected_color_list):
+    color_list = ['#0F375A', ' #F9C03D', ' #BFD0DA', '#65472F', '#E9D9BF', '#D4920A', '#056E83', '#FFAAAA',
+                  '#F0C046', '#4B4B4E', '#E9D9BF', '#0F375A']
+    result_list = list(set(color_list).difference(set(selected_color_list)))
+    return result_list
+
+
 # noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
 class AddBillDetail(APIView):
     """
@@ -1364,9 +1371,6 @@ class AddBillDetail(APIView):
             invitation_code_obj = models.ZyjWechatInvitationCode.objects.filter(
                 invitation_code=invitation_code).first()
             retail_id = invitation_code_obj.id
-            color_list = ['#0F375A', ' #F9C03D', ' #BFD0DA', '#65472F', '#E9D9BF', '#D4920A', '#056E83', '#FFAAAA',
-                          '#F0C046', '#4B4B4E', '#E9D9BF', '#0F375A']
-            color_random = random.sample(color_list, 1)[0]
             remark = request._request.POST.get('remark')
             unit_price = request._request.POST.get('unit_price')
             quantity = request._request.POST.get('quantity')
@@ -1379,6 +1383,13 @@ class AddBillDetail(APIView):
             local_time_day = str(local_time.day)
             local_time_year = str(local_time.year)
             local_time_result = local_time_year + '-' + local_time_month + '-' + local_time_day
+            bill_objects = models.ZyjWechatBill.objects.filter(
+                Retail_id=retail_id, InvitationCode_id=invitation_id).all()
+            selected_color_list = []
+            for bill_object in bill_objects:
+                selected_color_list.append(bill_object.chart_color)
+            new_color_list = select_different_color(selected_color_list)
+            color_random = random.sample(new_color_list, 1)[0]
             models.ZyjWechatBill.objects.create(
                 customer_name=invitation_code_name, cost_name=cost_name, unit_price=unit_price, quantity=quantity,
                 trading_time=local_time_result, chart_color=color_random, InvitationCode_id=invitation_id,
@@ -1426,9 +1437,6 @@ class AddBill(APIView):
             invitation_code_obj = models.ZyjWechatInvitationCode.objects.filter(
                 invitation_code=invitation_code).first()
             retail_id = invitation_code_obj.id
-            color_list = ['#0F375A', ' #F9C03D', ' #BFD0DA', '#65472F', '#E9D9BF', '#D4920A', '#056E83', '#FFAAAA',
-                          '#F0C046', '#4B4B4E', '#E9D9BF', '#0F375A']
-            color_random = random.sample(color_list, 1)[0]
             remark = request._request.POST.get('remark')
             unit_price = request._request.POST.get('unit_price')
             quantity = request._request.POST.get('quantity')
@@ -1444,6 +1452,13 @@ class AddBill(APIView):
                 local_time_day = str(local_time.day)
                 local_time_year = str(local_time.year)
                 local_time_result = local_time_year + '-' + local_time_month + '-' + local_time_day
+                bill_objects = models.ZyjWechatBill.objects.filter(
+                    Retail_id=retail_id, InvitationCode_id=invitation_id).all()
+                selected_color_list = []
+                for bill_object in bill_objects:
+                    selected_color_list.append(bill_object.chart_color)
+                new_color_list = select_different_color(selected_color_list)
+                color_random = random.sample(new_color_list, 1)[0]
                 models.ZyjWechatBill.objects.create(
                     customer_name=customer_name, cost_name=cost_name, unit_price=unit_price, quantity=quantity,
                     trading_time=local_time_result, chart_color=color_random, InvitationCode_id=invitation_id,
