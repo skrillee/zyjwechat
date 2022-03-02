@@ -1373,7 +1373,7 @@ class AddBillDetail(APIView):
             cost_name = request._request.POST.get('cost_name')
             invitation_id = request._request.POST.get('invitation_id')
             invitation_code_name = models.ZyjWechatInvitationCode.objects.filter(
-                invitation_code=invitation_id).first().name
+                id=invitation_id).first().name
             local_time = datetime.datetime.now()
             local_time_month = str(local_time.month)
             local_time_day = str(local_time.day)
