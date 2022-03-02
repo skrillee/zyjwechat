@@ -1349,7 +1349,7 @@ class BillDetail(APIView):
 
 
 def select_different_color(selected_color_list):
-    color_list = ['#0F375A', '#F9C03D', ' #BFD0DA', '#65472F', '#E9D9BF', '#D4920A', '#056E83', '#FFAAAA',
+    color_list = ['#0F375A', '#F9C03D', '#BFD0DA', '#65472F', '#E9D9BF', '#D4920A', '#056E83', '#FFAAAA',
                   '#F0C046', '#4B4B4E', '#E9D9BF', '#0F375A']
     result_list = list(set(color_list).difference(set(selected_color_list)))
     return result_list
