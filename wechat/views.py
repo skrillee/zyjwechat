@@ -1377,8 +1377,8 @@ class AddBillDetail(APIView):
             local_time = datetime.datetime.now()
             local_time_month = str(local_time.month)
             local_time_day = str(local_time.day)
-            local_time_hour = str(local_time.hour)
-            local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour
+            local_time_year = str(local_time.year)
+            local_time_result = local_time_year + '-' + local_time_month + '-' + local_time_day
             models.ZyjWechatBill.objects.create(
                 customer_name=invitation_code_name, cost_name=cost_name, unit_price=unit_price, quantity=quantity,
                 trading_time=local_time_result, chart_color=color_random, InvitationCode_id=invitation_id,
@@ -1436,19 +1436,23 @@ class AddBill(APIView):
             customer_id = request._request.POST.get('customer_id')
             invitation_code_obj = models.ZyjWechatInvitationCode.objects.filter(
                 invitation_code=customer_id).first()
-            invitation_id = invitation_code_obj.id
-            customer_name = invitation_code_obj.customer_name
-            local_time = datetime.datetime.now()
-            local_time_month = str(local_time.month)
-            local_time_day = str(local_time.day)
-            local_time_hour = str(local_time.hour)
-            local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour
-            models.ZyjWechatBill.objects.create(
-                customer_name=customer_name, cost_name=cost_name, unit_price=unit_price, quantity=quantity,
-                trading_time=local_time_result, chart_color=color_random, InvitationCode_id=invitation_id,
-                remark=remark, Retail_id=retail_id
-            )
-            responses['data'] = "更新成功"
+            if invitation_code_obj:
+                invitation_id = invitation_code_obj.id
+                customer_name = invitation_code_obj.name
+                local_time = datetime.datetime.now()
+                local_time_month = str(local_time.month)
+                local_time_day = str(local_time.day)
+                local_time_year = str(local_time.year)
+                local_time_result = local_time_year + '-' + local_time_month + '-' + local_time_day
+                models.ZyjWechatBill.objects.create(
+                    customer_name=customer_name, cost_name=cost_name, unit_price=unit_price, quantity=quantity,
+                    trading_time=local_time_result, chart_color=color_random, InvitationCode_id=invitation_id,
+                    remark=remark, Retail_id=retail_id
+                )
+                responses['data'] = "更新成功"
+            else:
+                responses['code'] = 3010
+                responses['message'] = "无效的邀请码"
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"
