@@ -29,5 +29,6 @@ urlpatterns = [
     url(r'^v1/retail/bill_detail/$', views.BillDetail.as_view()),
     url(r'^v1/retail/add_bill_detail/$', views.AddBillDetail.as_view()),
     url(r'^v1/retail/del_bill_detail/$', views.DelBillDetail.as_view()),
+    url(r'^v1/retail/add_bill/$', views.AddBill.as_view()),
     # url(r'^v1/retail/pay/$', views.Login.as_view()),
 ]

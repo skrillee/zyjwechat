@@ -1364,7 +1364,6 @@ class AddBillDetail(APIView):
             invitation_code_obj = models.ZyjWechatInvitationCode.objects.filter(
                 invitation_code=invitation_code).first()
             retail_id = invitation_code_obj.id
-            invitation_code_name = invitation_code_obj.name
             color_list = ['#0F375A', ' #F9C03D', ' #BFD0DA', '#65472F', '#E9D9BF', '#D4920A', '#056E83', '#FFAAAA',
                           '#F0C046', '#4B4B4E', '#E9D9BF', '#0F375A']
             color_random = random.sample(color_list, 1)[0]
@@ -1373,6 +1372,8 @@ class AddBillDetail(APIView):
             quantity = request._request.POST.get('quantity')
             cost_name = request._request.POST.get('cost_name')
             invitation_id = request._request.POST.get('invitation_id')
+            invitation_code_name = models.ZyjWechatInvitationCode.objects.filter(
+                invitation_code=invitation_id).first().name
             local_time = datetime.datetime.now()
             local_time_month = str(local_time.month)
             local_time_day = str(local_time.day)
@@ -1403,6 +1404,51 @@ class DelBillDetail(APIView):
             models.ZyjWechatBill.objects.filter(
                 id=bill_id).first().delete()
             responses['data'] = "删除成功"
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class AddBill(APIView):
+    """
+     color： ['#0F375A', ' #F9C03D', ' #BFD0DA', '#65472F', '#E9D9BF', '#D4920A', '#056E83', '#FFAAAA',
+                          '#F0C046', '#4B4B4E', '#E9D9BF', '#0F375A']
+    """
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            invitation_code = request.user.invitation_code
+            invitation_code_obj = models.ZyjWechatInvitationCode.objects.filter(
+                invitation_code=invitation_code).first()
+            retail_id = invitation_code_obj.id
+            color_list = ['#0F375A', ' #F9C03D', ' #BFD0DA', '#65472F', '#E9D9BF', '#D4920A', '#056E83', '#FFAAAA',
+                          '#F0C046', '#4B4B4E', '#E9D9BF', '#0F375A']
+            color_random = random.sample(color_list, 1)[0]
+            remark = request._request.POST.get('remark')
+            unit_price = request._request.POST.get('unit_price')
+            quantity = request._request.POST.get('quantity')
+            cost_name = request._request.POST.get('cost_name')
+            customer_id = request._request.POST.get('customer_id')
+            invitation_code_obj = models.ZyjWechatInvitationCode.objects.filter(
+                invitation_code=customer_id).first()
+            invitation_id = invitation_code_obj.id
+            customer_name = invitation_code_obj.customer_name
+            local_time = datetime.datetime.now()
+            local_time_month = str(local_time.month)
+            local_time_day = str(local_time.day)
+            local_time_hour = str(local_time.hour)
+            local_time_result = local_time_month + '-' + local_time_day + '-' + local_time_hour
+            models.ZyjWechatBill.objects.create(
+                customer_name=customer_name, cost_name=cost_name, unit_price=unit_price, quantity=quantity,
+                trading_time=local_time_result, chart_color=color_random, InvitationCode_id=invitation_id,
+                remark=remark, Retail_id=retail_id
+            )
+            responses['data'] = "更新成功"
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"
