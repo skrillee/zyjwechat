@@ -1216,14 +1216,14 @@ class Bill(APIView):
                         }
                         bill_chart = {
                             "name": bill_object.cost_name,
-                            "value": int(bill_object.unit_price)*int(bill_object.quantity)
+                            "value": float(bill_object.unit_price)*float(bill_object.quantity)
                         }
 
                         bill_object_list.append(bill_dict)
                         bill_chart_value_list.append(bill_chart)
                         bill_chart_name_list.append(bill_object.cost_name)
                         bill_chart_color_list.append(bill_object.chart_color)
-                        bill_total += int(bill_object.unit_price)*int(bill_object.quantity)
+                        bill_total += float(bill_object.unit_price)*float(bill_object.quantity)
                     responses['data'] = bill_object_list
                     responses['chart_value'] = bill_chart_value_list
                     responses['chart_name'] = bill_chart_name_list
@@ -1285,14 +1285,14 @@ class Bill(APIView):
                         if bill_object.customer_name in bill_objs_customer_dict.keys():
                             bill_detail_dict = bill_objs_customer_dict[bill_object.customer_name][0]
                             bill_detail_dict["item_quantity"] += 1
-                            bill_detail_dict["item_total"] += int(bill_object.unit_price)*int(bill_object.quantity)
+                            bill_detail_dict["item_total"] += float(bill_object.unit_price)*float(bill_object.quantity)
                             bill_detail_dict["customer_name"] = bill_object.customer_name
                             bill_detail_dict["trading_time"] = bill_object.trading_time
                         else:
                             bill_dict["item_quantity"] = 1
                             bill_dict["retail_id"] = bill_object.Retail_id
                             bill_dict["invitation_id"] = bill_object.InvitationCode_id
-                            bill_dict["item_total"] = int(bill_object.unit_price)*int(bill_object.quantity)
+                            bill_dict["item_total"] = float(bill_object.unit_price)*float(bill_object.quantity)
                             bill_objs_customer_dict[bill_object.customer_name] = [bill_dict]
                     responses['data'] = bill_objs_customer_dict
                 else:
@@ -1337,7 +1337,7 @@ class BillDetail(APIView):
                     "quantity": bill_object.quantity,
                     "trading_time": bill_object.trading_time,
                     "bill_id": bill_object.id,
-                    "item_total": int(bill_object.unit_price)*int(bill_object.quantity),
+                    "item_total": float(bill_object.unit_price)*float(bill_object.quantity),
                     "remark": bill_object.remark
                 }
                 bill_list.append(bill_dict)
