@@ -1472,3 +1472,46 @@ class AddBill(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class AddPicture(APIView):
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            invitation_code = request.user.invitation_code
+            invitation_code_obj = models.ZyjWechatInvitationCode.objects.filter(
+                invitation_code=invitation_code).first()
+            if invitation_code_obj.code_type != 1:
+                invitation_code = request._request.POST.get('invitation_code')
+                invitation_code_obj = models.ZyjWechatInvitationCode.objects.filter(
+                    invitation_code=invitation_code).first()
+                if invitation_code_obj:
+                    pic_item = request._request.POST.get('item')
+                    files = request.FILES
+                    content = files.get('image', None).read()
+                    # path = os.path.join(settings.IMAGES_DIR[0], 'aaa.jpg')
+                    path = os.path.join(settings.IMAGES_DIR[0])+'/{}'.format(invitation_code)
+                    path_pic = path+'/'+'{}'.format(pic_item)+'.jpg'
+                    try:
+                        with open(path_pic, 'wb') as f:
+                            f.write(content)
+                    except:
+                        os.makedirs(path)
+                        with open(path_pic, 'wb') as f:
+                            f.write(content)
+                    responses['data'] = "更新成功"
+                else:
+                    responses['code'] = 3010
+                    responses['message'] = "无效的邀请码"
+            else:
+                responses['code'] = 3009
+                responses['message'] = "该账号无权限添加"
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
