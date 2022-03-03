@@ -1540,12 +1540,13 @@ class CheckPicture(APIView):
             check_static_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/check/"
             check_url = check_static_url+invitation_code
             try:
-                images_path = os.listdir(check_url)
+                path_static = os.path.join(settings.STATIC_IMAGES_DIR[0]) + '/{}'.format(invitation_code)
+                images_path = os.listdir(path_static)
                 if images_path:
                     check_images_list = []
                     for filename in images_path:
                         check_dict = {
-                            "ticket_image": check_static_url + filename,
+                            "ticket_image": check_url + filename,
                         }
                         check_images_list.append(check_dict)
                     responses['data'] = check_images_list
