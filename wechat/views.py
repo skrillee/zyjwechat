@@ -1546,7 +1546,7 @@ class CheckPicture(APIView):
                     check_images_list = []
                     for filename in images_path:
                         check_dict = {
-                            "ticket_image": check_url + filename,
+                            "check_image": check_url + '/' + filename,
                         }
                         check_images_list.append(check_dict)
                     responses['data'] = check_images_list
