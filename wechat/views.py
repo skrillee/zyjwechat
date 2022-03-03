@@ -1499,17 +1499,19 @@ class AddPicture(APIView):
                     path_pic = path+'/'+'{}'.format(pic_item)+'.jpg'
 
                     path_static = os.path.join(settings.STATIC_IMAGES_DIR[0])+'/{}'.format(invitation_code)
-                    path_pic_static = path + '/' + '{}'.format(path_static) + '.jpg'
+                    path_pic_static = path_static + '/' + '{}'.format(pic_item) + '.jpg'
                     try:
                         with open(path_pic, 'wb') as f:
                             f.write(content)
+                    except:
+                        os.makedirs(path)
+                        with open(path_pic, 'wb') as f:
+                            f.write(content)
+                    try:
                         with open(path_pic_static, 'wb') as f_static:
                             f_static.write(content)
                     except:
-                        os.makedirs(path)
                         os.makedirs(path_static)
-                        with open(path_pic, 'wb') as f:
-                            f.write(content)
                         with open(path_pic_static, 'wb') as f_static:
                             f_static.write(content)
                     responses['data'] = "更新成功"

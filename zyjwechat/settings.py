@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-geknhmnp_+9p0k!%k^veba@wsfcrtv!2you_y$290ps%4y4+8&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['47.92.85.245','*']
+ALLOWED_HOSTS = ['47.92.85.245']
 
 
 # Application definition
@@ -146,5 +146,5 @@ IMAGES_DIR = [
 
 STATIC_IMAGES_DIR = [
     os.path.join(BASE_DIR, "/home/yanboce/apps/zyjwechat/static/media/manufactor/check"),
-    # os.path.join(BASE_DIR, "/办公/wechatProject/zyj1206/zyjwechat/wechat/static/media/manufactor/check"),
+    # os.path.join(BASE_DIR, "/办公/wechatProject/zyj1206/zyjwechat/static/media/manufactor/check"),
 ]
