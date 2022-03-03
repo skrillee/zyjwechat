@@ -1497,13 +1497,21 @@ class AddPicture(APIView):
                     # path = os.path.join(settings.IMAGES_DIR[0], 'aaa.jpg')
                     path = os.path.join(settings.IMAGES_DIR[0])+'/{}'.format(invitation_code)
                     path_pic = path+'/'+'{}'.format(pic_item)+'.jpg'
+
+                    path_static = os.path.join(settings.STATIC_IMAGES_DIR[0])+'/{}'.format(invitation_code)
+                    path_pic_static = path + '/' + '{}'.format(path_static) + '.jpg'
                     try:
                         with open(path_pic, 'wb') as f:
                             f.write(content)
+                        with open(path_pic_static, 'wb') as f_static:
+                            f_static.write(content)
                     except:
                         os.makedirs(path)
+                        os.makedirs(path_static)
                         with open(path_pic, 'wb') as f:
                             f.write(content)
+                        with open(path_pic_static, 'wb') as f_static:
+                            f_static.write(content)
                     responses['data'] = "更新成功"
                 else:
                     responses['code'] = 3010
@@ -1511,6 +1519,40 @@ class AddPicture(APIView):
             else:
                 responses['code'] = 3009
                 responses['message'] = "该账号无权限添加"
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class CheckPicture(APIView):
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            invitation_code = request.user.invitation_code
+            check_static_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/check/"
+            check_url = check_static_url+invitation_code
+            try:
+                images_path = os.listdir(check_url)
+                if images_path:
+                    check_images_list = []
+                    for filename in images_path:
+                        check_dict = {
+                            "ticket_image": check_static_url + filename,
+                        }
+                        check_images_list.append(check_dict)
+                    responses['data'] = check_images_list
+                else:
+                    responses['code'] = 3011
+                    responses['message'] = "该邀请码下暂无信息，请联系商家上传照片"
+            except:
+                responses['code'] = 3012
+                responses['message'] = "该邀请码下暂无信息，请联系商家上传照片"
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"

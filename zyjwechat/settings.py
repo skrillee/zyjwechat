@@ -140,7 +140,11 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "/home/yanboce/apps/zyjwechat/wechat/static"),
 ]
 IMAGES_DIR = [
-    os.path.join(BASE_DIR, "/home/yanboce/apps/zyjwechat/wechat/static/media/manufactor/check"),
-    # os.path.join(BASE_DIR, "/办公/wechatProject/zyj1206/zyjwechat/wechat/static/media/manufactor/check"),
+    # os.path.join(BASE_DIR, "/home/yanboce/apps/zyjwechat/wechat/static/media/manufactor/check"),
+    os.path.join(BASE_DIR, "/办公/wechatProject/zyj1206/zyjwechat/wechat/static/media/manufactor/check"),
 ]
 
+STATIC_IMAGES_DIR = [
+    os.path.join(BASE_DIR, "/home/yanboce/apps/zyjwechat/static/media/manufactor/check"),
+    # os.path.join(BASE_DIR, "/办公/wechatProject/zyj1206/zyjwechat/wechat/static/media/manufactor/check"),
+]
