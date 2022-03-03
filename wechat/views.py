@@ -1545,10 +1545,10 @@ class CheckPicture(APIView):
                 if images_path:
                     check_images_list = []
                     for filename in images_path:
-                        check_dict = {
-                            "check_image": check_url + '/' + filename,
-                        }
-                        check_images_list.append(check_dict)
+                        # check_dict = {
+                        #     "check_image": check_url + '/' + filename,
+                        # }
+                        check_images_list.append(check_url + '/' + filename)
                     responses['data'] = check_images_list
                 else:
                     responses['code'] = 3011
