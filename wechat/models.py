@@ -46,6 +46,8 @@ class ZyjWechatInvitationCode(models.Model):
     # LiveRoom = models.IntegerField('有效时间', default=3)
     LiveRoom = models.ForeignKey(LivingRoom, on_delete=models.CASCADE, null=True)
     name = models.CharField('名字', null=True, max_length=64)
+    mobile = models.CharField('联系方式', null=True, max_length=64)
+    street = models.CharField('地址', null=True, max_length=128)
 
     class Meta:
         verbose_name = '邀请码'
