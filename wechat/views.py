@@ -1576,3 +1576,30 @@ class Contacts(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class SearchContacts(APIView):
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+
+        try:
+            name_id = request._request.POST.get('name_id')
+            invitation_code_object = models.ZyjWechatInvitationCode.objects.filter(
+                id=name_id).first()
+            contacts_dict = {
+                "id": invitation_code_object.id,
+                "customer_name": invitation_code_object.name,
+                # "initials": initials,
+                "street": invitation_code_object.street,
+                "mobile": invitation_code_object.mobile
+            }
+            responses['data'] = contacts_dict
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
