@@ -1596,7 +1596,8 @@ class SearchContacts(APIView):
                 "customer_name": invitation_code_object.name,
                 # "initials": initials,
                 "street": invitation_code_object.street,
-                "mobile": invitation_code_object.mobile
+                "mobile": invitation_code_object.mobile,
+                "invitation_code": invitation_code_object.invitation_code
             }
             responses['data'] = contacts_dict
         except Exception as e:
