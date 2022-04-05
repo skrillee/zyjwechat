@@ -428,6 +428,40 @@ class Classification(APIView):
         return JsonResponse(responses)
 
 
+class Classification2(APIView):
+    """
+        Receive a parameter：retailretail
+        This parameter is limited to your own brand
+        Return the Edition corresponding to the invitation code
+    """
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            name = request._request.POST.get('name')
+            classification_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/classification/"
+            classification_object_list = []
+            classification = models.Classification.objects.filter(name=name).first()
+            images_big_list = classification.images_big.split(",")
+            images_big_list = [classification_url+var for var in images_big_list if var]
+            classification_object_dict = {'name': classification.name, 'product_name': classification.product_name,
+                                          'reference_price': classification.reference_price, 'images_big': images_big_list,
+                                          'characteristic': classification.characteristic, 'discount': classification.discount,
+                                          'images_parameter': classification_url+classification.images_parameter,
+                                          'original_price': classification.original_price, 'manual_price': classification.manual_price,
+                                          'size': classification.size, 'details': classification.details,
+                                          'evaluate': classification.evaluate
+                                          }
+            classification_object_list.append(classification_object_dict)
+            responses['data'] = classification_object_list
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+
 # noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
 class Voucher(APIView):
     """

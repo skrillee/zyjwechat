@@ -1,6 +1,7 @@
 import collections
 Grade = collections.namedtuple('Grade', ('score', 'weight'))
 
+
 class Subject(object):
     def __init__(self):
         self._grades = []
@@ -31,6 +32,7 @@ class Student(object):
             total += subject.average_grade()
             count += 1
         return total/count
+
 
 class GradeBook(object):
     def __init__(self):
