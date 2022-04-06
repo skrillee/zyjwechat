@@ -224,3 +224,27 @@ class Ticket(models.Model):
     ticket_information = models.CharField('券说明', max_length=1024, null=True)
     remark = models.CharField('备注', max_length=128, null=True)
     Retail = models.ForeignKey(ZyjWechatRetail, on_delete=models.CASCADE, null=True)
+
+
+class Cart(models.Model):
+    cart_create_time = models.DateTimeField('临时选中商品的时间', auto_now_add=True)
+    Classification = models.ForeignKey(Classification, on_delete=models.CASCADE, null=True)
+    cart_code = models.CharField('邀请码', max_length=32, null=True)
+
+    class Meta:
+        verbose_name = '临时选中的商品'
+        verbose_name_plural = '临时选中的商品'
+
+
+class Order(models.Model):
+    order_create_time = models.DateTimeField('订单创建时间', auto_now_add=True)
+    order_local = models.CharField('预约地点', max_length=64, null=True)
+    order_owner = models.CharField('客户姓名', max_length=32, null=True)
+    order_time = models.CharField('预约时间', max_length=32, null=True)
+    order_phone = models.CharField('电话', max_length=32, null=True)
+    order_code = models.CharField('邀请码', max_length=32, null=True)
+    remark = models.CharField('备注', max_length=128, null=True)
+
+    class Meta:
+        verbose_name = '订单'
+        verbose_name_plural = '订单'

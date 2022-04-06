@@ -1638,3 +1638,33 @@ class SearchContacts(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class AddOrder(APIView):
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            invitation_code = request.user.invitation_code
+            name = request._request.POST.get('name')
+            classification_object_id = models.Classification.objects.filter(
+                name=name).first().id
+            cart_object_id = models.Cart.objects.filter(
+                cart_code=invitation_code, Classification_id=classification_object_id).first()
+            order_dict = {
+                "cart_code": invitation_code,
+                "Classification_id": classification_object_id,
+            }
+            if cart_object_id:
+                models.Cart.objects.update_or_create(defaults=order_dict, id=cart_object_id.id)
+            else:
+                models.Cart.objects.update_or_create(cart_code=invitation_code, Classification_id=classification_object_id)
+
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
