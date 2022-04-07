@@ -36,5 +36,6 @@ urlpatterns = [
     url(r'^v1/retail/contacts/$', views.Contacts.as_view()),
     url(r'^v1/retail/search_contacts/$', views.SearchContacts.as_view()),
     url(r'^v1/retail/add_order/$', views.AddOrder.as_view()),
+    url(r'^v1/retail/get_order/$', views.GetOrder.as_view()),
     # url(r'^v1/retail/pay/$', views.Login.as_view()),
 ]

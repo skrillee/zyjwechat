@@ -1668,3 +1668,41 @@ class AddOrder(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class GetOrder(APIView):
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            classification_id_list = []
+            classification_object_list = []
+            invitation_code = request.user.invitation_code
+            cart_object_objs = models.Cart.objects.filter(
+                cart_code=invitation_code).all()
+            for cart_object_obj in cart_object_objs:
+                classification_id = cart_object_obj.Classification_id
+                classification_id_list.append(classification_id)
+            classification_objs = models.Classification.objects.filter(id__in=classification_id_list).all()
+            classification_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/classification/"
+            if classification_objs:
+                for classification in classification_objs:
+                    classification_object_dict = {'name': classification.name,
+                                                  'product_name': classification.product_name,
+                                                  'images_small': classification_url + classification.images_small,
+                                                  'reference_price': classification.reference_price,
+                                                  'characteristic': classification.characteristic,
+                                                  'discount': classification.discount,
+                                                  'original_price': classification.original_price,
+                                                  'size': classification.size,
+                                                  }
+                    classification_object_list.append(classification_object_dict)
+                    responses['data'] = classification_object_list
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
