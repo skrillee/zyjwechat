@@ -1671,6 +1671,27 @@ class AddOrder(APIView):
 
 
 # noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class DeleteOrder(APIView):
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            invitation_code = request.user.invitation_code
+            name = request._request.POST.get('name')
+            classification_object_id = models.Classification.objects.filter(
+                name=name).first().id
+            models.Cart.objects.filter(cart_code=invitation_code, Classification_id=classification_object_id).first().delete()
+            responses['data'] = "删除成功"
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
 class GetOrder(APIView):
 
     def post(self, request):
