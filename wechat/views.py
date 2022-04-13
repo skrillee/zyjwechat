@@ -1731,3 +1731,32 @@ class GetOrder(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class CreateOrder(APIView):
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            order_name = request._request.POST.get('name')
+            order_local = request._request.POST.get('local')
+            order_time = request._request.POST.get('time')
+            order_phone = request._request.POST.get('phone')
+            order_remark = request._request.POST.get('remark')
+            invitation_code = request.user.invitation_code
+            order_dict = {
+                "order_owner": order_name,
+                "order_local": order_local,
+                "order_time": order_time,
+                "order_phone": order_phone,
+                "remark": order_remark,
+            }
+            models.Order.objects.update_or_create(defaults=order_dict, order_code=invitation_code)
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
