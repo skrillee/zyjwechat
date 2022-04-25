@@ -4,19 +4,19 @@ from django.shortcuts import HttpResponse
 from rest_framework.views import APIView
 from django.http import JsonResponse
 
-import wechat.views
+# import wechat.views
+# import hashlib
+# import time
+# import requests
 from zyjwechat import settings
 from wechat import models
 import socket
 import datetime
-import hashlib
-import time
 import pytz
 import os
 import json
 import base64
 from Cryptodome.Cipher import AES
-import requests
 import random
 
 
@@ -29,14 +29,10 @@ def decrypt(appId, sessionKey, encryptedData, iv):
     sessionKey = base64.b64decode(sessionKey)
     encryptedData = base64.b64decode(encryptedData)
     iv = base64.b64decode(iv)
-
     cipher = AES.new(sessionKey, AES.MODE_CBC, iv)
-
     decrypted = json.loads(_unpad(cipher.decrypt(encryptedData)))
-
     if decrypted['watermark']['appid'] != appId:
         raise Exception('Invalid Buffer')
-
     return decrypted
 
 
