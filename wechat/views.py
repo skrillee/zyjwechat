@@ -20,6 +20,25 @@ import requests
 import random
 
 
+def _unpad(s):
+    return s[:-ord(s[len(s) - 1:])]
+
+
+def decrypt(appId, sessionKey, encryptedData, iv):
+    # base64 decode
+    sessionKey = base64.b64decode(sessionKey)
+    encryptedData = base64.b64decode(encryptedData)
+    iv = base64.b64decode(iv)
+
+    cipher = AES.new(sessionKey, AES.MODE_CBC, iv)
+
+    decrypted = json.loads(_unpad(cipher.decrypt(encryptedData)))
+
+    if decrypted['watermark']['appid'] != appId:
+        raise Exception('Invalid Buffer')
+
+    return decrypted
+
 
 def md5(invitation_code) -> object:
     current_time = str(time.time())
@@ -42,8 +61,41 @@ class AuthVIew(APIView):
             'message': None
         }
         try:
+            js_code = request._request.POST.get('jscode')
+            iv = request._request.POST.get('iv')
             invitation_code = request._request.POST.get('invitation_code')
-            invitation_code_object = models.ZyjWechatInvitationCode.objects.filter(invitation_code=invitation_code).first()
+            if js_code:
+                encrypted_data = request._request.POST.get('encryptedData')
+                url_code_session = "https://api.weixin.qq.com/sns/jscode2session" \
+                                   "?appid={}&secret={}&js_code={}&grant_type=authorization_code".format(
+                                    'wxc9ccd41f17a1fa42',
+                                    '168534ea6674446e6f2d7ea81bff1ab8',
+                                    js_code)
+                response = requests.get(url_code_session)
+                try:
+                    data = json.loads(response.content)
+                    openid = data['openid']
+                    session_key = data['session_key']
+                    appId = 'wxc9ccd41f17a1fa42'
+                    pResult = decrypt(appId, session_key, encrypted_data, iv)
+                    mobile_phone_number = pResult["phoneNumber"]
+                    username = openid
+                    effective_time = '120'
+                    models.ZyjWechatInvitationCode.objects.update_or_create(
+                        defaults={'name': username,
+                                  'effective_time': effective_time,
+                                  'Retail_id': '1',
+                                  'code_type': '1',
+                                  'mobile': mobile_phone_number
+                                  },
+                        invitation_code=mobile_phone_number)
+                    invitation_code = mobile_phone_number
+                except Exception as e:
+                    responses['code'] = 3002
+                    responses['message'] = "请求异常"
+
+            invitation_code_object = models.ZyjWechatInvitationCode.objects.filter(
+                invitation_code=invitation_code).first()
             if not invitation_code_object:
                 responses['code'] = 3001
                 responses['message'] = "邀请码错误，请填写正确的邀请码"
@@ -57,15 +109,16 @@ class AuthVIew(APIView):
                     time_state = remaining_time < datetime.timedelta(days=effective_time)
                     if time_state:
                         responses['token'] = token
-                        models.CodeToken.objects.update_or_create(defaults={'token': token, 'token_effective_time': effective_time}, code=invitation_code_object)
-                    #     return manufactor_id and edition_id string
-                    #     manufactor = request.user.Retail.Product.filter()
-                    #     edition_objects = models.ZyjWechatEdition.objects.filter(Manufactor=manufactor_id)
+                        models.CodeToken.objects.update_or_create(
+                            defaults={'token': token, 'token_effective_time': effective_time},
+                            code=invitation_code_object)
                     else:
                         responses['code'] = 2001
                         responses['message'] = "邀请码过期，请填写可用的邀请码"
                 else:
-                    models.CodeToken.objects.update_or_create(code=invitation_code_object, defaults={'token': token, 'token_effective_time': effective_time})
+                    models.CodeToken.objects.update_or_create(code=invitation_code_object, defaults={
+                        'token': token,
+                        'token_effective_time': effective_time})
                     responses['token'] = token
         except Exception as e:
             responses['code'] = 3002
@@ -726,35 +779,36 @@ class History(APIView):
         return JsonResponse(responses)
 
 
-class WXBizDataCrypt:
-    def __init__(self, appId, sessionKey):
-        self.appId = appId
-        self.sessionKey = sessionKey
-
-    def decrypt(self, encryptedData, iv):
-        # base64 decode
-        sessionKey = base64.b64decode(self.sessionKey)
-        encryptedData = base64.b64decode(encryptedData)
-        iv = base64.b64decode(iv)
-
-        cipher = AES.new(sessionKey, AES.MODE_CBC, iv)
-
-        decrypted = json.loads(self._unpad(cipher.decrypt(encryptedData)))
-
-        if decrypted['watermark']['appid'] != self.appId:
-            raise Exception('Invalid Buffer')
-
-        return decrypted
-
-    def _unpad(self, s):
-        return s[:-ord(s[len(s)-1:])]
+# class WXBizDataCrypt:
+#     def __init__(self, appId, sessionKey):
+#         self.appId = appId
+#         self.sessionKey = sessionKey
+#
+#     def decrypt(self, encryptedData, iv):
+#         # base64 decode
+#         sessionKey = base64.b64decode(self.sessionKey)
+#         encryptedData = base64.b64decode(encryptedData)
+#         iv = base64.b64decode(iv)
+#
+#         cipher = AES.new(sessionKey, AES.MODE_CBC, iv)
+#
+#         decrypted = json.loads(self._unpad(cipher.decrypt(encryptedData)))
+#
+#         if decrypted['watermark']['appid'] != self.appId:
+#             raise Exception('Invalid Buffer')
+#
+#         return decrypted
+#
+#     def _unpad(self, s):
+#         return s[:-ord(s[len(s)-1:])]
 
 
 # 解密获取用户信息
-def decrypt_encrypteddata(app_id, session_key, encryptedData, iv):
-    decrypt_data = WXBizDataCrypt(app_id, session_key)
-    decrypt_data = decrypt_data.decrypt(encryptedData, iv)
-    return decrypt_data
+# def decrypt_encrypteddata(app_id, session_key, encryptedData, iv):
+#     decrypt_data = WXBizDataCrypt(app_id, session_key)
+#     decrypt_data = decrypt_data.decrypt(encryptedData, iv)
+#     return decrypt_data
+
 
 # 随机随机字符串
 def get_random_str():
@@ -832,7 +886,7 @@ class Login(APIView):
             # wechat_code = "081lOcll2hW7G84wJCml2bhswh1lOcld"
             url_code_session = "https://api.weixin.qq.com/sns/jscode2session" \
                                "?appid={}&secret={}&js_code={}&grant_type=authorization_code".format(
-                                'wxc9ccd41f17a1fa42', 'bc8f9ad106f0975fedc5e83182c06d8a', wechat_code
+                                'wxc9ccd41f17a1fa42', '168534ea6674446e6f2d7ea81bff1ab8', wechat_code
             )
             data = requests.get(url_code_session)
             if data.status_code == 200:
