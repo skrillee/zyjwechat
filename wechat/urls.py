@@ -5,6 +5,7 @@ from wechat import views
 
 urlpatterns = [
     url(r'^v1/auth/$', views.AuthVIew.as_view()),
+    url(r'^v1/mobile_phone/$', views.MobilePhone.as_view()),
     url(r'^v1/retail/$', views.RetailVIew.as_view()),
     url(r'^v1/manufactor/$', views.Manufactor.as_view()),
     url(r'^v1/manufactor_picture/(\w+\.(?:png|jpg|gif|bmp))/$', views.ManufactorPicture.as_view()),

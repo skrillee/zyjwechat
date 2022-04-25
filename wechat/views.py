@@ -61,39 +61,7 @@ class AuthVIew(APIView):
             'message': None
         }
         try:
-            js_code = request._request.POST.get('jscode')
-            iv = request._request.POST.get('iv')
             invitation_code = request._request.POST.get('invitation_code')
-            if js_code:
-                encrypted_data = request._request.POST.get('encryptedData')
-                url_code_session = "https://api.weixin.qq.com/sns/jscode2session" \
-                                   "?appid={}&secret={}&js_code={}&grant_type=authorization_code".format(
-                                    'wxc9ccd41f17a1fa42',
-                                    '168534ea6674446e6f2d7ea81bff1ab8',
-                                    js_code)
-                response = requests.get(url_code_session)
-                try:
-                    data = json.loads(response.content)
-                    openid = data['openid']
-                    session_key = data['session_key']
-                    appId = 'wxc9ccd41f17a1fa42'
-                    pResult = decrypt(appId, session_key, encrypted_data, iv)
-                    mobile_phone_number = pResult["phoneNumber"]
-                    username = openid
-                    effective_time = '120'
-                    models.ZyjWechatInvitationCode.objects.update_or_create(
-                        defaults={'name': username,
-                                  'effective_time': effective_time,
-                                  'Retail_id': '1',
-                                  'code_type': '1',
-                                  'mobile': mobile_phone_number
-                                  },
-                        invitation_code=mobile_phone_number)
-                    invitation_code = mobile_phone_number
-                except Exception as e:
-                    responses['code'] = 3002
-                    responses['message'] = "请求异常"
-
             invitation_code_object = models.ZyjWechatInvitationCode.objects.filter(
                 invitation_code=invitation_code).first()
             if not invitation_code_object:
@@ -123,6 +91,51 @@ class AuthVIew(APIView):
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class MobilePhone(APIView):
+
+    authentication_classes = []
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        js_code = request._request.POST.get('jscode')
+        iv = request._request.POST.get('iv')
+
+        if js_code:
+            encrypted_data = request._request.POST.get('encryptedData')
+            url_code_session = "https://api.weixin.qq.com/sns/jscode2session" \
+                               "?appid={}&secret={}&js_code={}&grant_type=authorization_code".format(
+                                'wxc9ccd41f17a1fa42',
+                                '168534ea6674446e6f2d7ea81bff1ab8',
+                                js_code)
+            response = requests.get(url_code_session)
+            try:
+                data = json.loads(response.content)
+                openid = data['openid']
+                session_key = data['session_key']
+                appId = 'wxc9ccd41f17a1fa42'
+                pResult = decrypt(appId, session_key, encrypted_data, iv)
+                mobile_phone_number = pResult["phoneNumber"]
+                username = openid
+                effective_time = '120'
+                models.ZyjWechatInvitationCode.objects.update_or_create(
+                    defaults={'name': username,
+                              'effective_time': effective_time,
+                              'Retail_id': '1',
+                              'code_type': '1',
+                              'mobile': mobile_phone_number
+                              },
+                    invitation_code=mobile_phone_number)
+                responses['invitation_code'] = mobile_phone_number
+            except Exception as e:
+                responses['code'] = 3002
+                responses['message'] = "请求异常"
         return JsonResponse(responses)
 
 
