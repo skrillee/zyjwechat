@@ -18,6 +18,7 @@ import json
 import base64
 from Cryptodome.Cipher import AES
 import random
+import re
 
 
 def _unpad(s):
@@ -30,7 +31,9 @@ def decrypt(appId, sessionKey, encryptedData, iv):
     encryptedData = base64.b64decode(encryptedData)
     iv = base64.b64decode(iv)
     cipher = AES.new(sessionKey, AES.MODE_CBC, iv)
-    decrypted = json.loads(_unpad(cipher.decrypt(encryptedData)))
+    msg = cipher.decrypt(encryptedData)
+    msg = re.compile('[\\x00-\\x08\\x0b-\\x0c\\x0e-\\x1f\n\r\t]').sub('', msg.decode('utf-8'))
+    decrypted = json.loads(msg)
     if decrypted['watermark']['appid'] != appId:
         raise Exception('Invalid Buffer')
     return decrypted
