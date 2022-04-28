@@ -1826,3 +1826,45 @@ class CreateOrder(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class GetVideo(APIView):
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            characteristic = request._request.POST.get('characteristic')
+            classification_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/classification/"
+            retail = request.user.Retail
+            retail_id = retail.id
+            classification_object_list = []
+            classification_object = models.Classification.objects.filter(
+                Retail=retail_id, characteristic=characteristic).first()
+            if classification_object:
+                video_object_dict = {
+                    'video': classification_url + classification_object.images_small,
+                }
+                images_big_list = classification_object.images_big.split(",")
+                for var in images_big_list:
+                    if var:
+                        product_object = models.Classification.objects.filter(
+                            name=var).first()
+                        classification_object_dict = {'name': product_object.name,
+                                                      'product_name': product_object.product_name,
+                                                      'reference_price': product_object.reference_price,
+                                                      'characteristic': product_object.characteristic,
+                                                      'discount': product_object.discount,
+                                                      'original_price': product_object.original_price,
+                                                      'size': product_object.size,
+                                                      }
+                        classification_object_list.append(classification_object_dict)
+                responses['data'] = classification_object_list
+                responses['data_video'] = video_object_dict
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)

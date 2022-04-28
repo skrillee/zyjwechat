@@ -158,7 +158,7 @@ class Classification(models.Model):
     reference_price = models.FloatField('参考价格-不包贴', max_length=64, null=True)
     original_price = models.FloatField('原价', max_length=64, null=True)
     manual_price = models.FloatField('参考价格-包贴', max_length=64, null=True)
-    characteristic = models.FloatField('图案类型', max_length=64, null=True)
+    characteristic = models.CharField('图案类型', max_length=64, null=True)
     discount = models.CharField('折扣商品', max_length=32, null=True)
     size = models.CharField('规格尺寸', max_length=64, null=True)
     details = models.CharField('详情介绍', max_length=1024, null=True)
