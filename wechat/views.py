@@ -1855,6 +1855,7 @@ class GetVideo(APIView):
                             name=var).first()
                         classification_object_dict = {'name': product_object.name,
                                                       'product_name': product_object.product_name,
+                                                      'images_small': classification_url + product_object.images_small,
                                                       'reference_price': product_object.reference_price,
                                                       'characteristic': product_object.characteristic,
                                                       'discount': product_object.discount,
