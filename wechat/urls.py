@@ -41,6 +41,7 @@ urlpatterns = [
     url(r'^v1/retail/get_order/$', views.GetOrder.as_view()),
     url(r'^v1/retail/create_order/$', views.CreateOrder.as_view()),
     url(r'^v1/retail/video/$', views.GetVideo.as_view()),
+    url(r'^v1/retail/redirect/$', views.Redirect.as_view()),
     # url(r'^v1/retail/create_order/$', views.CreateOrder.as_view()),
     # url(r'^v1/retail/pay/$', views.Login.as_view()),
 ]

@@ -1878,3 +1878,32 @@ class GetVideo(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+from django.http import HttpResponseRedirect
+import webbrowser
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class Redirect(APIView):
+    """
+        Return information of authentication process
+        User authentication related services
+    """
+    authentication_classes = []
+
+    def get(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            app_id = 'wxc9ccd41f17a1fa42'
+            secret = '168534ea6674446e6f2d7ea81bff1ab8'
+            content = requests.get(url='https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={APPID}&secret={APPSECRET}'.format(APPID=app_id, APPSECRET=secret))
+            access_token = json.loads(content.content)['access_token']
+            content = requests.post(url='https://api.weixin.qq.com/wxa/generatescheme?access_token={ACCESS_TOKEN}'.format(ACCESS_TOKEN=access_token)).content
+            open_link = json.loads(content)['openlink']
+            return webbrowser.open_new(open_link)
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
