@@ -1902,7 +1902,9 @@ class Redirect(APIView):
             access_token = json.loads(content.content)['access_token']
             content = requests.post(url='https://api.weixin.qq.com/wxa/generatescheme?access_token={ACCESS_TOKEN}'.format(ACCESS_TOKEN=access_token)).content
             open_link = json.loads(content)['openlink']
-            return webbrowser.open_new(open_link)
+            response = HttpResponse("", status=302)
+            response['Location'] = open_link
+            return response
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"
