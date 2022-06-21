@@ -2,6 +2,7 @@ __author__ = 'Yan.zhe 2021.09.28'
 
 from django.conf.urls import url
 from wechat import views
+from django.views.generic import RedirectView
 
 urlpatterns = [
     url(r'^v1/auth/$', views.AuthVIew.as_view()),
@@ -42,7 +43,8 @@ urlpatterns = [
     url(r'^v1/retail/create_order/$', views.CreateOrder.as_view()),
     url(r'^v1/retail/video/$', views.GetVideo.as_view()),
     url(r'^v1/retail/redirect/$', views.Redirect.as_view()),
-    url(r'^v1/retail/douyin/$', views.Douyin.as_view()),
+    # url(r'^v1/retail/douyin/$', views.Douyin.as_view()),
+    url(r'^v1/retail/douyin/$', RedirectView.as_view(url='https://v.douyin.com/YPX29cs/'), name='douyin'),
     # url(r'^v1/retail/create_order/$', views.CreateOrder.as_view()),
     # url(r'^v1/retail/pay/$', views.Login.as_view()),
 ]
