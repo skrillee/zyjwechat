@@ -1933,3 +1933,23 @@ class Douyin(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+from django.shortcuts import render, redirect
+
+
+def index(request):
+    return render(request, 'index.html')
+
+def douyin(request):
+    responses = {
+        'code': 1000,
+        'message': None
+    }
+    try:
+        response = HttpResponse("", status=302)
+        response['Location'] = "https://v.douyin.com/YPX29cs/"
+        return response
+    except Exception as e:
+        responses['code'] = 3002
+        responses['message'] = "请求异常"
+    return JsonResponse(responses)
