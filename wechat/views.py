@@ -1882,6 +1882,8 @@ class GetVideo(APIView):
 
 from django.http import HttpResponseRedirect
 import webbrowser
+
+
 # noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
 class Redirect(APIView):
     """
@@ -1904,6 +1906,28 @@ class Redirect(APIView):
             open_link = json.loads(content)['openlink']
             response = HttpResponse("", status=302)
             response['Location'] = open_link
+            return response
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+
+class Douyin(APIView):
+    """
+        Return information of authentication process
+        User authentication related services
+    """
+    authentication_classes = []
+
+    def get(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            response = HttpResponse("", status=302)
+            response['Location'] = "https://v.douyin.com/YPX29cs/"
             return response
         except Exception as e:
             responses['code'] = 3002
