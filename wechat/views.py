@@ -1941,9 +1941,9 @@ from django.shortcuts import render, redirect
 def index(request):
     su = request.META.get("HTTP_USER_AGENT")
     if "Android" in su and "WeChat" in su:
-        response = HttpResponse("", status=302)
-        response['Location'] = "https://www.zhuangyuanjie.cn/static/media/manufactor/classification/android.png"
-        return response
+        path = "/home/yanboce/apps/zyjwechat/static/media/manufactor/classification/android.png"
+        file_one = open(path, "rb")
+        return HttpResponse(file_one.read(), content_type='image/jpg')
     else:
         return render(request, 'index.html')
 
