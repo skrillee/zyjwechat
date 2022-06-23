@@ -1934,11 +1934,19 @@ class Douyin(APIView):
             responses['message'] = "请求异常"
         return JsonResponse(responses)
 
+
 from django.shortcuts import render, redirect
 
 
 def index(request):
-    return render(request, 'index.html')
+    su = request.META.get("HTTP_USER_AGENT")
+    if "Android" in su and "WeChat" in su:
+        response = HttpResponse("", status=302)
+        response['Location'] = "https://www.zhuangyuanjie.cn/static/media/manufactor/classification/android.png"
+        return response
+    else:
+        return render(request, 'index.html')
+
 
 def douyin(request):
     responses = {
