@@ -1927,7 +1927,7 @@ class Douyin(APIView):
         }
         try:
             response = HttpResponse("", status=302)
-            response['Location'] = "https://v.douyin.com/YPX29cs/"
+            response['Location'] = "https://v.douyin.com/2BERMjD/"
             return response
         except Exception as e:
             responses['code'] = 3002
@@ -1955,7 +1955,7 @@ def douyin(request):
     }
     try:
         response = HttpResponse("", status=302)
-        response['Location'] = "https://v.douyin.com/YPX29cs/"
+        response['Location'] = "https://v.douyin.com/2BERMjD/"
         return response
     except Exception as e:
         responses['code'] = 3002
