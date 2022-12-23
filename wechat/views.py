@@ -147,6 +147,50 @@ class MobilePhone(APIView):
         return JsonResponse(responses)
 
 
+class MobilePhoneFL(APIView):
+
+    authentication_classes = []
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        js_code = request._request.POST.get('jscode')
+        iv = request._request.POST.get('iv')
+
+        if js_code:
+            encrypted_data = request._request.POST.get('encryptedData')
+            url_code_session = "https://api.weixin.qq.com/sns/jscode2session" \
+                               "?appid={}&secret={}&js_code={}&grant_type=authorization_code".format(
+                                'wxc754f862e84d18b5',
+                                '3c79d3dae2d4464e1875fa77d0188e6e',
+                                js_code)
+            response = requests.get(url_code_session)
+            try:
+                data = json.loads(response.content)
+                openid = data['openid']
+                session_key = data['session_key']
+                appId = 'wxc754f862e84d18b5'
+                pResult = decrypt(appId, session_key, encrypted_data, iv)
+                mobile_phone_number = pResult["phoneNumber"]
+                username = openid
+                effective_time = '120'
+                models.ZyjWechatInvitationCode.objects.update_or_create(
+                    defaults={'name': username,
+                              'effective_time': effective_time,
+                              'Retail_id': '1',
+                              'code_type': '1',
+                              'mobile': mobile_phone_number
+                              },
+                    invitation_code=mobile_phone_number)
+                responses['invitation_code'] = mobile_phone_number
+            except Exception as e:
+                responses['code'] = 3002
+                responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+
 # noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
 class RetailVIew(APIView):
     """
