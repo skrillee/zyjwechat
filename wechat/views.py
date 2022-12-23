@@ -67,7 +67,7 @@ class AuthVIew(APIView):
         }
         try:
             invitation_code = request._request.POST.get('invitation_code')
-            if invitation_code == '13720586809':
+            if invitation_code == '5211344':
                 fake_code = models.CodeToken.objects.first()
                 responses['token'] = fake_code.token
             else:
