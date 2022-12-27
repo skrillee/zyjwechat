@@ -1986,6 +1986,9 @@ class Manifest(APIView):
                 manifest_lines = odoo.env['fixed.freight_bill.line'].search([('freight_id', '=', manifest_id)])
                 for manifest in manifest_lines:
                     manifest_obj = odoo.env['fixed.freight_bill.line'].browse(manifest)
+                    remark = manifest_obj['remark']
+                    if remark is None:
+                        remark = "无"
                     manifest_line.append({
                         'product_id': manifest_obj['product_id'],
                         'length_of_the_goods': manifest_obj['length_of_the_goods'],
@@ -1993,7 +1996,7 @@ class Manifest(APIView):
                         'area_of_the_goods': manifest_obj['area_of_the_goods'],
                         'unit_price': manifest_obj['unit_price'],
                         'total_prices': manifest_obj['length_of_the_goods'] * manifest_obj['width_of_the_goods'] * manifest_obj['unit_price'],
-                        'remark': manifest_obj['remark']
+                        'remark': remark
                     })
                 manifest_line_list.append(manifest_line)
             manifest_dict = {
