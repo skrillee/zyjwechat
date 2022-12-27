@@ -1987,7 +1987,7 @@ class Manifest(APIView):
                 for manifest in manifest_lines:
                     manifest_obj = odoo.env['fixed.freight_bill.line'].browse(manifest)
                     remark = manifest_obj['remark']
-                    if remark is None:
+                    if not remark:
                         remark = "无"
                     manifest_line.append({
                         'product_id': manifest_obj['product_id'],
