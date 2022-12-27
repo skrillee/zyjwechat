@@ -1981,27 +1981,38 @@ class Manifest(APIView):
             manifest_list = odoo.env['fixed.freight_bill'].search(['|', ('date_invoice', '=', data_time),  ('id', '=', user_id)])
             list_number = len(manifest_list)
             manifest_line_list = []
+            total_prices_list = []
+            order_number = 0
             for manifest_id in manifest_list:
+                order_number = order_number+1
                 manifest_line = []
+                line_total_prices = 0
                 manifest_lines = odoo.env['fixed.freight_bill.line'].search([('freight_id', '=', manifest_id)])
                 for manifest in manifest_lines:
                     manifest_obj = odoo.env['fixed.freight_bill.line'].browse(manifest)
                     remark = manifest_obj['remark']
                     if not remark:
                         remark = "无"
+                    total_prices = manifest_obj['length_of_the_goods'] * manifest_obj['width_of_the_goods'] * manifest_obj['unit_price']
                     manifest_line.append({
                         'product_id': manifest_obj['product_id'],
                         'length_of_the_goods': manifest_obj['length_of_the_goods'],
                         'width_of_the_goods': manifest_obj['width_of_the_goods'],
                         'area_of_the_goods': manifest_obj['area_of_the_goods'],
                         'unit_price': manifest_obj['unit_price'],
-                        'total_prices': manifest_obj['length_of_the_goods'] * manifest_obj['width_of_the_goods'] * manifest_obj['unit_price'],
+                        'total_prices': total_prices,
                         'remark': remark
                     })
+                    line_total_prices = line_total_prices+total_prices
                 manifest_line_list.append(manifest_line)
+                total_prices_list.append({
+                    "order_number": order_number,
+                    "line_total_prices": line_total_prices
+                })
             manifest_dict = {
                 "list_number": list_number,
-                "manifest_list": manifest_line_list
+                "manifest_list": manifest_line_list,
+                "total_prices_list": total_prices_list
             }
             responses['manifest_dict'] = manifest_dict
         except Exception as e:
