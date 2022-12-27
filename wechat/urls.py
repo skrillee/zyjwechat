@@ -46,6 +46,7 @@ urlpatterns = [
     url(r'^v1/retail/video/$', views.GetVideo.as_view()),
     url(r'^v1/retail/redirect/$', views.Redirect.as_view()),
     url(r'^register/', views.douyin, name='douyin'),
+    url(r'^v1/retail/manifest/$', views.Manifest.as_view()),
     # url(r'^v1/retail/douyin/$', views.Douyin.as_view()),
     # url(r'^v1/retail/douyin/$', RedirectView.as_view(url='https://v.douyin.com/YPX29cs/'), name='douyin'),
 

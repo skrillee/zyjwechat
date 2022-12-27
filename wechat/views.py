@@ -19,6 +19,7 @@ import base64
 from Cryptodome.Cipher import AES
 import random
 import re
+import odoorpc
 
 
 def _unpad(s):
@@ -1952,6 +1953,54 @@ class Redirect(APIView):
             response = HttpResponse("", status=302)
             response['Location'] = open_link
             return response
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class Manifest(APIView):
+    """
+        Return information of authentication process
+        User authentication related services
+    """
+    authentication_classes = []
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            data_time = request._request.POST.get('data_time')
+            phone_number = request._request.POST.get('phone_number')
+            odoo = odoorpc.ODOO('47.92.85.245', port=3369)
+            odoo.login('FenLin', '1979736774@qq.com', 'odooodoo')
+            user_id = odoo.env['feeling_customer.information'].search([('customer_information_phone', '=', phone_number)])
+            manifest_list = odoo.env['fixed.freight_bill'].search(['|', ('date_invoice', '=', data_time),  ('id', '=', user_id)])
+            list_number = len(manifest_list)
+            manifest_line_list = []
+            for manifest_id in manifest_list:
+                manifest_line = []
+                manifest_lines = odoo.env['fixed.freight_bill.line'].search([('freight_id', '=', manifest_id)])
+                for manifest in manifest_lines:
+                    manifest_obj = odoo.env['fixed.freight_bill.line'].browse(manifest)
+                    manifest_line.append({
+                        'product_id': manifest_obj['product_id'],
+                        'length_of_the_goods': manifest_obj['length_of_the_goods'],
+                        'width_of_the_goods': manifest_obj['width_of_the_goods'],
+                        'area_of_the_goods': manifest_obj['area_of_the_goods'],
+                        'unit_price': manifest_obj['unit_price'],
+                        'total_prices': manifest_obj['length_of_the_goods'] * manifest_obj['width_of_the_goods'] * manifest_obj['unit_price'],
+                        'remark': manifest_obj['remark']
+                    })
+                manifest_line_list.append(manifest_line)
+            manifest_dict = {
+                "list_number": list_number,
+                "manifest_list": manifest_line_list
+            }
+            responses['manifest_dict'] = manifest_dict
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"
