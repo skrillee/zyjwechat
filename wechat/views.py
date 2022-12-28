@@ -1960,6 +1960,66 @@ class Redirect(APIView):
 
 
 # noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class ManifestBill(APIView):
+    """
+        Return information of authentication process
+        User authentication related services
+    """
+    authentication_classes = []
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            data_time = request._request.POST.get('data_time')
+            phone_number = request._request.POST.get('phone_number')
+            odoo = odoorpc.ODOO('47.92.85.245', port=3369)
+            odoo.login('FenLin', '1979736774@qq.com', 'odooodoo')
+            user_id = odoo.env['feeling_customer.information'].search([('customer_information_phone', '=', phone_number)])
+            freight_obj = odoo.env['fixed.freight_bill']
+            manifest_list = freight_obj.search(['&', ('date_invoice', '=', data_time),  ('partner_name_id', '=', user_id)])
+
+            list_number = len(manifest_list)
+            freight_filter_obj_list = freight_obj.browse(manifest_list)
+            manifest_line_list = []
+            for freight_filter_obj in freight_filter_obj_list:
+                freight_total_prices = freight_filter_obj.amount_total_signed
+                freight_id = freight_filter_obj.id
+
+                freight_line_list = []
+                manifest_lines = odoo.env['fixed.freight_bill.line'].search([('freight_id', '=', freight_id)])
+                for manifest in manifest_lines:
+                    manifest_obj = odoo.env['fixed.freight_bill.line'].browse(manifest)
+                    remark = manifest_obj['remark']
+                    if not remark:
+                        remark = "无"
+                    freight_line_list.append({
+                        'product_id': manifest_obj['product_id'],
+                        'length_of_the_goods': manifest_obj['length_of_the_goods'],
+                        'width_of_the_goods': manifest_obj['width_of_the_goods'],
+                        'area_of_the_goods': manifest_obj['area_of_the_goods'],
+                        'unit_price': manifest_obj['unit_price'],
+                        'remark': remark
+                    })
+                manifest_line = {
+                    "freight_total_prices": freight_total_prices,
+                    "freight_line_list": freight_line_list
+                }
+                manifest_line_list.append(manifest_line)
+            manifest_dict = {
+                "list_number": list_number,
+                "manifest_list": manifest_line_list,
+            }
+            responses['manifest_dict'] = manifest_dict
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
 class Manifest(APIView):
     """
         Return information of authentication process
@@ -1978,37 +2038,16 @@ class Manifest(APIView):
             odoo = odoorpc.ODOO('47.92.85.245', port=3369)
             odoo.login('FenLin', '1979736774@qq.com', 'odooodoo')
             user_id = odoo.env['feeling_customer.information'].search([('customer_information_phone', '=', phone_number)])
-            manifest_list = odoo.env['fixed.freight_bill'].search(['|', ('date_invoice', '=', data_time),  ('id', '=', user_id)])
-            list_number = len(manifest_list)
-            manifest_line_list = []
-            total_prices_list = []
-            order_number = 0
-            for manifest_id in manifest_list:
-                order_number = order_number+1
-                manifest_line = []
-                line_total_prices = 0
-                manifest_lines = odoo.env['fixed.freight_bill.line'].search([('freight_id', '=', manifest_id)])
-                for manifest in manifest_lines:
-                    manifest_obj = odoo.env['fixed.freight_bill.line'].browse(manifest)
-                    remark = manifest_obj['remark']
-                    if not remark:
-                        remark = "无"
-                    total_prices = manifest_obj['length_of_the_goods'] * manifest_obj['width_of_the_goods'] * manifest_obj['unit_price']
-                    manifest_line.append({
-                        'product_id': manifest_obj['product_id'],
-                        'length_of_the_goods': manifest_obj['length_of_the_goods'],
-                        'width_of_the_goods': manifest_obj['width_of_the_goods'],
-                        'area_of_the_goods': manifest_obj['area_of_the_goods'],
-                        'unit_price': manifest_obj['unit_price'],
-                        'total_prices': total_prices,
-                        'remark': remark
-                    })
-                    line_total_prices = line_total_prices+total_prices
-                manifest_line_list.append(manifest_line)
-                total_prices_list.append({
-                    "order_number": order_number,
-                    "line_total_prices": line_total_prices
-                })
+            freight_bill = odoo.env['fixed.freight_bill']
+            manifest_ids_list = freight_bill.search([('partner_name_id', '=', user_id)])
+            manifest_bill_list = []
+            for bill in freight_bill.browse(manifest_ids_list):
+                bill_time = str(bill.date_invoice)
+                if data_time in bill_time:
+                    manifest_bill_list.append(bill)
+            list_number = len(manifest_bill_list)
+            for manifest_obj_list in manifest_bill_list:
+                print(manifest_obj_list)
             manifest_dict = {
                 "list_number": list_number,
                 "manifest_list": manifest_line_list,
