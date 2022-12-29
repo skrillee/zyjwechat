@@ -1313,6 +1313,7 @@ class Ticket(APIView):
             # advertiser_ids_list = [var for var in advertiser_ids_list if var]
             # ticket_objs = models.Ticket.objects.filter(
             #     Retail_id__in=advertiser_ids_list).all()
+            ticket_type = request._request.POST.get('ticket_type')
             ticket_objs = models.Ticket.objects.all()
             ticket_objs_type_dict = {}
             ticket_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/ticket/"
@@ -1327,16 +1328,17 @@ class Ticket(APIView):
                 #     "ticket_active": ticket_obj.ticket_active,
                 #     "ticket_price": ticket_obj.remark,
                 # }
-                ticket_dict = {
-                    "ticket_id": ticket_obj.id,
-                    "ticket_name": ticket_obj.ticket_name,
-                    "ticket_information": ticket_obj.ticket_information,
-                    "ticket_image": ticket_url + ticket_obj.ticket_image,
-                }
-                if ticket_obj.ticket_type in ticket_objs_type_dict.keys():
-                    ticket_objs_type_dict[ticket_obj.ticket_type].append(ticket_dict)
-                else:
-                    ticket_objs_type_dict[ticket_obj.ticket_type] = [ticket_dict]
+                if ticket_obj.ticket_type == ticket_type:
+                    ticket_dict = {
+                        "ticket_id": ticket_obj.id,
+                        "ticket_name": ticket_obj.ticket_name,
+                        "ticket_information": ticket_obj.ticket_information,
+                        "ticket_image": ticket_url + ticket_obj.ticket_image,
+                    }
+                    if ticket_obj.ticket_type in ticket_objs_type_dict.keys():
+                        ticket_objs_type_dict[ticket_obj.ticket_type].append(ticket_dict)
+                    else:
+                        ticket_objs_type_dict[ticket_obj.ticket_type] = [ticket_dict]
             responses['data'] = ticket_objs_type_dict
         except Exception as e:
             responses['code'] = 3002
