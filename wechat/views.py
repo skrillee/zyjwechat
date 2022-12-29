@@ -2098,7 +2098,7 @@ class Manifest(APIView):
                    一年各个月份的简略数据，例如2022年的各个月份
                 """
                 pass
-            if not data_date:
+            if data_year and not data_date:
                 """
                     某年某一个月的所有数据，例如2022年一月的所有数据
                 """
