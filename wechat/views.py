@@ -20,6 +20,7 @@ from Cryptodome.Cipher import AES
 import random
 import re
 import odoorpc
+from collections import Counter
 
 
 def _unpad(s):
@@ -2039,26 +2040,107 @@ class Manifest(APIView):
             'message': None
         }
         try:
-            data_time = request._request.POST.get('data_time')
+            data_year = request._request.POST.get('data_year')
+            data_month = request._request.POST.get('data_month')
+            data_date = request._request.POST.get('data_date')
+
             phone_number = request._request.POST.get('phone_number')
             odoo = odoorpc.ODOO('47.92.85.245', port=3369)
             odoo.login('FenLin', '1979736774@qq.com', 'odooodoo')
             user_id = odoo.env['feeling_customer.information'].search([('customer_information_phone', '=', phone_number)])
             freight_bill = odoo.env['fixed.freight_bill']
             manifest_ids_list = freight_bill.search([('partner_name_id', '=', user_id)])
-            manifest_bill_list = []
-            for bill in freight_bill.browse(manifest_ids_list):
-                bill_time = str(bill.date_invoice)
-                if data_time in bill_time:
-                    manifest_bill_list.append(bill)
-            list_number = len(manifest_bill_list)
-            for manifest_obj_list in manifest_bill_list:
-                print(manifest_obj_list)
+            freight_bill_obj = freight_bill.browse(manifest_ids_list)
+
             manifest_dict = {
-                "list_number": list_number,
-                "manifest_list": manifest_line_list,
-                "total_prices_list": total_prices_list
+                "list_number": 0,
+                "manifest_list": [],
             }
+            if not data_year:
+                """全年的数据"""
+                year_list = []
+                year_month_dict = {}
+                for bill in freight_bill_obj:
+
+                    bill_time = str(bill.date_invoice)
+                    year_month_date = bill_time.split('-')[0] + '-' + bill_time.split('-')[1]
+                    if year_month_date in year_month_dict:
+                        year_month_dict[year_month_date].append(bill)
+                    else:
+                        year_month_dict[year_month_date] = []
+                        year_month_dict[year_month_date].append(bill)
+
+                for year_month in year_month_dict:
+                    year_month_price = 0
+                    year_months_obj = year_month_dict[year_month]
+                    for year_month_obj in year_months_obj:
+                        year_month_price += year_month_obj.amount_total_signed
+                    result_data_dict = {
+                        "time": year_month,
+                        "amount": len(year_months_obj),
+                        "year_month_price": year_month_price
+                    }
+                    year_list.append(result_data_dict)
+                "冒泡降序"
+                for i in range(len(year_list) - 1):
+                    for j in range(len(year_list)-i-1):
+                        if time.strptime(year_list[j]['time'], '%Y-%m') < time.strptime(year_list[j + 1]['time'], '%Y-%m'):
+                            t = year_list[j]
+                            year_list[j] = year_list[j + 1]
+                            year_list[j + 1] = t
+
+                manifest_dict = {
+                    "list_number": len(year_list),
+                    "manifest_list": year_list,
+                }
+            if not data_month:
+                """
+                   一年各个月份的简略数据，例如2022年的各个月份
+                """
+                pass
+            if not data_date:
+                """
+                    某年某一个月的所有数据，例如2022年一月的所有数据
+                """
+                """全年的数据"""
+                year_month_list = []
+                year_month_dict = {}
+                item_time = data_year + '-' + data_month
+                for bill in freight_bill_obj:
+                    bill_time = str(bill.date_invoice)
+                    year_month_time = bill_time.split('-')[0] + '-' + bill_time.split('-')[1]
+                    year_month_date_time = bill_time.split('-')[0] + '-' + bill_time.split('-')[1] + '-' + bill_time.split('-')[2]
+                    if item_time in year_month_time:
+                        if year_month_date_time in year_month_dict:
+                            year_month_dict[year_month_date_time].append(bill)
+                        else:
+                            year_month_dict[year_month_date_time] = []
+                            year_month_dict[year_month_date_time].append(bill)
+
+                for year_month_date in year_month_dict:
+                    year_month_price = 0
+                    year_months_obj = year_month_dict[year_month_date]
+                    for year_month_obj in year_months_obj:
+                        year_month_price += year_month_obj.amount_total_signed
+                    result_data_dict = {
+                        "time": year_month_date,
+                        "amount": len(year_months_obj),
+                        "year_month_price": year_month_price
+                    }
+                    year_month_list.append(result_data_dict)
+                "冒泡降序"
+                for i in range(len(year_month_list) - 1):
+                    for j in range(len(year_month_list)-i-1):
+                        if time.strptime(year_month_list[j]['time'], '%Y-%m-%d') < time.strptime(year_month_list[j + 1]['time'], '%Y-%m-%d'):
+                            t = year_month_list[j]
+                            year_month_list[j] = year_month_list[j + 1]
+                            year_month_list[j + 1] = t
+
+                manifest_dict = {
+                    "list_number": len(year_month_list),
+                    "manifest_list": year_month_list,
+                }
+            """具体到每天的数据，前端用ManifestBill的接口查询"""
             responses['manifest_dict'] = manifest_dict
         except Exception as e:
             responses['code'] = 3002
