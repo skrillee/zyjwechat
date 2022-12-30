@@ -123,7 +123,7 @@ class MobilePhone(APIView):
             url_code_session = "https://api.weixin.qq.com/sns/jscode2session" \
                                "?appid={}&secret={}&js_code={}&grant_type=authorization_code".format(
                                 'wxc9ccd41f17a1fa42',
-                                '168534ea6674446e6f2d7ea81bff1ab8',
+                                'ddbe4a7654a3223c6ed40921f083995c',
                                 js_code)
             response = requests.get(url_code_session)
             try:
