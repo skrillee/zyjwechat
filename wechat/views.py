@@ -157,6 +157,7 @@ class MobilePhone(APIView):
         return JsonResponse(responses)
 
 
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
 class MobilePhoneFL(APIView):
 
     authentication_classes = []
@@ -194,7 +195,13 @@ class MobilePhoneFL(APIView):
                               'mobile': mobile_phone_number
                               },
                     invitation_code=mobile_phone_number)
+
+                customer_information = odoo.env['feeling_customer.information']
+                user_id = customer_information.search([('customer_information_phone', '=', mobile_phone_number)])
+                customer_business = customer_information.browse(user_id).customer_business
+
                 responses['invitation_code'] = mobile_phone_number
+                responses['customer_business'] = customer_business
             except Exception as e:
                 responses['code'] = 3002
                 responses['message'] = "请求异常"
