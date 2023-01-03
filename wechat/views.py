@@ -143,7 +143,14 @@ class MobilePhone(APIView):
                               'mobile': mobile_phone_number
                               },
                     invitation_code=mobile_phone_number)
+
+                customer_information = odoo.env['feeling_customer.information']
+                user_id = customer_information.search([('customer_information_phone', '=', mobile_phone_number)])
+                customer_business = customer_information.browse(user_id).customer_business
+
                 responses['invitation_code'] = mobile_phone_number
+                responses['customer_business'] = customer_business
+
             except Exception as e:
                 responses['code'] = 3002
                 responses['message'] = "请求异常"
@@ -1997,7 +2004,6 @@ class ManifestBill(APIView):
             for freight_filter_obj in freight_filter_obj_list:
                 freight_total_prices = freight_filter_obj.amount_total_signed
                 freight_id = freight_filter_obj.id
-
                 freight_line_list = []
                 manifest_lines = odoo.env['fixed.freight_bill.line'].search([('freight_id', '=', freight_id)])
                 for manifest in manifest_lines:
@@ -2036,6 +2042,93 @@ class ManifestBill(APIView):
 
 
 # noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class PaintBill(APIView):
+    """
+        Return information of authentication process
+        User authentication related services
+    """
+    authentication_classes = []
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            data_time = request._request.POST.get('data_time')
+            phone_number = request._request.POST.get('phone_number')
+            odoo = odoorpc.ODOO('47.92.85.245', port=3369)
+            odoo.login('FenLin', '1979736774@qq.com', 'odooodoo')
+            user_id = odoo.env['feeling_customer.information'].search([('customer_information_phone', '=', phone_number)])
+            paint_sell_obj = odoo.env['feeling_manifest.sell']
+            paint_sell_list = paint_sell_obj.search(['&', ('sell_create_date', '=', data_time),  ('sell_customer_name_id', '=', user_id)])
+            list_number = len(paint_sell_list)
+            paint_line_list = []
+            number_flag = 0
+            for paint_sell_id in paint_sell_list:
+                number_flag += 1
+                sell_total_prices = paint_sell_obj.browse(paint_sell_id).sell_total_prices
+                paint_main_obj = odoo.env['feeling_manifest.main.line']
+                paint_accessories_obj = odoo.env['feeling_manifest.accessories.line']
+
+                paint_main_lines_ids = paint_main_obj.search([('sell_main_id', '=', paint_sell_id)])
+                paint_accessories_lines_ids = paint_accessories_obj.search([('sell_accessories_id', '=', paint_sell_id)])
+
+                paint_main_line_objs = paint_main_obj.browse(paint_main_lines_ids)
+                paint_accessories_line_objs = paint_accessories_obj.browse(paint_accessories_lines_ids)
+
+                paint_main_line_objs_list = []
+                if paint_main_line_objs:
+                    for paint_main_line_obj in paint_main_line_objs:
+                        stock_model_name = paint_main_line_obj.manifest_flmodel_id.display_name
+                        main_categories_number = paint_main_line_obj.main_categories_number
+                        main_categories_code = paint_main_line_obj.main_categories_code
+                        main_price = paint_main_line_obj.main_price
+                        main_color_price = paint_main_line_obj.main_color_price
+                        main_categories_specification = paint_main_line_obj.main_categories_specification
+                        paint_main_line_objs_list.append({
+                            'stock_model_name': stock_model_name,
+                            'main_categories_number': main_categories_number,
+                            'main_categories_code': main_categories_code,
+                            'main_price': main_price,
+                            'main_color_price': main_color_price,
+                            'main_categories_specification': main_categories_specification,
+                        })
+                paint_accessories_line_objs_list = []
+                if paint_accessories_line_objs:
+                    for paint_accessories_line_obj in paint_accessories_line_objs:
+                        stock_model_name = paint_accessories_line_obj.manifest_categories_id.display_name
+
+                        accessories_categories_number = paint_accessories_line_obj.accessories_categories_number
+                        accessories_categories_code = paint_accessories_line_obj.accessories_categories_code
+                        accessories_price = paint_accessories_line_obj.accessories_price
+                        accessories_categories_unit = paint_accessories_line_obj.accessories_categories_unit
+                        paint_accessories_line_objs_list.append({
+                            'stock_model_name': stock_model_name,
+                            'accessories_categories_number': accessories_categories_number,
+                            'accessories_categories_code': accessories_categories_code,
+                            'accessories_price': accessories_price,
+                            'accessories_categories_unit': accessories_categories_unit,
+                        })
+                paint_line_list.append({
+                    'number_flag': number_flag,
+                    'main_categories_list': paint_main_line_objs_list,
+                    'accessories_categories_list': paint_accessories_line_objs_list,
+                    'sell_total_prices': sell_total_prices
+                })
+
+            manifest_dict = {
+                "list_number": list_number,
+                "paint_line_list": paint_line_list,
+            }
+            responses['manifest_dict'] = manifest_dict
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
 class Manifest(APIView):
     """
         Return information of authentication process
@@ -2051,14 +2144,22 @@ class Manifest(APIView):
             data_year = request._request.POST.get('data_year')
             data_month = request._request.POST.get('data_month')
             data_date = request._request.POST.get('data_date')
-
             phone_number = request._request.POST.get('phone_number')
             odoo = odoorpc.ODOO('47.92.85.245', port=3369)
             odoo.login('FenLin', '1979736774@qq.com', 'odooodoo')
-            user_id = odoo.env['feeling_customer.information'].search([('customer_information_phone', '=', phone_number)])
-            freight_bill = odoo.env['fixed.freight_bill']
-            manifest_ids_list = freight_bill.search([('partner_name_id', '=', user_id)])
-            freight_bill_obj = freight_bill.browse(manifest_ids_list)
+
+            customer_information = odoo.env['feeling_customer.information']
+            user_id = customer_information.search([('customer_information_phone', '=', phone_number)])
+            customer_business = customer_information.browse(user_id).customer_business
+
+            if customer_business == "paint":
+                manifest_sell = odoo.env['feeling_manifest.sell']
+                manifest_ids_list = manifest_sell.search([('sell_customer_name_id', '=', user_id)])
+                freight_bill_obj = manifest_sell.browse(manifest_ids_list)
+            else:
+                freight_bill = odoo.env['fixed.freight_bill']
+                manifest_ids_list = freight_bill.search([('partner_name_id', '=', user_id)])
+                freight_bill_obj = freight_bill.browse(manifest_ids_list)
 
             manifest_dict = {
                 "list_number": 0,
@@ -2069,8 +2170,10 @@ class Manifest(APIView):
                 year_list = []
                 year_month_dict = {}
                 for bill in freight_bill_obj:
-
-                    bill_time = str(bill.date_invoice)
+                    if customer_business == "paint":
+                        bill_time = str(bill.sell_create_date)
+                    else:
+                        bill_time = str(bill.date_invoice)
                     year_month_date = bill_time.split('-')[0] + '-' + bill_time.split('-')[1]
                     if year_month_date in year_month_dict:
                         year_month_dict[year_month_date].append(bill)
@@ -2082,7 +2185,10 @@ class Manifest(APIView):
                     year_month_price = 0
                     year_months_obj = year_month_dict[year_month]
                     for year_month_obj in year_months_obj:
-                        year_month_price += year_month_obj.amount_total_signed
+                        if customer_business == "paint":
+                            year_month_price += year_month_obj.sell_total_prices
+                        else:
+                            year_month_price += year_month_obj.amount_total_signed
                     result_data_dict = {
                         "time": year_month,
                         "amount": len(year_months_obj),
@@ -2115,7 +2221,10 @@ class Manifest(APIView):
                 year_month_dict = {}
                 item_time = data_year + '-' + data_month
                 for bill in freight_bill_obj:
-                    bill_time = str(bill.date_invoice)
+                    if customer_business == "paint":
+                        bill_time = str(bill.sell_create_date)
+                    else:
+                        bill_time = str(bill.date_invoice)
                     year_month_time = bill_time.split('-')[0] + '-' + bill_time.split('-')[1]
                     year_month_date_time = bill_time.split('-')[0] + '-' + bill_time.split('-')[1] + '-' + bill_time.split('-')[2]
                     if item_time in year_month_time:
@@ -2129,7 +2238,10 @@ class Manifest(APIView):
                     year_month_price = 0
                     year_months_obj = year_month_dict[year_month_date]
                     for year_month_obj in year_months_obj:
-                        year_month_price += year_month_obj.amount_total_signed
+                        if customer_business == "paint":
+                            year_month_price += year_month_obj.sell_total_prices
+                        else:
+                            year_month_price += year_month_obj.amount_total_signed
                     result_data_dict = {
                         "time": year_month_date,
                         "amount": len(year_months_obj),
