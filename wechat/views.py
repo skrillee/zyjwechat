@@ -195,7 +195,8 @@ class MobilePhoneFL(APIView):
                               'mobile': mobile_phone_number
                               },
                     invitation_code=mobile_phone_number)
-
+                odoo = odoorpc.ODOO('47.92.85.245', port=3369)
+                odoo.login('FenLin', '1979736774@qq.com', 'odooodoo')
                 customer_information = odoo.env['feeling_customer.information']
                 user_id = customer_information.search([('customer_information_phone', '=', mobile_phone_number)])
                 customer_business = customer_information.browse(user_id).customer_business
