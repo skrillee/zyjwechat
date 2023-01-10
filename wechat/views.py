@@ -1970,8 +1970,8 @@ class Redirect(APIView):
             'message': None
         }
         try:
-            app_id = 'wxc9ccd41f17a1fa42'
-            secret = '168534ea6674446e6f2d7ea81bff1ab8'
+            app_id = 'wxc754f862e84d18b5'
+            secret = 'ddbe4a7654a3223c6ed40921f083995c'
             content = requests.get(url='https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={APPID}&secret={APPSECRET}'.format(APPID=app_id, APPSECRET=secret))
             access_token = json.loads(content.content)['access_token']
             content = requests.post(url='https://api.weixin.qq.com/wxa/generatescheme?access_token={ACCESS_TOKEN}'.format(ACCESS_TOKEN=access_token)).content
