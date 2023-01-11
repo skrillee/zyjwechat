@@ -2341,10 +2341,7 @@ class Samples:
     def __init__(self):
         pass
 
-    with open('/home/yanboce/apps/message.json', 'r', encoding='utf8') as fp:
-        json_data = json.load(fp)
-        access_key_id = json_data['access_key_id']
-        access_key_secret = json_data['access_key_secret']
+
 
     @staticmethod
     def create_client(
@@ -2358,6 +2355,11 @@ class Samples:
         @return: Client
         @throws Exception
         """
+        with open('/home/yanboce/apps/message.json', 'r', encoding='utf8') as fp:
+            json_data = json.load(fp)
+            access_key_id = json_data['access_key_id']
+            access_key_secret = json_data['access_key_secret']
+
         config = open_api_models.Config(
             # 必填，您的 AccessKey ID,
             access_key_id=access_key_id,
