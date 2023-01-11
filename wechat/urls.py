@@ -49,6 +49,7 @@ urlpatterns = [
     url(r'^v1/retail/manifest/$', views.Manifest.as_view()),
     url(r'^v1/retail/manifest_bill/$', views.ManifestBill.as_view()),
     url(r'^v1/retail/paint_bill/$', views.PaintBill.as_view()),
+    url(r'^v1/retail/send_message/$', views.SendMessage.as_view()),
     # url(r'^v1/retail/douyin/$', views.Douyin.as_view()),
     # url(r'^v1/retail/douyin/$', RedirectView.as_view(url='https://v.douyin.com/YPX29cs/'), name='douyin'),
 

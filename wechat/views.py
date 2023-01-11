@@ -2324,3 +2324,135 @@ def douyin(request):
         responses['code'] = 3002
         responses['message'] = "请求异常"
     return JsonResponse(responses)
+
+
+# -*- coding: utf-8 -*-
+# This file is auto-generated, don't edit it. Thanks.
+import sys
+from typing import List
+from alibabacloud_dysmsapi20170525.client import Client as Dysmsapi20170525Client
+from alibabacloud_tea_openapi import models as open_api_models
+from alibabacloud_dysmsapi20170525 import models as dysmsapi_20170525_models
+from alibabacloud_tea_util import models as util_models
+from alibabacloud_tea_util.client import Client as UtilClient
+
+
+class Samples:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def create_client(
+        access_key_id: str,
+        access_key_secret: str,
+    ) -> Dysmsapi20170525Client:
+        """
+        使用AK&SK初始化账号Client
+        @param access_key_id:
+        @param access_key_secret:
+        @return: Client
+        @throws Exception
+        """
+        config = open_api_models.Config(
+            # 必填，您的 AccessKey ID,
+            access_key_id="LTAI5tMkT77UN9uwGaCDQH2h",
+            # 必填，您的 AccessKey Secret,
+            access_key_secret="lEfxy1SS4jFsX03X10l7rtwIg499KD"
+        )
+        # 访问的域名
+        config.endpoint = f'dysmsapi.aliyuncs.com'
+        return Dysmsapi20170525Client(config)
+
+    @staticmethod
+    def main(
+        **kwargs: dict,
+    ):
+        phone_numbers = kwargs["phone_numbers"]
+        sign_name = kwargs["sign_name"]
+        template_code = kwargs["template_code"]
+        template_param = kwargs["template_param"]
+        # 工程代码泄露可能会导致AccessKey泄露，并威胁账号下所有资源的安全性。以下代码示例仅供参考，建议使用更安全的 STS 方式，更多鉴权访问方式请参见：https://help.aliyun.com/document_detail/378659.html
+        client = Samples.create_client('LTAI5tMkT77UN9uwGaCDQH2h', 'lEfxy1SS4jFsX03X10l7rtwIg499KD')
+        send_sms_request = dysmsapi_20170525_models.SendSmsRequest(
+            phone_numbers=phone_numbers,
+            sign_name=sign_name,
+            template_code=template_code,
+            template_param=template_param
+        )
+        runtime = util_models.RuntimeOptions()
+        try:
+            # 复制代码运行请自行打印 API 的返回值
+            return_result = client.send_sms_with_options(send_sms_request, runtime)
+            return return_result
+        except Exception as error:
+            # 如有需要，请打印 error
+            UtilClient.assert_as_string(error.message)
+            return None
+
+    @staticmethod
+    async def main_async(
+        **kwargs: dict,
+    ) -> None:
+        phone_numbers = kwargs["phone_numbers"]
+        sign_name = kwargs["sign_name"]
+        template_code = kwargs["template_code"]
+        template_param = kwargs["template_param"]
+        # 工程代码泄露可能会导致AccessKey泄露，并威胁账号下所有资源的安全性。问方式请参见：https://help.aliyun.com/document_detail/378659.html
+        client = Samples.create_client('LTAI5tMkT77UN9uwGaCDQH2h', 'lEfxy1SS4jFsX03X10l7rtwIg499KD')
+        send_sms_request = dysmsapi_20170525_models.SendSmsRequest(
+            phone_numbers=phone_numbers,
+            sign_name=sign_name,
+            template_code=template_code,
+            template_param=template_param
+        )
+        runtime = util_models.RuntimeOptions()
+        try:
+            # 复制代码运行请自行打印 API 的返回值
+            return_result = await client.send_sms_with_options_async(send_sms_request, runtime)
+            return return_result
+        except Exception as error:
+            # 如有需要，请打印 error
+            UtilClient.assert_as_string(error.message)
+            return None
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class SendMessage(APIView):
+    """
+        Return information of authentication process
+        User authentication related services
+    """
+    authentication_classes = []
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            phone_numbers = request._request.POST.get('phone_numbers')
+            customer_name = request._request.POST.get('customer_name')
+            customer_type = request._request.POST.get('customer_type')
+            template_param = {"name": customer_name}
+            template_code = ""
+            if customer_type == "wallpaper":
+                template_code = "SMS_267770543"
+            elif customer_type == "paint":
+                template_code = "SMS_267680526"
+            return_result = Samples.main(
+                phone_numbers=phone_numbers,
+                sign_name="陕西邦臣建材有限公司",
+                template_code=template_code,
+                template_param=str(template_param)
+            )
+            if return_result:
+                if return_result.body.code == "OK":
+                    responses['status'] = "ok"
+                else:
+                    responses['status'] = "fail"
+            else:
+                responses['status'] = "fail"
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
