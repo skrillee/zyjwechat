@@ -2341,6 +2341,11 @@ class Samples:
     def __init__(self):
         pass
 
+    with open('/home/yanboce/apps/message.json', 'r', encoding='utf8') as fp:
+        json_data = json.load(fp)
+        access_key_id = json_data['access_key_id']
+        access_key_secret = json_data['access_key_secret']
+
     @staticmethod
     def create_client(
         access_key_id: str,
@@ -2355,9 +2360,9 @@ class Samples:
         """
         config = open_api_models.Config(
             # 必填，您的 AccessKey ID,
-            access_key_id="",
+            access_key_id=access_key_id,
             # 必填，您的 AccessKey Secret,
-            access_key_secret=""
+            access_key_secret=access_key_secret
         )
         # 访问的域名
         config.endpoint = f'dysmsapi.aliyuncs.com'
@@ -2372,7 +2377,7 @@ class Samples:
         template_code = kwargs["template_code"]
         template_param = kwargs["template_param"]
         # 工程代码泄露可能会导致AccessKey泄露，并威胁账号下所有资源的安全性。以下代码示例仅供参考，建议使用更安全的 STS 方式，更多鉴权访问方式请参见：https://help.aliyun.com/document_detail/378659.html
-        client = Samples.create_client('', '')
+        client = Samples.create_client(access_key_id, access_key_secret)
         send_sms_request = dysmsapi_20170525_models.SendSmsRequest(
             phone_numbers=phone_numbers,
             sign_name=sign_name,
@@ -2398,7 +2403,7 @@ class Samples:
         template_code = kwargs["template_code"]
         template_param = kwargs["template_param"]
         # 工程代码泄露可能会导致AccessKey泄露，并威胁账号下所有资源的安全性。问方式请参见：https://help.aliyun.com/document_detail/378659.html
-        client = Samples.create_client('', '')
+        client = Samples.create_client(access_key_id, access_key_secret)
         send_sms_request = dysmsapi_20170525_models.SendSmsRequest(
             phone_numbers=phone_numbers,
             sign_name=sign_name,
