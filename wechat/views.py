@@ -1349,6 +1349,8 @@ class Ticket(APIView):
                         "ticket_name": ticket_obj.ticket_name,
                         "ticket_information": ticket_obj.ticket_information,
                         "ticket_image": ticket_url + ticket_obj.ticket_image,
+                        "ticket_image_detail": ticket_obj.ticket_image_detail,
+                        "remark": ticket_obj.remark,
                     }
                     if ticket_obj.ticket_type in ticket_objs_type_dict.keys():
                         ticket_objs_type_dict[ticket_obj.ticket_type].append(ticket_dict)
