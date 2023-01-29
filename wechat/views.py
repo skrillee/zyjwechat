@@ -1313,8 +1313,6 @@ class Status(APIView):
 # noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
 class Ticket(APIView):
 
-    authentication_classes = []
-
     def post(self, request):
         responses = {
             'code': 1000,
@@ -1357,6 +1355,28 @@ class Ticket(APIView):
                     else:
                         ticket_objs_type_dict[ticket_obj.ticket_type] = [ticket_dict]
             responses['data'] = ticket_objs_type_dict
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class Point(APIView):
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            phone_number = request._request.POST.get('phone_number')
+            odoo = odoorpc.ODOO('47.92.85.245', port=3369)
+            odoo.login('FenLin', '1979736774@qq.com', 'odooodoo')
+            feeling_customer_obj = odoo.env['feeling_customer.information']
+            user_id = feeling_customer_obj.search([('customer_information_phone', '=', phone_number)])
+            customer_credit = feeling_customer_obj.browse(user_id)['customer_credit']
+            responses['data'] = customer_credit
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"
@@ -2367,7 +2387,7 @@ class Samples:
 
     @staticmethod
     def main(
-        **kwargs: dict,
+        **kwargs
     ):
         with open('/home/yanboce/apps/message.json', 'r', encoding='utf8') as fp:
             json_data = json.load(fp)
@@ -2397,8 +2417,12 @@ class Samples:
 
     @staticmethod
     async def main_async(
-        **kwargs: dict,
+        **kwargs
     ) -> None:
+        with open('/home/yanboce/apps/message.json', 'r', encoding='utf8') as fp:
+            json_data = json.load(fp)
+            access_key_id = json_data['access_key_id']
+            access_key_secret = json_data['access_key_secret']
         phone_numbers = kwargs["phone_numbers"]
         sign_name = kwargs["sign_name"]
         template_code = kwargs["template_code"]
