@@ -1319,41 +1319,33 @@ class Ticket(APIView):
             'message': None
         }
         try:
-            # invitation_code = request.user.invitation_code
-            # advertiser_ids = models.ZyjWechatInvitationCode.objects.filter(
-            #     invitation_code=invitation_code).first().Retail.advertiser
-            # advertiser_ids_list = advertiser_ids.split(",")
-            # advertiser_ids_list = [var for var in advertiser_ids_list if var]
-            # ticket_objs = models.Ticket.objects.filter(
-            #     Retail_id__in=advertiser_ids_list).all()
+            phone_number = request._request.POST.get('phone_number')
+            odoo = odoorpc.ODOO('47.92.85.245', port=3369)
+            odoo.login('FenLin', '1979736774@qq.com', 'odooodoo')
+            feeling_customer_obj = odoo.env['feeling_customer.information']
+            user_id = feeling_customer_obj.search([('customer_information_phone', '=', phone_number)])
+            customer_credit = feeling_customer_obj.browse(user_id)['customer_business']
+
             ticket_type = request._request.POST.get('ticket_type')
             ticket_objs = models.Ticket.objects.all()
             ticket_objs_type_dict = {}
             ticket_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/ticket/"
             for ticket_obj in ticket_objs:
-                # ticket_dict = {
-                #     "ticket_id": ticket_obj.id,
-                #     "ticket_name": ticket_obj.ticket_name,
-                #     "ticket_type": ticket_obj.ticket_type,
-                #     "ticket_information": ticket_obj.ticket_information,
-                #     "ticket_image": ticket_url+ticket_obj.ticket_image,
-                #     "ticket_image_detail": ticket_obj.ticket_image_detail,
-                #     "ticket_active": ticket_obj.ticket_active,
-                #     "ticket_price": ticket_obj.remark,
-                # }
                 if ticket_obj.ticket_type == ticket_type:
-                    ticket_dict = {
-                        "ticket_id": ticket_obj.id,
-                        "ticket_name": ticket_obj.ticket_name,
-                        "ticket_information": ticket_obj.ticket_information,
-                        "ticket_image": ticket_url + ticket_obj.ticket_image,
-                        "ticket_image_detail": ticket_obj.ticket_image_detail,
-                        "remark": ticket_obj.remark,
-                    }
-                    if ticket_obj.ticket_type in ticket_objs_type_dict.keys():
-                        ticket_objs_type_dict[ticket_obj.ticket_type].append(ticket_dict)
-                    else:
-                        ticket_objs_type_dict[ticket_obj.ticket_type] = [ticket_dict]
+                    ticket_information_list = ticket_obj.ticket_information.split(',')
+                    if customer_credit in ticket_information_list:
+                        ticket_dict = {
+                            "ticket_id": ticket_obj.id,
+                            "ticket_name": ticket_obj.ticket_name,
+                            "ticket_information": ticket_obj.ticket_information,
+                            "ticket_image": ticket_url + ticket_obj.ticket_image,
+                            "ticket_image_detail": ticket_obj.ticket_image_detail,
+                            "remark": ticket_obj.remark,
+                        }
+                        if ticket_obj.ticket_type in ticket_objs_type_dict.keys():
+                            ticket_objs_type_dict[ticket_obj.ticket_type].append(ticket_dict)
+                        else:
+                            ticket_objs_type_dict[ticket_obj.ticket_type] = [ticket_dict]
             responses['data'] = ticket_objs_type_dict
         except Exception as e:
             responses['code'] = 3002
