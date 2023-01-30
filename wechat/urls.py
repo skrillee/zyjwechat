@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^v1/retail/room/$', views.Room.as_view()),
     url(r'^v1/retail/status/$', views.Status.as_view()),
     url(r'^v1/retail/ticket/$', views.Ticket.as_view()),
+    url(r'^v1/retail/card/$', views.Card.as_view()),
     url(r'^v1/retail/point/$', views.Point.as_view()),
     url(r'^v1/retail/bill/$', views.Bill.as_view()),
     url(r'^v1/retail/bill_detail/$', views.BillDetail.as_view()),
