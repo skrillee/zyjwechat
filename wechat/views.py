@@ -134,7 +134,7 @@ class MobilePhone(APIView):
                 pResult = decrypt(appId, session_key, encrypted_data, iv)
                 mobile_phone_number = pResult["phoneNumber"]
                 username = openid
-                effective_time = '120'
+                effective_time = '365'
                 models.ZyjWechatInvitationCode.objects.update_or_create(
                     defaults={'name': username,
                               'effective_time': effective_time,
@@ -186,7 +186,7 @@ class MobilePhoneFL(APIView):
                 pResult = decrypt(appId, session_key, encrypted_data, iv)
                 mobile_phone_number = pResult["phoneNumber"]
                 username = openid
-                effective_time = '120'
+                effective_time = '365'
                 models.ZyjWechatInvitationCode.objects.update_or_create(
                     defaults={'name': username,
                               'effective_time': effective_time,
