@@ -2492,9 +2492,9 @@ class SendMessage(APIView):
             template_param = {"name": customer_name}
             template_code = ""
             if customer_type == "wallpaper":
-                template_code = "SMS_267770543"
+                template_code = "SMS_269060503"
             elif customer_type == "paint":
-                template_code = "SMS_267680526"
+                template_code = "SMS_269075502"
             return_result = Samples.main(
                 phone_numbers=phone_numbers,
                 sign_name="陕西邦臣建材有限公司",
