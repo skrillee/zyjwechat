@@ -2534,19 +2534,19 @@ class Tvoc(APIView):
 
             tvoc_obj = odoo.env['feeling_tvoc.check']
             tvoc_value_line_obj = odoo.env['feeling_tvoc.check.line']
-            customer_information = odoo.env['feeling_customer.information']
-            user_id = customer_information.search([('customer_information_phone', '=', phone_number)])
+            # customer_information = odoo.env['feeling_customer.information']
+            user_id = tvoc_obj.search([('tvoc_customer_phone', '=', phone_number)])
             tvoc_objs = tvoc_obj.browse(user_id)
             tvoc_obj_list = []
+            tvoc_customer_name_id = tvoc_objs[0].tvoc_customer_name_id.customer_information_name
             for tvoc_obj in tvoc_objs:
-                tvoc_customer_name_id = tvoc_obj.tvoc_customer_name_id
                 tvoc_check_date = tvoc_obj.tvoc_check_date
                 tvoc_id = tvoc_obj.tvoc_id
                 check_clerk = tvoc_obj.check_clerk
                 check_type = tvoc_obj.check_type
                 check_location_number = tvoc_obj.check_location_number
                 value_line_ids = tvoc_obj.id
-                tvoc_value_line_ids = odoo.env['fixed.freight_bill.line'].search([('tvoc_value_id', '=', value_line_ids)])
+                tvoc_value_line_ids = odoo.env['feeling_tvoc.check.line'].search([('tvoc_value_id', '=', value_line_ids)])
                 tvoc_value_line_objs = tvoc_value_line_obj.browse(tvoc_value_line_ids)
                 tvoc_value_list = []
                 for tvoc_value_line in tvoc_value_line_objs:
