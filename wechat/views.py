@@ -2512,3 +2512,66 @@ class SendMessage(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class Tvoc(APIView):
+    """
+        Return information of authentication process
+        User authentication related services
+    """
+    authentication_classes = []
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            phone_number = request._request.POST.get('phone_number')
+            odoo = odoorpc.ODOO('47.92.85.245', port=3369)
+            odoo.login('FenLin', '1979736774@qq.com', 'odooodoo')
+
+            tvoc_obj = odoo.env['feeling_tvoc.check']
+            tvoc_value_line_obj = odoo.env['feeling_tvoc.check.line']
+            customer_information = odoo.env['feeling_customer.information']
+            user_id = customer_information.search([('customer_information_phone', '=', phone_number)])
+            tvoc_objs = tvoc_obj.browse(user_id)
+            tvoc_obj_list = []
+            for tvoc_obj in tvoc_objs:
+                tvoc_customer_name_id = tvoc_obj.tvoc_customer_name_id
+                tvoc_check_date = tvoc_obj.tvoc_check_date
+                tvoc_id = tvoc_obj.tvoc_id
+                check_clerk = tvoc_obj.check_clerk
+                check_type = tvoc_obj.check_type
+                check_location_number = tvoc_obj.check_location_number
+                value_line_ids = tvoc_obj.id
+                tvoc_value_line_ids = odoo.env['fixed.freight_bill.line'].search([('tvoc_value_id', '=', value_line_ids)])
+                tvoc_value_line_objs = tvoc_value_line_obj.browse(tvoc_value_line_ids)
+                tvoc_value_list = []
+                for tvoc_value_line in tvoc_value_line_objs:
+                    tvoc_location = tvoc_value_line['tvoc_location']
+                    tvoc_result = tvoc_value_line['tvoc_result']
+                    tvoc_value = tvoc_value_line['tvoc_value']
+                    tvoc_value_list.append({
+                        "tvoc_location": tvoc_location,
+                        "tvoc_result": tvoc_result,
+                        "tvoc_value": tvoc_value
+                    })
+                tvoc_obj_list.append({
+                    "tvoc_customer_name_id": tvoc_customer_name_id,
+                    "tvoc_check_date": tvoc_check_date,
+                    "tvoc_id": tvoc_id,
+                    "check_clerk": check_clerk,
+                    "check_type": check_type,
+                    "check_location_number": check_location_number,
+                    "tvoc_value_list": tvoc_value_list,
+                })
+            tvoc_dict = {
+                "tvoc_obj_list": tvoc_obj_list,
+            }
+            responses['tvoc_dict'] = tvoc_dict
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
