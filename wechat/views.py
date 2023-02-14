@@ -2548,15 +2548,21 @@ class Tvoc(APIView):
                 value_line_ids = tvoc_obj.id
                 tvoc_value_line_ids = odoo.env['feeling_tvoc.check.line'].search([('tvoc_value_id', '=', value_line_ids)])
                 tvoc_value_line_objs = tvoc_value_line_obj.browse(tvoc_value_line_ids)
+                tvoc_location_list = []
+                tvoc_result_list = []
                 tvoc_value_list = []
                 for tvoc_value_line in tvoc_value_line_objs:
                     tvoc_location = tvoc_value_line['tvoc_location']
                     tvoc_result = tvoc_value_line['tvoc_result']
                     tvoc_value = tvoc_value_line['tvoc_value']
-                    tvoc_value_list.append({
+                    tvoc_location_list.append({
                         "tvoc_location": tvoc_location,
+                    })
+                    tvoc_result_list.append({
                         "tvoc_result": tvoc_result,
-                        "tvoc_value": tvoc_value
+                    })
+                    tvoc_value_list.append({
+                        "tvoc_value": tvoc_value,
                     })
                 tvoc_obj_list.append({
                     "tvoc_customer_name_id": tvoc_customer_name_id,
@@ -2565,7 +2571,9 @@ class Tvoc(APIView):
                     "check_clerk": check_clerk,
                     "check_type": check_type,
                     "check_location_number": check_location_number,
-                    "tvoc_value_list": tvoc_value_list,
+                    "tvoc_location_list": tvoc_location_list,
+                    "tvoc_result_list": tvoc_result_list,
+                    "tvoc_value_list": tvoc_value_list
                 })
             tvoc_dict = {
                 "tvoc_obj_list": tvoc_obj_list,
