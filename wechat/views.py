@@ -2555,15 +2555,9 @@ class Tvoc(APIView):
                     tvoc_location = tvoc_value_line['tvoc_location']
                     tvoc_result = tvoc_value_line['tvoc_result']
                     tvoc_value = tvoc_value_line['tvoc_value']
-                    tvoc_location_list.append({
-                        "tvoc_location": tvoc_location,
-                    })
-                    tvoc_result_list.append({
-                        "tvoc_result": tvoc_result,
-                    })
-                    tvoc_value_list.append({
-                        "tvoc_value": tvoc_value,
-                    })
+                    tvoc_location_list.append(tvoc_location)
+                    tvoc_result_list.append(tvoc_result)
+                    tvoc_value_list.append(tvoc_value)
                 tvoc_obj_list.append({
                     "tvoc_customer_name_id": tvoc_customer_name_id,
                     "tvoc_check_date": tvoc_check_date,
