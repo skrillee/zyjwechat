@@ -2576,7 +2576,8 @@ class Tvoc(APIView):
                 }
                 responses['tvoc_dict'] = tvoc_dict
             else:
-                pass
+                responses['code'] = 1001
+                responses['message'] = "暂无数据"
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"
