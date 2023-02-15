@@ -2208,15 +2208,14 @@ class Manifest(APIView):
             user_id = customer_information.search([('customer_information_phone', '=', phone_number)])
             customer_business = customer_information.browse(user_id).customer_business
 
-            if customer_business == "paint":
-                manifest_sell = odoo.env['feeling_manifest.sell']
-                manifest_ids_list = manifest_sell.search([('sell_customer_name_id', '=', user_id)])
-                freight_bill_obj = manifest_sell.browse(manifest_ids_list)
-            else:
+            if customer_business == "wallpaper":
                 freight_bill = odoo.env['fixed.freight_bill']
                 manifest_ids_list = freight_bill.search([('partner_name_id', '=', user_id)])
                 freight_bill_obj = freight_bill.browse(manifest_ids_list)
-
+            else:
+                manifest_sell = odoo.env['feeling_manifest.sell']
+                manifest_ids_list = manifest_sell.search([('sell_customer_name_id', '=', user_id)])
+                freight_bill_obj = manifest_sell.browse(manifest_ids_list)
             manifest_dict = {
                 "list_number": 0,
                 "manifest_list": [],
