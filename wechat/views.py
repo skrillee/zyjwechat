@@ -2520,7 +2520,6 @@ class Tvoc(APIView):
         Return information of authentication process
         User authentication related services
     """
-    authentication_classes = []
 
     def post(self, request):
         responses = {
