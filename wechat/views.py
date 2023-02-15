@@ -2190,6 +2190,7 @@ class Manifest(APIView):
         Return information of authentication process
         User authentication related services
     """
+    authentication_classes = []
 
     def post(self, request):
         responses = {
@@ -2225,10 +2226,10 @@ class Manifest(APIView):
                 year_list = []
                 year_month_dict = {}
                 for bill in freight_bill_obj:
-                    if customer_business == "paint":
-                        bill_time = str(bill.sell_create_date)
-                    else:
+                    if customer_business == "wallpaper":
                         bill_time = str(bill.date_invoice)
+                    else:
+                        bill_time = str(bill.sell_create_date)
                     year_month_date = bill_time.split('-')[0] + '-' + bill_time.split('-')[1]
                     if year_month_date in year_month_dict:
                         year_month_dict[year_month_date].append(bill)
@@ -2240,10 +2241,10 @@ class Manifest(APIView):
                     year_month_price = 0
                     year_months_obj = year_month_dict[year_month]
                     for year_month_obj in year_months_obj:
-                        if customer_business == "paint":
-                            year_month_price += year_month_obj.sell_total_prices
-                        else:
+                        if customer_business == "wallpaper":
                             year_month_price += year_month_obj.amount_total_signed
+                        else:
+                            year_month_price += year_month_obj.sell_total_prices
                     result_data_dict = {
                         "time": year_month,
                         "amount": len(year_months_obj),
@@ -2276,10 +2277,10 @@ class Manifest(APIView):
                 year_month_dict = {}
                 item_time = data_year + '-' + data_month
                 for bill in freight_bill_obj:
-                    if customer_business == "paint":
-                        bill_time = str(bill.sell_create_date)
-                    else:
+                    if customer_business == "wallpaper":
                         bill_time = str(bill.date_invoice)
+                    else:
+                        bill_time = str(bill.sell_create_date)
                     year_month_time = bill_time.split('-')[0] + '-' + bill_time.split('-')[1]
                     year_month_date_time = bill_time.split('-')[0] + '-' + bill_time.split('-')[1] + '-' + bill_time.split('-')[2]
                     if item_time in year_month_time:
@@ -2293,10 +2294,10 @@ class Manifest(APIView):
                     year_month_price = 0
                     year_months_obj = year_month_dict[year_month_date]
                     for year_month_obj in year_months_obj:
-                        if customer_business == "paint":
-                            year_month_price += year_month_obj.sell_total_prices
-                        else:
+                        if customer_business == "wallpaper":
                             year_month_price += year_month_obj.amount_total_signed
+                        else:
+                            year_month_price += year_month_obj.sell_total_prices
                     result_data_dict = {
                         "time": year_month_date,
                         "amount": len(year_months_obj),
