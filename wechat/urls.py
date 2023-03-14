@@ -54,6 +54,7 @@ urlpatterns = [
     url(r'^v1/retail/send_message/$', views.SendMessage.as_view()),
     url(r'^v1/retail/tvoc/$', views.Tvoc.as_view()),
     url(r'^v1/retail/color_type/$', views.ColorType.as_view()),
+    url(r'^v1/retail/color_unit/$', views.ColorUnit.as_view()),
     # url(r'^v1/retail/douyin/$', views.Douyin.as_view()),
     # url(r'^v1/retail/douyin/$', RedirectView.as_view(url='https://v.douyin.com/YPX29cs/'), name='douyin'),
     # url(r'^v1/retail/create_order/$', views.CreateOrder.as_view()),

@@ -2592,37 +2592,70 @@ class ColorType(APIView):
     """
     authentication_classes = []
 
-    def post(self, request):
+    def post(self):
         responses = {
             'code': 1000,
             'message': None
         }
         try:
-            color_id = request._request.POST.get('color_id')
-            if color_id:
-                ticket_type = request._request.POST.get('ticket_type')
-                ticket_objs = models.Ticket.objects.all()
-                ticket_objs_type_dict = {}
-                ticket_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/ticket/"
-                for ticket_obj in ticket_objs:
-                    if ticket_obj.ticket_type == ticket_type:
-                        ticket_dict = {
-                            "ticket_id": ticket_obj.id,
-                            "ticket_name": ticket_obj.ticket_name,
-                            "ticket_information": ticket_obj.ticket_information,
-                            "ticket_image": ticket_url + ticket_obj.ticket_image,
-                            "ticket_image_detail": ticket_obj.ticket_image_detail,
-                            "remark": ticket_obj.remark,
-                        }
-                        if ticket_obj.ticket_type in ticket_objs_type_dict.keys():
-                            ticket_objs_type_dict[ticket_obj.ticket_type].append(ticket_dict)
-                        else:
-                            ticket_objs_type_dict[ticket_obj.ticket_type] = [ticket_dict]
-                responses['data'] = ticket_objs_type_dict
-            else:
-                responses['code'] = 1001
-                responses['message'] = "暂无数据"
+            color_type_objs = models.ColorType.objects.all()
+            color_type_objs_list = []
+            color_type_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/ticket/"
+            for color_obj in color_type_objs:
+                color_type_dict = {
+                    "color_type_id": color_obj.id,
+                    "color_type_name": color_obj.color_type_id,
+                    "color_image": color_type_url + color_obj.color_type_pic,
+                }
+                color_type_objs_list.append(color_type_dict)
+            responses['data'] = {
+                "color_type_data": color_type_objs_list
+            }
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+# class ColorUnit(APIView):
+#     """
+#         Return information of authentication process
+#         User authentication related services
+#     """
+#     authentication_classes = []
+#
+#     def post(self, request):
+#         responses = {
+#             'code': 1000,
+#             'message': None
+#         }
+#         try:
+#             color_id = request._request.POST.get('color_id')
+#             if color_id:
+#                 ticket_type = request._request.POST.get('ticket_type')
+#                 ticket_objs = models.Ticket.objects.all()
+#                 ticket_objs_type_dict = {}
+#                 ticket_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/ticket/"
+#                 for ticket_obj in ticket_objs:
+#                     if ticket_obj.ticket_type == ticket_type:
+#                         ticket_dict = {
+#                             "ticket_id": ticket_obj.id,
+#                             "ticket_name": ticket_obj.ticket_name,
+#                             "ticket_information": ticket_obj.ticket_information,
+#                             "ticket_image": ticket_url + ticket_obj.ticket_image,
+#                             "ticket_image_detail": ticket_obj.ticket_image_detail,
+#                             "remark": ticket_obj.remark,
+#                         }
+#                         if ticket_obj.ticket_type in ticket_objs_type_dict.keys():
+#                             ticket_objs_type_dict[ticket_obj.ticket_type].append(ticket_dict)
+#                         else:
+#                             ticket_objs_type_dict[ticket_obj.ticket_type] = [ticket_dict]
+#                 responses['data'] = ticket_objs_type_dict
+#             else:
+#                 responses['code'] = 1001
+#                 responses['message'] = "暂无数据"
+#         except Exception as e:
+#             responses['code'] = 3002
+#             responses['message'] = "请求异常"
+#         return JsonResponse(responses)
