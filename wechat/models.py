@@ -248,3 +248,26 @@ class Order(models.Model):
     class Meta:
         verbose_name = '订单'
         verbose_name_plural = '订单'
+
+
+class ColorType(models.Model):
+    color_type_id = models.CharField('颜色类型名称', max_length=128, null=True)
+    color_type_pic = models.CharField('单元图', max_length=128, null=True)
+    remark = models.CharField('备注', max_length=128, null=True)
+
+    class Meta:
+        verbose_name = '颜色类型名称'
+        verbose_name_plural = '颜色类型名称集合'
+
+
+class ColorUnit(models.Model):
+    color_id = models.CharField('色号编码', max_length=32, null=True)
+    color_name = models.CharField('色号名称', max_length=128, null=True)
+    color_type = models.CharField('色号类型', max_length=32, null=True)
+    color_unit_pic = models.CharField('单元图', max_length=128, null=True)
+    color_pic_1 = models.CharField('效果图1', max_length=128, null=True)
+    color_pic_2 = models.CharField('效果图1', max_length=128, null=True)
+    color_pic_3 = models.CharField('效果图1', max_length=128, null=True)
+    color_pic_4 = models.CharField('效果图1', max_length=128, null=True)
+    remark = models.CharField('备注', max_length=128, null=True)
+    Retail = models.ForeignKey(ColorType, on_delete=models.CASCADE, null=True)
