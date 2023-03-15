@@ -2675,8 +2675,6 @@ class ColorUnitPic(APIView):
                     "id": color_type_obj.id,
                     "color_list": []
                 }
-                if color_type_obj.color_unit_pic:
-                    color_dict_pic['color_list'].append(color_url + color_type_obj.color_unit_pic)
                 if color_type_obj.color_pic_1:
                     color_dict_pic['color_list'].append(color_url + color_type_obj.color_pic_1)
                 if color_type_obj.color_pic_2:
@@ -2685,6 +2683,8 @@ class ColorUnitPic(APIView):
                     color_dict_pic['color_list'].append(color_url + color_type_obj.color_pic_3)
                 if color_type_obj.color_pic_4:
                     color_dict_pic['color_list'].append(color_url + color_type_obj.color_pic_4)
+                if color_type_obj.color_unit_pic:
+                    color_dict_pic['color_list'].append(color_url + color_type_obj.color_unit_pic)
                 responses['data'] = color_dict_pic
             else:
                 responses['code'] = 1001
