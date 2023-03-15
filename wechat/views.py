@@ -2651,3 +2651,45 @@ class ColorUnit(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class ColorUnitPic(APIView):
+    """
+        Return information of authentication process
+        User authentication related services
+    """
+    authentication_classes = []
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            color_id = request._request.POST.get('color_id')
+            if color_id:
+                color_type_obj = models.ColorUnit.objects.filter(id=color_id).first()
+                color_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/color/"
+                color_dict_pic = {
+                    "id": color_type_obj.id,
+                    "color_list": []
+                }
+                if color_type_obj.color_unit_pic:
+                    color_dict_pic['color_list'].append(color_url + color_type_obj.color_unit_pic)
+                if color_type_obj.color_pic_1:
+                    color_dict_pic['color_list'].append(color_url + color_type_obj.color_pic_1)
+                if color_type_obj.color_pic_2:
+                    color_dict_pic['color_list'].append(color_url + color_type_obj.color_pic_2)
+                if color_type_obj.color_pic_3:
+                    color_dict_pic['color_list'].append(color_url + color_type_obj.color_pic_3)
+                if color_type_obj.color_pic_4:
+                    color_dict_pic['color_list'].append(color_url + color_type_obj.color_pic_4)
+                responses['data'] = color_dict_pic
+            else:
+                responses['code'] = 1001
+                responses['message'] = "暂无数据"
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
