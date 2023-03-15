@@ -2630,25 +2630,19 @@ class ColorUnit(APIView):
         try:
             color_id = request._request.POST.get('color_id')
             if color_id:
-                ticket_type = request._request.POST.get('ticket_type')
-                ticket_objs = models.Ticket.objects.all()
-                ticket_objs_type_dict = {}
-                ticket_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/ticket/"
-                for ticket_obj in ticket_objs:
-                    if ticket_obj.ticket_type == ticket_type:
-                        ticket_dict = {
-                            "ticket_id": ticket_obj.id,
-                            "ticket_name": ticket_obj.ticket_name,
-                            "ticket_information": ticket_obj.ticket_information,
-                            "ticket_image": ticket_url + ticket_obj.ticket_image,
-                            "ticket_image_detail": ticket_obj.ticket_image_detail,
-                            "remark": ticket_obj.remark,
-                        }
-                        if ticket_obj.ticket_type in ticket_objs_type_dict.keys():
-                            ticket_objs_type_dict[ticket_obj.ticket_type].append(ticket_dict)
-                        else:
-                            ticket_objs_type_dict[ticket_obj.ticket_type] = [ticket_dict]
-                responses['data'] = ticket_objs_type_dict
+                color_type_objs = models.ColorUnit.objects.filter(Retail_id=color_id).all()
+                color_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/ticket/"
+                color_list = []
+                for color_type_obj in color_type_objs:
+                    color_dict = {
+                        "color_id": color_type_obj.color_id,
+                        "color_name": color_type_obj.color_name,
+                        "color_type": color_type_obj.color_type,
+                        "color_unit_image": color_url + color_type_obj.color_unit_pic,
+                        "remark": color_type_obj.remark,
+                    }
+                    color_list.append(color_dict)
+                responses['data'] = color_list
             else:
                 responses['code'] = 1001
                 responses['message'] = "暂无数据"
