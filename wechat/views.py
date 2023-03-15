@@ -2631,10 +2631,11 @@ class ColorUnit(APIView):
             color_id = request._request.POST.get('color_id')
             if color_id:
                 color_type_objs = models.ColorUnit.objects.filter(Retail_id=color_id).all()
-                color_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/ticket/"
+                color_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/color/"
                 color_list = []
                 for color_type_obj in color_type_objs:
                     color_dict = {
+                        "id": color_type_obj.id,
                         "color_id": color_type_obj.color_id,
                         "color_name": color_type_obj.color_name,
                         "color_type": color_type_obj.color_type,
