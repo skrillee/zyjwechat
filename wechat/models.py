@@ -271,3 +271,21 @@ class ColorUnit(models.Model):
     color_pic_4 = models.CharField('效果图1', max_length=128, null=True)
     remark = models.CharField('备注', max_length=128, null=True)
     Retail = models.ForeignKey(ColorType, on_delete=models.CASCADE, null=True)
+
+
+class TotalColor(models.Model):
+    color_name = models.CharField('颜色简码', max_length=128, null=True)
+    color_rgb = models.CharField('颜色RGB', max_length=128, null=True)
+    hubuse_name = models.CharField('互补色简码', max_length=128, null=True)
+    hubuse_rgb = models.CharField('互补色RGB', max_length=128, null=True)
+    leibise_name = models.CharField('类比色简码', max_length=128, null=True)
+    leibise_rgb = models.CharField('类比色RGB', max_length=128, null=True)
+    jianbianse_name = models.CharField('类比色简码', max_length=128, null=True)
+    jianbianse_rgb = models.CharField('类比色RGB', max_length=128, null=True)
+    color_type = models.CharField('颜色类别', max_length=128, null=True)
+    color_system = models.CharField('颜色色系', max_length=128, null=True)
+    remark = models.CharField('备注', max_length=128, null=True)
+
+    class Meta:
+        verbose_name = '全色卡名称'
+        verbose_name_plural = '全色卡名称集合'
