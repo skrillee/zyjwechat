@@ -21,6 +21,7 @@ import random
 import re
 import odoorpc
 from collections import Counter
+import math
 
 
 def _unpad(s):
@@ -2689,6 +2690,121 @@ class ColorUnitPic(APIView):
             else:
                 responses['code'] = 1001
                 responses['message'] = "暂无数据"
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class AllColor(APIView):
+    """
+        Return information of authentication process
+        User authentication related services
+    """
+    authentication_classes = []
+
+    # 定义计算颜色相似度的函数
+    def color_distance(self, color1, color2):
+        r1, g1, b1 = color1
+        r2, g2, b2 = color2
+        return math.sqrt((r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2)
+
+    # 定义函数查找五个渐变色最接近的数组
+    def find_closest_gradient_colors(self, rgb, color_list):
+        # 计算与给定颜色rgb的相似度并存入列表中
+        # distances = [self.color_distance(rgb, color[1:]) for color in color_list]
+        distances=[]
+        for color in color_list:
+            distances.append(self.color_distance(rgb, color[1:]))
+        # 对相似度进行排序
+        sorted_distances = sorted(distances)
+        # 寻找五个最接近的颜色
+        closest_colors = []
+        for i in range(5):
+            idx = distances.index(sorted_distances[i])
+            closest_colors.append(color_list[idx])
+            distances[idx] = float('inf')
+        return closest_colors
+
+    # 互补色
+    @staticmethod
+    def find_complementary_colors(rgb, colors, n=5):
+        # 计算RGB颜色的互补色
+        complementary_rgb = (255 - rgb[0], 255 - rgb[1], 255 - rgb[2])
+
+        # 计算每个颜色与互补色的欧几里得距离
+        distances = [(i, ((c[1] - complementary_rgb[0]) ** 2 +
+                          (c[2] - complementary_rgb[1]) ** 2 +
+                          (c[3] - complementary_rgb[2]) ** 2) ** 0.5)
+                     for i, c in enumerate(colors)]
+
+        # 按照距离排序并返回最接近的n个颜色
+        sorted_distances = sorted(distances, key=lambda x: x[1])
+        return [colors[i[0]] for i in sorted_distances[:n]]
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            color_input_name = request._request.POST.get('color_input_name')
+            color_input_name = json.loads(color_input_name)
+            color_type_objs = models.TotalColor.objects.all()
+            color_grateful_obj = models.ColorUnit.objects.all()
+            grateful_list = []
+            color_list = []
+            for grateful_color in color_grateful_obj:
+                if grateful_color.remark:
+                    grateful_rgb = json.loads(grateful_color.remark)
+                    grateful_list.append((grateful_color.color_id, grateful_rgb[0], grateful_rgb[1], grateful_rgb[2]))
+            for color_obj in color_type_objs:
+                color_rgb = json.loads(color_obj.color_rgb)
+                color_list.append((color_obj.color_name, color_rgb[0], color_rgb[1], color_rgb[2]))
+            # 查找与rgb颜色的互补色最接近的5个颜色
+            hubuse_list = self.find_complementary_colors(color_input_name, color_list, n=5)
+            # 查找与rgb颜色的渐变色色最接近的5个颜色
+            jianbianse_list = self.find_closest_gradient_colors(color_input_name, color_list)
+            # 在热门色号中，查找与rgb颜色的渐变色色最接近的5个颜色
+            grateful_list = self.find_closest_gradient_colors(color_input_name, grateful_list)
+            color_analyse = {
+                "hubuse": hubuse_list,
+                "jianbianse": jianbianse_list,
+                "grateful": grateful_list
+            }
+            responses['data'] = color_analyse
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class AllColorDetail(APIView):
+    """
+        Return information of authentication process
+        User authentication related services
+    """
+    authentication_classes = []
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            color_type = request._request.POST.get('color_type')
+            color_system = request._request.POST.get('color_system')
+            color_type_objs = models.TotalColor.objects.filter(color_type=color_type, color_system=color_system).all()
+            color_list = []
+            for color_type_obj in color_type_objs:
+                color_rgb = json.loads(color_type_obj.color_rgb)
+                color_list.append([color_type_obj.color_name, color_rgb[0], color_rgb[1], color_rgb[2]])
+            color_selected = {
+                "color_list": color_list,
+            }
+            responses['data'] = color_selected
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"
