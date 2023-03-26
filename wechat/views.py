@@ -2801,8 +2801,11 @@ class AllColorDetail(APIView):
             for color_type_obj in color_type_objs:
                 color_rgb = json.loads(color_type_obj.color_rgb)
                 color_list.append([color_type_obj.color_name, color_rgb[0], color_rgb[1], color_rgb[2]])
+
+            step = 3
+            color_list_3 = [color_list[i:i+step] for i in range(0, len(color_list), step)]
             color_selected = {
-                "color_list": color_list,
+                "color_list_3": color_list_3,
             }
             responses['data'] = color_selected
         except Exception as e:
