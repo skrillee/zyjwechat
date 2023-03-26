@@ -2702,7 +2702,6 @@ class AllColor(APIView):
         Return information of authentication process
         User authentication related services
     """
-    authentication_classes = []
 
     # 定义计算颜色相似度的函数
     def color_distance(self, color1, color2):
@@ -2786,7 +2785,6 @@ class AllColorDetail(APIView):
         Return information of authentication process
         User authentication related services
     """
-    authentication_classes = []
 
     def post(self, request):
         responses = {
@@ -2800,7 +2798,7 @@ class AllColorDetail(APIView):
             color_list = []
             for color_type_obj in color_type_objs:
                 color_rgb = json.loads(color_type_obj.color_rgb)
-                color_list.append([color_type_obj.color_name, color_rgb[0], color_rgb[1], color_rgb[2]])
+                color_list.append([color_type_obj.color_name, color_rgb])
 
             step = 3
             color_list_3 = [color_list[i:i+step] for i in range(0, len(color_list), step)]
