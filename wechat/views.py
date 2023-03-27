@@ -2702,8 +2702,9 @@ class AllColor(APIView):
         Return information of authentication process
         User authentication related services
     """
-
+    authentication_classes = []
     # 定义计算颜色相似度的函数
+
     def color_distance(self, color1, color2):
         r1, g1, b1 = color1
         r2, g2, b2 = color2
@@ -2713,14 +2714,14 @@ class AllColor(APIView):
     def find_closest_gradient_colors(self, rgb, color_list):
         # 计算与给定颜色rgb的相似度并存入列表中
         # distances = [self.color_distance(rgb, color[1:]) for color in color_list]
-        distances=[]
+        distances = []
         for color in color_list:
             distances.append(self.color_distance(rgb, color[1:]))
         # 对相似度进行排序
         sorted_distances = sorted(distances)
         # 寻找五个最接近的颜色
         closest_colors = []
-        for i in range(5):
+        for i in range(6):
             idx = distances.index(sorted_distances[i])
             closest_colors.append(color_list[idx])
             distances[idx] = float('inf')
@@ -2728,7 +2729,7 @@ class AllColor(APIView):
 
     # 互补色
     @staticmethod
-    def find_complementary_colors(rgb, colors, n=5):
+    def find_complementary_colors(rgb, colors, n=6):
         # 计算RGB颜色的互补色
         complementary_rgb = (255 - rgb[0], 255 - rgb[1], 255 - rgb[2])
 
@@ -2762,11 +2763,17 @@ class AllColor(APIView):
                 color_rgb = json.loads(color_obj.color_rgb)
                 color_list.append((color_obj.color_name, color_rgb[0], color_rgb[1], color_rgb[2]))
             # 查找与rgb颜色的互补色最接近的5个颜色
-            hubuse_list = self.find_complementary_colors(color_input_name, color_list, n=5)
+            hubuse_list = self.find_complementary_colors(color_input_name, color_list, n=6)
             # 查找与rgb颜色的渐变色色最接近的5个颜色
             jianbianse_list = self.find_closest_gradient_colors(color_input_name, color_list)
             # 在热门色号中，查找与rgb颜色的渐变色色最接近的5个颜色
             grateful_list = self.find_closest_gradient_colors(color_input_name, grateful_list)
+
+            step = 3
+            hubuse_list = [hubuse_list[i:i+step] for i in range(0, len(hubuse_list), step)]
+            jianbianse_list = [jianbianse_list[i:i+step] for i in range(0, len(jianbianse_list), step)]
+            grateful_list = [grateful_list[i:i+step] for i in range(0, len(grateful_list), step)]
+
             color_analyse = {
                 "hubuse": hubuse_list,
                 "jianbianse": jianbianse_list,
