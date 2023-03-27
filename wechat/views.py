@@ -2670,7 +2670,7 @@ class ColorUnitPic(APIView):
         try:
             color_id = request._request.POST.get('color_id')
             if color_id:
-                color_type_obj = models.ColorUnit.objects.filter(id=color_id).first()
+                color_type_obj = models.ColorUnit.objects.filter(color_id=color_id).first()
                 color_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/color/"
                 color_dict_pic = {
                     "id": color_type_obj.id,
