@@ -2817,3 +2817,30 @@ class AllColorDetail(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class EntryPhoneNumber(APIView):
+    """
+        Return information of authentication process
+        User authentication related services
+    """
+    authentication_classes = []
+    
+    def get(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+
+            invitation_objs = models.ZyjWechatInvitationCode.objects.all()
+            phone_list = []
+            for invitation_obj in invitation_objs:
+                invitation_phone_number = invitation_obj.invitation_code
+                phone_list.append(invitation_phone_number)
+            responses['data'] = phone_list
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
