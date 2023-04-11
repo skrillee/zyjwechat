@@ -2844,3 +2844,246 @@ class EntryPhoneNumber(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+from PIL import Image
+import numpy as np
+import tempfile
+from sklearn.cluster import KMeans
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class AiSelectColor(APIView):
+    """
+        Return information of authentication process
+        User authentication related services
+    """
+    authentication_classes = []
+
+    def get_image_colors(self, image_path, num_colors=3):
+        # 打开图片
+        image = Image.open(image_path)
+
+        # 将图片大小调整为较小的尺寸以提高处理速度
+        image = image.resize((150, 150))
+
+        # 将图像数据转换为numpy数组
+        pixels = np.array(image)
+
+        # 将二维的图像数组展平成一维数组
+        flattened_pixels = pixels.reshape(-1, 3)
+
+        # 使用KMeans聚类找到主要颜色
+        kmeans = KMeans(n_clusters=num_colors)
+        kmeans.fit(flattened_pixels)
+        dominant_colors = kmeans.cluster_centers_
+
+        # 将主要颜色的RGB值四舍五入为整数
+        rounded_colors = dominant_colors.round(0).astype(int)
+
+        return rounded_colors
+
+    def color_distance(self, c1, c2):
+        return np.sqrt(np.sum((np.array(c1) - np.array(c2)) ** 2))
+
+    def find_closest_color(self, input_color, colors):
+        min_distance = float('inf')
+        closest_color_name = None
+
+        for color_name, color_value in colors.items():
+            distance = self.color_distance(input_color, color_value)
+
+            if distance < min_distance:
+                min_distance = distance
+                closest_color_name = color_name
+
+        return closest_color_name
+
+    def analyze_color(self, input_color):
+        colors = {
+            "红色": (255, 0, 0),
+            "绿色": (0, 255, 0),
+            "蓝色": (0, 0, 255),
+            "黄色": (255, 255, 0),
+            "青色": (0, 255, 255),
+            "品红": (255, 0, 255),
+            "白色": (255, 255, 255),
+            "黑色": (0, 0, 0),
+            "灰色": (128, 128, 128),
+            "棕色": (165, 42, 42),
+            "橙色": (255, 165, 0),
+            "浅黄色": (252, 232, 179),
+            "淡蓝色": (135, 206, 250),
+            "紫色": (128, 0, 128),
+            "金色": (255, 215, 0),
+            "银色": (192, 192, 192),
+            "深红色": (139, 0, 0),
+            "橄榄绿": (128, 128, 0),
+            "深蓝色": (0, 0, 139),
+            "淡紫色": (221, 160, 221),
+            "深紫色": (75, 0, 130),
+            "石榴红": (255, 20, 147),
+            "巧克力色": (210, 105, 30),
+            "天蓝色": (30, 144, 255),
+            "绿松石": (64, 224, 208),
+            "酒红色": (128, 0, 0),
+            "海绿色": (46, 139, 87),
+            "石灰绿": (50, 205, 50),
+            "薰衣草": (230, 230, 250),
+            "紫罗兰": (238, 130, 238),
+            "中绿色": (0, 128, 0),
+            "中蓝色": (0, 0, 205),
+            "暗灰色": (169, 169, 169),
+            "玫瑰红": (255, 0, 127),
+            "亮绿色": (144, 238, 144),
+            "鸢尾花色": (85, 107, 47),
+            "亮金色": (238, 221, 130),
+            "中紫色": (147, 112, 219),
+            "苍绿色": (152, 251, 152),
+            "钢蓝": (70, 130, 180),
+            "金麒麟色": (233, 216, 173),
+            "暗绿色": (0, 100, 0),
+            "暗海绿色": (143, 188, 143),
+            "暗紫色": (102, 51, 153),
+            "古铜色": (205, 127, 50),
+            "亮珊瑚色": (240, 128, 128),
+            "蓝绿色": (32, 178, 170),
+            "亮蓝色": (173, 216, 230),
+            "橙红色": (255, 69, 0),
+            "深橙色": (255, 140, 0),
+            "深粉色": (255, 20, 147),
+            "亮紫色": (218, 112, 214),
+            "火砖色": (178, 34, 34),
+            "法国玫瑰色": (246, 74, 138),
+            "浅粉色": (255, 182, 193),
+            "亮麒麟色": (250, 250, 210),
+            "亮青色": (95, 158, 160),
+            "珍珠白": (234, 224, 200),
+            "珍珠红": (183, 110, 121),
+            "珍珠蓝": (77, 121, 255),
+            "烟白色": (245, 245, 245),
+            "中石板蓝": (123, 104, 238),
+            "草绿色": (124, 252, 0),
+            "柠檬绸色": (255, 250, 205),
+            "亮天蓝色": (135, 206, 255),
+            "洋红色": (255, 0, 255),
+            "米色": (245, 222, 179),
+            "孔雀石绿": (50, 205, 153),
+            "梅红色": (176, 48, 96),
+            "马鞍棕": (139, 69, 19),
+            "沙棕色": (244, 164, 96),
+            "海贝色": (255, 228, 196),
+            "紫罗兰红": (208, 32, 144),
+            "石板蓝": (106, 90, 205),
+            "草莓色": (252, 90, 141),
+            "棕绿色": (150, 75, 0),
+            "棕褐色": (139, 35, 35),
+            "中宝石蓝": (48, 99, 191),
+            "茶色": (210, 180, 140),
+            "薄荷色": (24, 176, 116),
+            "藏青色": (16, 78, 139),
+            "旧麻色": (253, 245, 230),
+            "土耳其蓝": (0, 199, 140),
+            "亮石板灰": (207, 207, 196),
+            "玫瑰金": (183, 110, 121),
+            "柔和黄": (253, 253, 150),
+            "石榴石绿": (0, 201, 87),
+            "亮绿松石": (0, 229, 238),
+            "烟雾蓝": (96, 130, 182),
+            "暗茶色": (101, 67, 33),
+            "森林绿": (34, 139, 34),
+            "海军蓝": (0, 0, 128),
+            "橄榄土": (87, 59, 12),
+            "暗金黄": (184, 134, 11),
+            "亮绿": (0, 255, 127),
+            "薄荷绿": (245, 255, 250),
+            "浅钢蓝": (176, 196, 222),
+            "橙黄色": (255, 174, 66),
+            "鲑红色": (250, 128, 114),
+            "苍老紫": (148, 0, 211),
+            "暗橙色": (255, 140, 0),
+            "暗灰蓝": (72, 61, 139),
+            "石板灰": (112, 128, 144),
+            "栗色": (128, 0, 0),
+            "珊瑚色": (255, 127, 80),
+            "青蓝色": (51, 153, 255),
+            "昏灰": (105, 105, 105),
+            "印度红": (205, 92, 92),
+            "深天蓝": (0, 191, 255),
+            "亮钢蓝": (202, 225, 255),
+            "蜜蜂蓝": (39, 58, 129),
+            "绿松石蓝": (0, 199, 140),
+            "绛紫色": (226, 43, 138),
+            "砖红色": (156, 102, 31),
+            "暗鲑红": (233, 150, 122),
+            "深天鹅绿": (0, 199, 89),
+            "紫水晶": (155, 135, 206),
+            "亮杏仁色": (255, 235, 205),
+            "象牙色": (255, 255, 240),
+            "普莱士红": (153, 0, 76),
+            "中紫红": (186, 85, 211),
+            "深红褐": (139, 0, 0),
+            "暗褐色": (101, 67, 33),
+            "浅绿松石": (64, 224, 208),
+        }
+
+        closest_color = self.find_closest_color(input_color, colors)
+        # return f"输入的RGB颜色{input_color}属于{closest_color}。"
+        return closest_color
+
+    def find_complementary_colors(self, rgb, colors, n=6):
+        # 计算RGB颜色的互补色
+        complementary_rgb = (255 - rgb[0], 255 - rgb[1], 255 - rgb[2])
+
+        # 计算每个颜色与互补色的欧几里得距离
+        distances = [(i, ((c[1] - complementary_rgb[0]) ** 2 +
+                          (c[2] - complementary_rgb[1]) ** 2 +
+                          (c[3] - complementary_rgb[2]) ** 2) ** 0.5)
+                     for i, c in enumerate(colors)]
+
+        # 按照距离排序并返回最接近的n个颜色
+        sorted_distances = sorted(distances, key=lambda x: x[1])
+        return [colors[i[0]] for i in sorted_distances[:n]]
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        # 将处理后的图片保存到一个临时文件
+        temp_file = tempfile.NamedTemporaryFile(delete=False)
+        try:
+            files = request.FILES
+            uploaded_image = files.get('image', None)
+            img = Image.open(uploaded_image)
+
+            img.save(temp_file.name, 'PNG')
+
+            # 在这里你可以将临时文件的路径传递给其他函数进行处理
+
+            color_type_objs = models.TotalColor.objects.all()
+            color_list = []
+            for color_obj in color_type_objs:
+                color_rgb = json.loads(color_obj.color_rgb)
+                color_list.append((color_obj.color_name, color_rgb[0], color_rgb[1], color_rgb[2]))
+
+            image_path = uploaded_image
+            main_colors = self.get_image_colors(image_path, num_colors=1)
+            main_color = ''
+            for idx, color in enumerate(main_colors):
+                # print(f"主要颜色 {idx + 1}: {tuple(color)}")
+                main_color = tuple(color)
+            main_color_1 = self.analyze_color(main_color)
+            hubuse_list = self.find_complementary_colors(main_color, color_list)
+            color_analyse = {
+                "main_color": main_color_1,
+                "hubuse": hubuse_list,
+            }
+            responses['data'] = color_analyse
+            # 关闭临时文件
+            temp_file.close()
+
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        # 接口调用完成后删除临时文件
+        os.unlink(temp_file.name)
+        return JsonResponse(responses)
