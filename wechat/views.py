@@ -2888,15 +2888,16 @@ class AiSelectColor(APIView):
     def find_closest_color(self, input_color, colors):
         min_distance = float('inf')
         closest_color_name = None
-
+        closest_color_rgb = None
         for color_name, color_value in colors.items():
             distance = self.color_distance(input_color, color_value)
 
             if distance < min_distance:
                 min_distance = distance
                 closest_color_name = color_name
+                closest_color_rgb = color_value
 
-        return closest_color_name
+        return closest_color_name, closest_color_rgb
 
     def analyze_color(self, input_color):
         colors = {
@@ -3026,9 +3027,9 @@ class AiSelectColor(APIView):
             "浅绿松石": (64, 224, 208),
         }
 
-        closest_color = self.find_closest_color(input_color, colors)
+        closest_color_name, closest_color_rgb  = self.find_closest_color(input_color, colors)
         # return f"输入的RGB颜色{input_color}属于{closest_color}。"
-        return closest_color
+        return closest_color_name, closest_color_rgb
 
     def find_complementary_colors(self, rgb, colors, n=6):
         # 计算RGB颜色的互补色
@@ -3060,7 +3061,7 @@ class AiSelectColor(APIView):
 
             # 在这里你可以将临时文件的路径传递给其他函数进行处理
 
-            color_type_objs = models.TotalColor.objects.all()
+            color_grateful_obj = models.ColorUnit.objects.all()
             grateful_list = []
             for grateful_color in color_grateful_obj:
                 if grateful_color.remark:
@@ -3073,10 +3074,11 @@ class AiSelectColor(APIView):
             for idx, color in enumerate(main_colors):
                 # print(f"主要颜色 {idx + 1}: {tuple(color)}")
                 main_color = tuple(color)
-            main_color_1 = self.analyze_color(main_color)
+            main_color_name, main_color_rgb = self.analyze_color(main_color)
             hubuse_list = self.find_complementary_colors(main_color, grateful_list)
             color_analyse = {
-                "main_color": main_color_1,
+                "main_color": main_color_name,
+                "main_color_rgb": main_color_rgb,
                 "hubuse": hubuse_list,
             }
             responses['data'] = color_analyse
