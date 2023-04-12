@@ -3061,10 +3061,11 @@ class AiSelectColor(APIView):
             # 在这里你可以将临时文件的路径传递给其他函数进行处理
 
             color_type_objs = models.TotalColor.objects.all()
-            color_list = []
-            for color_obj in color_type_objs:
-                color_rgb = json.loads(color_obj.color_rgb)
-                color_list.append((color_obj.color_name, color_rgb[0], color_rgb[1], color_rgb[2]))
+            grateful_list = []
+            for grateful_color in color_grateful_obj:
+                if grateful_color.remark:
+                    grateful_rgb = json.loads(grateful_color.remark)
+                    grateful_list.append((grateful_color.color_id, grateful_rgb[0], grateful_rgb[1], grateful_rgb[2]))
 
             image_path = uploaded_image
             main_colors = self.get_image_colors(image_path, num_colors=1)
@@ -3073,7 +3074,7 @@ class AiSelectColor(APIView):
                 # print(f"主要颜色 {idx + 1}: {tuple(color)}")
                 main_color = tuple(color)
             main_color_1 = self.analyze_color(main_color)
-            hubuse_list = self.find_complementary_colors(main_color, color_list)
+            hubuse_list = self.find_complementary_colors(main_color, grateful_list)
             color_analyse = {
                 "main_color": main_color_1,
                 "hubuse": hubuse_list,
