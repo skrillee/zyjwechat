@@ -3267,10 +3267,13 @@ class AiSelectColor(APIView):
             for idx, color in enumerate(main_colors):
                 # print(f"主要颜色 {idx + 1}: {tuple(color)}")
                 main_color = tuple(color)
-            main_color_name, main_color_rgb = self.analyze_color(main_color)
+            # main_color_name, main_color_rgb = self.analyze_color(main_color)
             hubuse_list = self.find_complementary_colors(main_color, grateful_list)
+            main_color_rgb = []
+            for i in main_color:
+                main_color_rgb.append(int(i))
             color_analyse = {
-                "main_color": main_color_name,
+                "main_color": "图片中的主色",
                 "main_color_rgb": main_color_rgb,
                 "hubuse": hubuse_list,
             }
