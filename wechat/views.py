@@ -48,6 +48,7 @@ def md5(invitation_code) -> object:
     md5_object.update(bytes(current_time, encoding='utf-8'))
     return md5_object.hexdigest()
 
+
 import calendar;
 
 import time;
@@ -108,7 +109,6 @@ class AuthVIew(APIView):
 
 # noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
 class MobilePhone(APIView):
-
     authentication_classes = []
 
     def post(self, request):
@@ -123,9 +123,9 @@ class MobilePhone(APIView):
             encrypted_data = request._request.POST.get('encryptedData')
             url_code_session = "https://api.weixin.qq.com/sns/jscode2session" \
                                "?appid={}&secret={}&js_code={}&grant_type=authorization_code".format(
-                                'wxc9ccd41f17a1fa42',
-                                'ddbe4a7654a3223c6ed40921f083995c',
-                                js_code)
+                'wxc9ccd41f17a1fa42',
+                'ddbe4a7654a3223c6ed40921f083995c',
+                js_code)
             response = requests.get(url_code_session)
             try:
                 data = json.loads(response.content)
@@ -160,7 +160,6 @@ class MobilePhone(APIView):
 
 # noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
 class MobilePhoneFL(APIView):
-
     authentication_classes = []
 
     def post(self, request):
@@ -175,9 +174,9 @@ class MobilePhoneFL(APIView):
             encrypted_data = request._request.POST.get('encryptedData')
             url_code_session = "https://api.weixin.qq.com/sns/jscode2session" \
                                "?appid={}&secret={}&js_code={}&grant_type=authorization_code".format(
-                                'wxc754f862e84d18b5',
-                                'ddbe4a7654a3223c6ed40921f083995c',
-                                js_code)
+                'wxc754f862e84d18b5',
+                'ddbe4a7654a3223c6ed40921f083995c',
+                js_code)
             response = requests.get(url_code_session)
             try:
                 data = json.loads(response.content)
@@ -215,6 +214,7 @@ class RetailVIew(APIView):
     """
         Return the retailer information corresponding to the invitation code
     """
+
     def get(self, request):
         responses = {
             'code': 1000,
@@ -244,6 +244,7 @@ class Manufactor(APIView):
     """
         Return the manufactor information corresponding to the invitation code
     """
+
     def get(self, request):
         responses = {
             'code': 1000,
@@ -258,8 +259,8 @@ class Manufactor(APIView):
                 edition_objects = single_manufactor.zyjwechatedition_set.all()
                 for edition_object in edition_objects:
                     edition_id = edition_object.id
-                    edition_id_string += str(edition_id)+','
-                    manufactor_edition_id_string += str(edition_id)+','
+                    edition_id_string += str(edition_id) + ','
+                    manufactor_edition_id_string += str(edition_id) + ','
                 manufactor_id = single_manufactor.id
                 name = single_manufactor.name
                 manufactor_introduction = single_manufactor.manufactor_introduction
@@ -303,6 +304,7 @@ class ManufactorPicture(APIView):
     """
         Return the Manufactor Picture corresponding to the invitation code
     """
+
     def get(self, request, manufactor_request):
         responses = {
             'code': 1000,
@@ -326,6 +328,7 @@ class Edition(APIView):
         This parameter is limited to your own brand
         Return the Edition corresponding to the invitation code
     """
+
     def get(self, request, manufactor_id):
         responses = {
             'code': 1000,
@@ -367,6 +370,7 @@ class Model(APIView):
         This parameter is limited to your own brand
         Return the Edition corresponding to the invitation code
     """
+
     def post(self, request):
         responses = {
             'code': 1000,
@@ -394,10 +398,10 @@ class Model(APIView):
                     model_object_dict['name'] = name
                     model_object_dict['scene'] = scene
                     model_object_dict['date'] = date
-                    model_object_dict['model_VrQr'] = sample_url+edition_sample+model_VrQr
+                    model_object_dict['model_VrQr'] = sample_url + edition_sample + model_VrQr
                     model_object_dict['model_vr'] = model_vr
                     model_object_dict['model_unit'] = model_unit
-                    model_object_dict['model_sample'] = sample_url+edition_sample+model_sample
+                    model_object_dict['model_sample'] = sample_url + edition_sample + model_sample
                     model_object_dict['edition_name'] = model_object.Edition.name
                     model_object_dict['edition_style'] = model_object.Edition.style
                     model_object_list.append(model_object_dict)
@@ -415,6 +419,7 @@ class Sample(APIView):
         This parameter is limited to your own brand
         Return the Edition corresponding to the invitation code
     """
+
     def post(self, request):
         responses = {
             'code': 1000,
@@ -429,7 +434,7 @@ class Sample(APIView):
             edition_sample = model_object.Edition.edition_sample
             model_unit_url_list = []
             for model_unit in model_unit_list:
-                model_unit_url_list.append(sample_url+edition_sample+model_unit)
+                model_unit_url_list.append(sample_url + edition_sample + model_unit)
             model_object_dict['name'] = model_object.name
             model_object_dict['scene'] = model_object.scene
             model_object_dict['date'] = model_object.date
@@ -451,6 +456,7 @@ class Artificial(APIView):
         This parameter is limited to your own brand
         Return the Edition corresponding to the invitation code
     """
+
     def post(self, request):
         responses = {
             'code': 1000,
@@ -463,7 +469,8 @@ class Artificial(APIView):
             artificial_object_list = []
             for artificial in artificial_object:
                 artificial_object_dict = {'name': artificial.name, 'number': artificial.number,
-                                          'reference_price': artificial.reference_price, 'experience': artificial.experience}
+                                          'reference_price': artificial.reference_price,
+                                          'experience': artificial.experience}
                 artificial_object_list.append(artificial_object_dict)
             responses['data'] = artificial_object_list
         except Exception as e:
@@ -479,6 +486,7 @@ class Ingredients(APIView):
         This parameter is limited to your own brand
         Return the Edition corresponding to the invitation code
     """
+
     def post(self, request):
         responses = {
             'code': 1000,
@@ -492,8 +500,10 @@ class Ingredients(APIView):
             ingredients_object_list = []
             for ingredients in ingredients_object:
                 ingredients_object_dict = {'name': ingredients.name, 'specification': ingredients.specification,
-                                           'reference_price': ingredients.reference_price, 'area_size': ingredients.area_size,
-                                           'product_name': ingredients.product_name, 'images': ingredients_url+ingredients.images,
+                                           'reference_price': ingredients.reference_price,
+                                           'area_size': ingredients.area_size,
+                                           'product_name': ingredients.product_name,
+                                           'images': ingredients_url + ingredients.images,
                                            'explain': ingredients.explain}
                 ingredients_object_list.append(ingredients_object_dict)
             responses['data'] = ingredients_object_list
@@ -510,6 +520,7 @@ class Classification(APIView):
         This parameter is limited to your own brand
         Return the Edition corresponding to the invitation code
     """
+
     def post(self, request):
         responses = {
             'code': 1000,
@@ -526,10 +537,13 @@ class Classification(APIView):
             if name:
                 classification = models.Classification.objects.filter(name=name).first()
                 classification_object_dict = {'name': classification.name, 'product_name': classification.product_name,
-                                              'reference_price': classification.reference_price, 'images_big': classification_url+classification.images_big,
-                                              'characteristic': classification.characteristic, 'discount': classification.discount,
-                                              'images_parameter': classification_url+classification.images_parameter,
-                                              'original_price': classification.original_price, 'manual_price': classification.manual_price,
+                                              'reference_price': classification.reference_price,
+                                              'images_big': classification_url + classification.images_big,
+                                              'characteristic': classification.characteristic,
+                                              'discount': classification.discount,
+                                              'images_parameter': classification_url + classification.images_parameter,
+                                              'original_price': classification.original_price,
+                                              'manual_price': classification.manual_price,
                                               'size': classification.size, 'details': classification.details,
                                               'evaluate': classification.evaluate
                                               }
@@ -538,10 +552,12 @@ class Classification(APIView):
                 classification_object = models.Classification.objects.filter(discount=discount).all()
                 for classification in classification_object:
                     if classification.discount == discount:
-                        classification_object_dict = {'name': classification.name, 'product_name': classification.product_name,
-                                                      'images_small': classification_url+classification.images_small,
+                        classification_object_dict = {'name': classification.name,
+                                                      'product_name': classification.product_name,
+                                                      'images_small': classification_url + classification.images_small,
                                                       'reference_price': classification.reference_price,
-                                                      'characteristic': classification.characteristic, 'discount': classification.discount,
+                                                      'characteristic': classification.characteristic,
+                                                      'discount': classification.discount,
                                                       'original_price': classification.original_price,
                                                       'size': classification.size,
                                                       }
@@ -550,10 +566,12 @@ class Classification(APIView):
                 classification_object = models.Classification.objects.filter(Retail=retail_id).all()
                 for classification in classification_object:
                     if classification.characteristic == characteristic:
-                        classification_object_dict = {'name': classification.name, 'product_name': classification.product_name,
-                                                      'images_small': classification_url+classification.images_small,
+                        classification_object_dict = {'name': classification.name,
+                                                      'product_name': classification.product_name,
+                                                      'images_small': classification_url + classification.images_small,
                                                       'reference_price': classification.reference_price,
-                                                      'characteristic': classification.characteristic, 'discount': classification.discount,
+                                                      'characteristic': classification.characteristic,
+                                                      'discount': classification.discount,
                                                       'original_price': classification.original_price,
                                                       'size': classification.size,
                                                       }
@@ -571,6 +589,7 @@ class Classification2(APIView):
         This parameter is limited to your own brand
         Return the Edition corresponding to the invitation code
     """
+
     def post(self, request):
         responses = {
             'code': 1000,
@@ -582,12 +601,15 @@ class Classification2(APIView):
             classification_object_list = []
             classification = models.Classification.objects.filter(name=name).first()
             images_big_list = classification.images_big.split(",")
-            images_big_list = [classification_url+var for var in images_big_list if var]
+            images_big_list = [classification_url + var for var in images_big_list if var]
             classification_object_dict = {'name': classification.name, 'product_name': classification.product_name,
-                                          'reference_price': classification.reference_price, 'images_big': images_big_list,
-                                          'characteristic': classification.characteristic, 'discount': classification.discount,
-                                          'images_parameter': classification_url+classification.images_parameter,
-                                          'original_price': classification.original_price, 'manual_price': classification.manual_price,
+                                          'reference_price': classification.reference_price,
+                                          'images_big': images_big_list,
+                                          'characteristic': classification.characteristic,
+                                          'discount': classification.discount,
+                                          'images_parameter': classification_url + classification.images_parameter,
+                                          'original_price': classification.original_price,
+                                          'manual_price': classification.manual_price,
                                           'size': classification.size, 'details': classification.details,
                                           'evaluate': classification.evaluate
                                           }
@@ -606,6 +628,7 @@ class Voucher(APIView):
         This parameter is limited to your own brand
         Return the Edition corresponding to the invitation code
     """
+
     def post(self, request):
         responses = {
             'code': 1000,
@@ -620,7 +643,7 @@ class Voucher(APIView):
             for voucher in voucher_object:
                 voucher_object_dict = {'name': voucher.name, 'phone': voucher.phone,
                                        'address': voucher.address, 'reduction': voucher.reduction,
-                                       'state': voucher.state, 'images_small': voucher_url+voucher.images_small,
+                                       'state': voucher.state, 'images_small': voucher_url + voucher.images_small,
                                        'remaining': voucher.remaining, 'verification': voucher.verification}
                 voucher_object_list.append(voucher_object_dict)
             responses['data'] = voucher_object_list
@@ -771,7 +794,8 @@ class Banner(APIView):
             if banners_objs:
                 for banner_obj in banners_objs:
                     banner_object_dict = {'location': banner_obj.location, 'images': banner_obj.images,
-                                          'describe': banner_obj.describe, 'images_big': banners_url+banner_obj.images,
+                                          'describe': banner_obj.describe,
+                                          'images_big': banners_url + banner_obj.images,
                                           'category': banner_obj.category,
                                           }
                     banner_object_list.append(banner_object_dict)
@@ -787,6 +811,7 @@ class Banner(APIView):
 
 
 import collections
+
 AirContent = collections.namedtuple('AirContent', ('tvoc', 'co2'))
 
 
@@ -896,7 +921,6 @@ class History(APIView):
 
 # 随机随机字符串
 def get_random_str():
-
     data = "123456789zxcvbnmasdfghdjklqwertyuiopZXCVBNMASDFGHJKLQWERTYUIOP"
     nonce_str = ''.join(random.sample(data, 30))
     return nonce_str
@@ -922,6 +946,7 @@ import hashlib
 import xmltodict
 import time
 import string
+
 
 # 生成一个以当前文件名为名字的logger实例
 
@@ -970,7 +995,7 @@ class Login(APIView):
             # wechat_code = "081lOcll2hW7G84wJCml2bhswh1lOcld"
             url_code_session = "https://api.weixin.qq.com/sns/jscode2session" \
                                "?appid={}&secret={}&js_code={}&grant_type=authorization_code".format(
-                                'wxc9ccd41f17a1fa42', '168534ea6674446e6f2d7ea81bff1ab8', wechat_code
+                'wxc9ccd41f17a1fa42', '168534ea6674446e6f2d7ea81bff1ab8', wechat_code
             )
             data = requests.get(url_code_session)
             if data.status_code == 200:
@@ -1126,7 +1151,7 @@ def generate_bill(out_trade_no, fee, openid):
                 "appid": APPID,
                 "partnerid": MCHID,
                 "prepayid": prepay_id,
-                "package": 'prepay_id'+prepay_id,
+                "package": 'prepay_id' + prepay_id,
                 "noncestr": nonce_str,
                 "timestamp": timeStamp,
             }  # 6. paySign签名
@@ -1168,7 +1193,7 @@ class Payback(APIView):
 
             return HttpResponse("""<xml><return_code><![CDATA[SUCCESS]]></return_code>
                                 <return_msg><![CDATA[OK]]></return_msg></xml>""",
-    content_type='text/xml', status=200)
+                                content_type='text/xml', status=200)
 
 
 # noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
@@ -1218,7 +1243,7 @@ class Live(APIView):
                 "closeComment": close_comment,
                 "feedsImg": media_id
             }
-            create_room_url = "https://api.weixin.qq.com/wxaapi/broadcast/room/create?access_token="+access_token
+            create_room_url = "https://api.weixin.qq.com/wxaapi/broadcast/room/create?access_token=" + access_token
             headers = {'Content-Type': 'application/json;charset=UTF-8'}
             create_room_result = requests.request("post", url=create_room_url, json=param_data, headers=headers)
             room_id = json.loads(create_room_result.text)['roomId']
@@ -1415,6 +1440,7 @@ class Bill(APIView):
     """
      color： #0F375A #F9C03D #BFD0DA #65472F #E9D9BF #D4920A #056E83 #FFAAAA #F0C046 #4B4B4E #E9D9BF #0F375A
     """
+
     def post(self, request):
         responses = {
             'code': 1000,
@@ -1446,14 +1472,14 @@ class Bill(APIView):
                         }
                         bill_chart = {
                             "name": bill_object.cost_name,
-                            "value": float(bill_object.unit_price)*float(bill_object.quantity)
+                            "value": float(bill_object.unit_price) * float(bill_object.quantity)
                         }
 
                         bill_object_list.append(bill_dict)
                         bill_chart_value_list.append(bill_chart)
                         bill_chart_name_list.append(bill_object.cost_name)
                         bill_chart_color_list.append(bill_object.chart_color)
-                        bill_total += float(bill_object.unit_price)*float(bill_object.quantity)
+                        bill_total += float(bill_object.unit_price) * float(bill_object.quantity)
                     responses['data'] = bill_object_list
                     responses['chart_value'] = bill_chart_value_list
                     responses['chart_name'] = bill_chart_name_list
@@ -1479,14 +1505,15 @@ class Bill(APIView):
                         if bill_object.customer_name in bill_objs_customer_dict.keys():
                             bill_detail_dict = bill_objs_customer_dict[bill_object.customer_name][0]
                             bill_detail_dict["item_quantity"] += 1
-                            bill_detail_dict["item_total"] += float(bill_object.unit_price)*float(bill_object.quantity)
+                            bill_detail_dict["item_total"] += float(bill_object.unit_price) * float(
+                                bill_object.quantity)
                             bill_detail_dict["customer_name"] = bill_object.customer_name
                             bill_detail_dict["trading_time"] = bill_object.trading_time
                         else:
                             bill_dict["item_quantity"] = 1
                             bill_dict["retail_id"] = bill_object.Retail_id
                             bill_dict["invitation_id"] = bill_object.InvitationCode_id
-                            bill_dict["item_total"] = float(bill_object.unit_price)*float(bill_object.quantity)
+                            bill_dict["item_total"] = float(bill_object.unit_price) * float(bill_object.quantity)
                             bill_objs_customer_dict[bill_object.customer_name] = [bill_dict]
                     responses['data'] = bill_objs_customer_dict
                 else:
@@ -1506,6 +1533,7 @@ class BillDetail(APIView):
     """
      color： #0F375A #F9C03D #BFD0DA #65472F #E9D9BF #D4920A #056E83 #FFAAAA #F0C046 #4B4B4E #E9D9BF #0F375A
     """
+
     def post(self, request):
         responses = {
             'code': 1000,
@@ -1531,7 +1559,7 @@ class BillDetail(APIView):
                     "quantity": bill_object.quantity,
                     "trading_time": bill_object.trading_time,
                     "bill_id": bill_object.id,
-                    "item_total": float(bill_object.unit_price)*float(bill_object.quantity),
+                    "item_total": float(bill_object.unit_price) * float(bill_object.quantity),
                     "remark": bill_object.remark
                 }
                 bill_list.append(bill_dict)
@@ -1555,6 +1583,7 @@ class AddBillDetail(APIView):
      color： ['#0F375A', ' #F9C03D', ' #BFD0DA', '#65472F', '#E9D9BF', '#D4920A', '#056E83', '#FFAAAA',
                           '#F0C046', '#4B4B4E', '#E9D9BF', '#0F375A']
     """
+
     def post(self, request):
         responses = {
             'code': 1000,
@@ -1621,6 +1650,7 @@ class AddBill(APIView):
      color： ['#0F375A', ' #F9C03D', ' #BFD0DA', '#65472F', '#E9D9BF', '#D4920A', '#056E83', '#FFAAAA',
                           '#F0C046', '#4B4B4E', '#E9D9BF', '#0F375A']
     """
+
     def post(self, request):
         responses = {
             'code': 1000,
@@ -1689,10 +1719,10 @@ class AddPicture(APIView):
                     files = request.FILES
                     content = files.get('image', None).read()
                     # path = os.path.join(settings.IMAGES_DIR[0], 'aaa.jpg')
-                    path = os.path.join(settings.IMAGES_DIR[0])+'/{}'.format(invitation_code)
-                    path_pic = path+'/'+'{}'.format(pic_item)+'.jpg'
+                    path = os.path.join(settings.IMAGES_DIR[0]) + '/{}'.format(invitation_code)
+                    path_pic = path + '/' + '{}'.format(pic_item) + '.jpg'
 
-                    path_static = os.path.join(settings.STATIC_IMAGES_DIR[0])+'/{}'.format(invitation_code)
+                    path_static = os.path.join(settings.STATIC_IMAGES_DIR[0]) + '/{}'.format(invitation_code)
                     path_pic_static = path_static + '/' + '{}'.format(pic_item) + '.jpg'
                     try:
                         with open(path_pic, 'wb') as f:
@@ -1732,7 +1762,7 @@ class CheckPicture(APIView):
         try:
             invitation_code = request.user.invitation_code
             check_static_url = "https://www.zhuangyuanjie.cn/static/media/manufactor/check/"
-            check_url = check_static_url+invitation_code
+            check_url = check_static_url + invitation_code
             try:
                 path_static = os.path.join(settings.STATIC_IMAGES_DIR[0]) + '/{}'.format(invitation_code)
                 images_path = os.listdir(path_static)
@@ -1858,7 +1888,8 @@ class AddOrder(APIView):
             if cart_object_id:
                 models.Cart.objects.update_or_create(defaults=order_dict, id=cart_object_id.id)
             else:
-                models.Cart.objects.update_or_create(cart_code=invitation_code, Classification_id=classification_object_id)
+                models.Cart.objects.update_or_create(cart_code=invitation_code,
+                                                     Classification_id=classification_object_id)
 
         except Exception as e:
             responses['code'] = 3002
@@ -1879,7 +1910,8 @@ class DeleteOrder(APIView):
             name = request._request.POST.get('name')
             classification_object_id = models.Classification.objects.filter(
                 name=name).first().id
-            models.Cart.objects.filter(cart_code=invitation_code, Classification_id=classification_object_id).first().delete()
+            models.Cart.objects.filter(cart_code=invitation_code,
+                                       Classification_id=classification_object_id).first().delete()
             responses['data'] = "删除成功"
         except Exception as e:
             responses['code'] = 3002
@@ -2021,9 +2053,13 @@ class Redirect(APIView):
         try:
             app_id = 'wxc754f862e84d18b5'
             secret = 'ddbe4a7654a3223c6ed40921f083995c'
-            content = requests.get(url='https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={APPID}&secret={APPSECRET}'.format(APPID=app_id, APPSECRET=secret))
+            content = requests.get(
+                url='https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={APPID}&secret={APPSECRET}'.format(
+                    APPID=app_id, APPSECRET=secret))
             access_token = json.loads(content.content)['access_token']
-            content = requests.post(url='https://api.weixin.qq.com/wxa/generatescheme?access_token={ACCESS_TOKEN}'.format(ACCESS_TOKEN=access_token)).content
+            content = requests.post(
+                url='https://api.weixin.qq.com/wxa/generatescheme?access_token={ACCESS_TOKEN}'.format(
+                    ACCESS_TOKEN=access_token)).content
             open_link = json.loads(content)['openlink']
             response = HttpResponse("", status=302)
             response['Location'] = open_link
@@ -2051,9 +2087,11 @@ class ManifestBill(APIView):
             phone_number = request._request.POST.get('phone_number')
             odoo = odoorpc.ODOO('47.92.85.245', port=3369)
             odoo.login('FenLin', '1979736774@qq.com', 'odooodoo')
-            user_id = odoo.env['feeling_customer.information'].search([('customer_information_phone', '=', phone_number)])
+            user_id = odoo.env['feeling_customer.information'].search(
+                [('customer_information_phone', '=', phone_number)])
             freight_obj = odoo.env['fixed.freight_bill']
-            manifest_list = freight_obj.search(['&', ('date_invoice', '=', data_time),  ('partner_name_id', '=', user_id)])
+            manifest_list = freight_obj.search(
+                ['&', ('date_invoice', '=', data_time), ('partner_name_id', '=', user_id)])
 
             list_number = len(manifest_list)
             freight_filter_obj_list = freight_obj.browse(manifest_list)
@@ -2116,9 +2154,11 @@ class PaintBill(APIView):
             phone_number = request._request.POST.get('phone_number')
             odoo = odoorpc.ODOO('47.92.85.245', port=3369)
             odoo.login('FenLin', '1979736774@qq.com', 'odooodoo')
-            user_id = odoo.env['feeling_customer.information'].search([('customer_information_phone', '=', phone_number)])
+            user_id = odoo.env['feeling_customer.information'].search(
+                [('customer_information_phone', '=', phone_number)])
             paint_sell_obj = odoo.env['feeling_manifest.sell']
-            paint_sell_list = paint_sell_obj.search(['&', ('sell_create_date', '=', data_time),  ('sell_customer_name_id', '=', user_id)])
+            paint_sell_list = paint_sell_obj.search(
+                ['&', ('sell_create_date', '=', data_time), ('sell_customer_name_id', '=', user_id)])
             list_number = len(paint_sell_list)
             paint_line_list = []
             number_flag = 0
@@ -2129,7 +2169,8 @@ class PaintBill(APIView):
                 paint_accessories_obj = odoo.env['feeling_manifest.accessories.line']
 
                 paint_main_lines_ids = paint_main_obj.search([('sell_main_id', '=', paint_sell_id)])
-                paint_accessories_lines_ids = paint_accessories_obj.search([('sell_accessories_id', '=', paint_sell_id)])
+                paint_accessories_lines_ids = paint_accessories_obj.search(
+                    [('sell_accessories_id', '=', paint_sell_id)])
 
                 paint_main_line_objs = paint_main_obj.browse(paint_main_lines_ids)
                 paint_accessories_line_objs = paint_accessories_obj.browse(paint_accessories_lines_ids)
@@ -2254,8 +2295,9 @@ class Manifest(APIView):
                     year_list.append(result_data_dict)
                 "冒泡降序"
                 for i in range(len(year_list) - 1):
-                    for j in range(len(year_list)-i-1):
-                        if time.strptime(year_list[j]['time'], '%Y-%m') < time.strptime(year_list[j + 1]['time'], '%Y-%m'):
+                    for j in range(len(year_list) - i - 1):
+                        if time.strptime(year_list[j]['time'], '%Y-%m') < time.strptime(year_list[j + 1]['time'],
+                                                                                        '%Y-%m'):
                             t = year_list[j]
                             year_list[j] = year_list[j + 1]
                             year_list[j + 1] = t
@@ -2283,7 +2325,8 @@ class Manifest(APIView):
                     else:
                         bill_time = str(bill.sell_create_date)
                     year_month_time = bill_time.split('-')[0] + '-' + bill_time.split('-')[1]
-                    year_month_date_time = bill_time.split('-')[0] + '-' + bill_time.split('-')[1] + '-' + bill_time.split('-')[2]
+                    year_month_date_time = bill_time.split('-')[0] + '-' + bill_time.split('-')[1] + '-' + \
+                                           bill_time.split('-')[2]
                     if item_time in year_month_time:
                         if year_month_date_time in year_month_dict:
                             year_month_dict[year_month_date_time].append(bill)
@@ -2307,8 +2350,9 @@ class Manifest(APIView):
                     year_month_list.append(result_data_dict)
                 "冒泡降序"
                 for i in range(len(year_month_list) - 1):
-                    for j in range(len(year_month_list)-i-1):
-                        if time.strptime(year_month_list[j]['time'], '%Y-%m-%d') < time.strptime(year_month_list[j + 1]['time'], '%Y-%m-%d'):
+                    for j in range(len(year_month_list) - i - 1):
+                        if time.strptime(year_month_list[j]['time'], '%Y-%m-%d') < time.strptime(
+                                year_month_list[j + 1]['time'], '%Y-%m-%d'):
                             t = year_month_list[j]
                             year_month_list[j] = year_month_list[j + 1]
                             year_month_list[j + 1] = t
@@ -2392,8 +2436,8 @@ class Samples:
 
     @staticmethod
     def create_client(
-        access_key_id: str,
-        access_key_secret: str,
+            access_key_id: str,
+            access_key_secret: str,
     ) -> Dysmsapi20170525Client:
         """
         使用AK&SK初始化账号Client
@@ -2414,7 +2458,7 @@ class Samples:
 
     @staticmethod
     def main(
-        **kwargs
+            **kwargs
     ):
         with open('/home/yanboce/apps/message.json', 'r', encoding='utf8') as fp:
             json_data = json.load(fp)
@@ -2444,7 +2488,7 @@ class Samples:
 
     @staticmethod
     async def main_async(
-        **kwargs
+            **kwargs
     ) -> None:
         with open('/home/yanboce/apps/message.json', 'r', encoding='utf8') as fp:
             json_data = json.load(fp)
@@ -2549,7 +2593,8 @@ class Tvoc(APIView):
                     check_type = tvoc_obj.check_type
                     check_location_number = tvoc_obj.check_location_number
                     value_line_ids = tvoc_obj.id
-                    tvoc_value_line_ids = odoo.env['feeling_tvoc.check.line'].search([('tvoc_value_id', '=', value_line_ids)])
+                    tvoc_value_line_ids = odoo.env['feeling_tvoc.check.line'].search(
+                        [('tvoc_value_id', '=', value_line_ids)])
                     tvoc_value_line_objs = tvoc_value_line_obj.browse(tvoc_value_line_ids)
                     tvoc_location_list = []
                     tvoc_result_list = []
@@ -2703,6 +2748,7 @@ class AllColor(APIView):
         User authentication related services
     """
     authentication_classes = []
+
     # 定义计算颜色相似度的函数
 
     def color_distance(self, color1, color2):
@@ -2770,9 +2816,9 @@ class AllColor(APIView):
             grateful_list = self.find_closest_gradient_colors(color_input_name, grateful_list)
 
             step = 3
-            hubuse_list = [hubuse_list[i:i+step] for i in range(0, len(hubuse_list), step)]
-            jianbianse_list = [jianbianse_list[i:i+step] for i in range(0, len(jianbianse_list), step)]
-            grateful_list = [grateful_list[i:i+step] for i in range(0, len(grateful_list), step)]
+            hubuse_list = [hubuse_list[i:i + step] for i in range(0, len(hubuse_list), step)]
+            jianbianse_list = [jianbianse_list[i:i + step] for i in range(0, len(jianbianse_list), step)]
+            grateful_list = [grateful_list[i:i + step] for i in range(0, len(grateful_list), step)]
 
             color_analyse = {
                 "hubuse": hubuse_list,
@@ -2808,7 +2854,7 @@ class AllColorDetail(APIView):
                 color_list.append([color_type_obj.color_name, color_rgb])
 
             step = 3
-            color_list_3 = [color_list[i:i+step] for i in range(0, len(color_list), step)]
+            color_list_3 = [color_list[i:i + step] for i in range(0, len(color_list), step)]
             color_selected = {
                 "color_list_3": color_list_3,
             }
@@ -2826,7 +2872,7 @@ class EntryPhoneNumber(APIView):
         User authentication related services
     """
     authentication_classes = []
-    
+
     def get(self, request):
         responses = {
             'code': 1000,
@@ -2850,6 +2896,7 @@ from PIL import Image
 import numpy as np
 import tempfile
 from sklearn.cluster import KMeans
+
 
 # noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
 class AiSelectColor(APIView):
@@ -3269,12 +3316,16 @@ class AiSelectColor(APIView):
                 main_color = tuple(color)
             # main_color_name, main_color_rgb = self.analyze_color(main_color)
             hubuse_list = self.find_complementary_colors(main_color, grateful_list)
-            main_color_rgb = []
+            main_color_rgb_int: List[int] = []
+            main_color_rgb_str: Str[int] = []
             for i in main_color:
-                main_color_rgb.append(int(i))
+                main_color_rgb_int.append(int(i))
+                main_color_rgb_str.append(str(i))
+            main_color_name = ",".join(main_color_rgb_str)
+            main_color_name = 'RGB(' + main_color_name + ')'
             color_analyse = {
-                "main_color": "图片中的主色",
-                "main_color_rgb": main_color_rgb,
+                "main_color": main_color_name,
+                "main_color_rgb": main_color_rgb_int,
                 "hubuse": hubuse_list,
             }
             responses['data'] = color_analyse
