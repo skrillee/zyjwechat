@@ -289,3 +289,19 @@ class TotalColor(models.Model):
     class Meta:
         verbose_name = '全色卡名称'
         verbose_name_plural = '全色卡名称集合'
+
+
+class AdsImage(models.Model):
+    ads_image_id = models.CharField('id', max_length=64, null=True)
+    ads_image_type = models.CharField('类型', max_length=64, null=True)
+    ads_image_page = models.CharField('页面', max_length=64, null=True)
+    ads_image_name = models.CharField('位置', max_length=64, null=True)
+    ads_image_title = models.CharField('标题', max_length=64, null=True)
+    ads_image_status = models.CharField('状态', max_length=64, null=True)
+    ads_image_pic = models.CharField('图片', max_length=128, null=True)
+    ads_image_size = models.CharField('图片尺寸', max_length=128, null=True)
+    ads_image_remark = models.CharField('备注', max_length=128, null=True)
+
+    class Meta:
+        verbose_name = '广告图片信息'
+        verbose_name_plural = '广告图片信息'
