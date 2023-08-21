@@ -3375,7 +3375,7 @@ class HomeSwiperPic(APIView):
                 for filtered_ad_image_type in filtered_ad_image_types:
                     if filtered_ad_image_type.ads_image_status == "valid":
                         result_list.append({
-                            "_id": filtered_ad_image_type.ads_image_id,
+                            "image_id": filtered_ad_image_type.ads_image_id,
                             "title": filtered_ad_image_type.ads_image_title,
                             "image_status": filtered_ad_image_type.ads_image_status,
                             "image_pic": filtered_ad_image_type.ads_image_pic,
