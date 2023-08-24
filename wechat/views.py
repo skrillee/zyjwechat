@@ -1,26 +1,20 @@
 __author__ = 'Yan.zhe 2021.09.28'
 
-from django.shortcuts import HttpResponse
 from rest_framework.views import APIView
 from django.http import JsonResponse
-
-# import wechat.views
-# import hashlib
-# import time
-# import requests
 from zyjwechat import settings
 from wechat import models
+from django.db.models import Q
+from Cryptodome.Cipher import AES
 import socket
 import datetime
 import pytz
 import os
 import json
 import base64
-from Cryptodome.Cipher import AES
 import random
 import re
 import odoorpc
-from collections import Counter
 import math
 
 
@@ -3339,11 +3333,57 @@ class AiSelectColor(APIView):
         os.unlink(temp_file.name)
         return JsonResponse(responses)
 
-from django.db.models import Q
-
 
 # noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
 class HomeSwiperPic(APIView):
+    """
+        Return information of authentication process
+        User authentication related services
+    """
+    authentication_classes = []
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            ads_image_type = request._request.POST.get('ads_image_type')
+            ads_image_page = request._request.POST.get('ads_image_page')
+            ads_image_name = request._request.POST.get('ads_image_name')
+            ads_image_status = request._request.POST.get('ads_image_status')
+            query = Q()  # Initialize an empty Q object
+            if ads_image_type is not None and ads_image_type != '':
+                query &= Q(ads_image_type=ads_image_type)
+            if ads_image_page is not None and ads_image_page != '':
+                query &= Q(ads_image_page=ads_image_page)
+            if ads_image_name is not None and ads_image_name != '':
+                query &= Q(ads_image_name=ads_image_name)
+            if ads_image_status is not None and ads_image_status != '':
+                query &= Q(ads_image_status=ads_image_status)
+            filtered_ad_image_types = models.AdsImage.objects.filter(query)
+            if filtered_ad_image_types:
+                result_list = []
+                for filtered_ad_image_type in filtered_ad_image_types:
+                    if filtered_ad_image_type.ads_image_status == "valid":
+                        result_list.append({
+                            "image_id": filtered_ad_image_type.ads_image_id,
+                            "title": filtered_ad_image_type.ads_image_title,
+                            "image_status": filtered_ad_image_type.ads_image_status,
+                            "image_pic": filtered_ad_image_type.ads_image_pic,
+                        })
+                responses['result'] = result_list
+            else:
+                responses['code'] = 1001
+                responses['message'] = "暂无数据"
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class AdsCoverPic(APIView):
     """
         Return information of authentication process
         User authentication related services
