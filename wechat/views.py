@@ -3417,6 +3417,7 @@ class AdsCoverPic(APIView):
                         result_list.append({
                             "image_id": filtered_ad_image_type.ads_image_id,
                             "title": filtered_ad_image_type.ads_image_title,
+                            "name": filtered_ad_image_type.ads_image_name,
                             "image_status": filtered_ad_image_type.ads_image_status,
                             "image_pic": filtered_ad_image_type.ads_image_pic,
                         })
