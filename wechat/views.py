@@ -2841,12 +2841,17 @@ class AllColorDetail(APIView):
         try:
             color_type = request._request.POST.get('color_type')
             color_system = request._request.POST.get('color_system')
-            color_type_objs = models.TotalColor.objects.filter(color_type=color_type, color_system=color_system).all()
+
+            query = Q()  # Initialize an empty Q object
+            if color_type is not None and color_type != '':
+                query &= Q(color_type=color_type)
+            if color_system is not None and color_system != '':
+                query &= Q(color_system=color_system)
+            color_type_objs = models.TotalColor.objects.filter(query)
             color_list = []
             for color_type_obj in color_type_objs:
                 color_rgb = json.loads(color_type_obj.color_rgb)
                 color_list.append([color_type_obj.color_name, color_rgb])
-
             step = 3
             color_list_3 = [color_list[i:i + step] for i in range(0, len(color_list), step)]
             color_selected = {
