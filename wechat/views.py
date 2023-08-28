@@ -3434,3 +3434,34 @@ class AdsCoverPic(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class AllColors(APIView):
+    """
+        Return information of authentication process
+        User authentication related services
+    """
+    authentication_classes = []
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            color_type = request._request.POST.get('color_type')
+            color_type_objs = models.TotalColor.objects.filter(color_type=color_type).all()
+            color_list = []
+            for color_type_obj in color_type_objs:
+                color_name = color_type_obj.color_name
+                color_rgb = json.loads(color_type_obj.color_rgb)
+                color_list.append({
+                            "color_name": color_name,
+                            "color_list": color_rgb,
+                        })
+            responses['result'] = color_list
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
