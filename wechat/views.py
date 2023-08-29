@@ -3465,3 +3465,34 @@ class AllColors(APIView):
             responses['code'] = 3002
             responses['message'] = "请求异常"
         return JsonResponse(responses)
+
+
+# noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
+class ColorsCategory(APIView):
+    """
+        Return information of authentication process
+        User authentication related services
+    """
+    authentication_classes = []
+
+    def post(self, request):
+        responses = {
+            'code': 1000,
+            'message': None
+        }
+        try:
+            color_name_list = []
+            color_category_list = ['黄色', '橘色', '红色', '洋红', '紫色', '深蓝', '浅蓝', '绿色',
+                                   '果绿', '黄绿', '莫兰迪绿', '莫兰迪黄', '莫兰迪红', '莫兰迪紫',
+                                   '莫兰迪蓝', '莫兰迪绿', '莫兰迪黄绿', '莫兰迪褐', '莫兰迪灰', '莫兰迪黑']
+            for id, color_category in enumerate(color_category_list):
+                color_name_list.append({
+                    "color_category_name": color_category,
+                    "status": 1,
+                    "id": id,
+                })
+            responses['result'] = color_name_list
+        except Exception as e:
+            responses['code'] = 3002
+            responses['message'] = "请求异常"
+        return JsonResponse(responses)
