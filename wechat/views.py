@@ -3515,7 +3515,7 @@ class SingleColors(APIView):
             color_code = request._request.POST.get('color_code')
             color_type_objs = models.TotalColor.objects.filter(color_name=color_code).first()
             if color_type_objs:
-                color_dict_pic = {
+                color_list_pic = [{
                     "color_code": color_type_objs.color_name,
                     "color_list": color_type_objs.color_rgb,
                     "color_name": color_type_objs.hubuse_name if color_type_objs.hubuse_name is not None else "",
@@ -3524,8 +3524,8 @@ class SingleColors(APIView):
                     "color_picture_3": color_type_objs.leibise_rgb if color_type_objs.leibise_rgb is not None else "",
                     "color_picture_4": color_type_objs.jianbianse_name if color_type_objs.jianbianse_name is not None else "",
                     "color_picture_5": color_type_objs.jianbianse_rgb if color_type_objs.jianbianse_rgb is not None else "",
-                }
-                responses['result'] = color_dict_pic
+                }]
+                responses['result'] = color_list_pic
             else:
                 responses['result'] = []
         except Exception as e:
