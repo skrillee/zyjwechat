@@ -64,6 +64,7 @@ urlpatterns = [
     url(r'^v1/retail/home_ads_cover_pic/$', views.AdsCoverPic.as_view()),
     url(r'^v1/retail/cart_ads_colors_category/$', views.ColorsCategory.as_view()),
     url(r'^v1/retail/cart_ads_all_colors/$', views.AllColors.as_view()),
+    url(r'^v1/retail/cart_ads_single_colors/$', views.SingleColors.as_view()),
     # url(r'^v1/retail/douyin/$', views.Douyin.as_view()),
     # url(r'^v1/retail/douyin/$', RedirectView.as_view(url='https://v.douyin.com/YPX29cs/'), name='douyin'),
     # url(r'^v1/retail/create_order/$', views.CreateOrder.as_view()),
