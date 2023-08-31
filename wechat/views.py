@@ -3531,7 +3531,4 @@ class SingleColors(APIView):
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"
-        except Exception as e:
-            responses['code'] = 3002
-            responses['message'] = "请求异常"
         return JsonResponse(responses)
