@@ -3512,7 +3512,8 @@ class SingleColors(APIView):
             'message': None
         }
         try:
-            color_code_set = request._request.POST.get('color_code')
+            color_code_str = request._request.POST.get('color_code')
+            color_code_set = json.loads(color_code_str)
             color_code = list(color_code_set)[0]
             color_type_objs = models.TotalColor.objects.filter(color_name=color_code).first()
             if color_type_objs:
