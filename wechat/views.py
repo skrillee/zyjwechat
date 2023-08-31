@@ -3535,8 +3535,5 @@ class SingleColors(APIView):
                 responses['result'] = []
         except Exception as e:
             responses['code'] = 3002
-            responses['message'] = "请求异常"
-        except Exception as e:
-            responses['code'] = 3002
-            responses['message'] = "请求异常"
+            responses['message'] = request._request.POST.get('color_code')
         return JsonResponse(responses)
