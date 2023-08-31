@@ -3513,21 +3513,24 @@ class SingleColors(APIView):
         }
         try:
             color_code_str = request._request.POST.get('color_code')
-            color_code_set = json.loads(color_code_str)
-            color_code = list(color_code_set)[0]
-            color_type_objs = models.TotalColor.objects.filter(color_name=color_code).first()
-            if color_type_objs:
-                color_list_pic = [{
-                    "color_code": color_type_objs.color_name,
-                    "color_list": json.loads(color_type_objs.color_rgb),
-                    "color_name": color_type_objs.hubuse_name if color_type_objs.hubuse_name is not None else "",
-                    "color_picture_1": color_type_objs.hubuse_rgb if color_type_objs.hubuse_rgb is not None else "",
-                    "color_picture_2": color_type_objs.leibise_name if color_type_objs.leibise_name is not None else "",
-                    "color_picture_3": color_type_objs.leibise_rgb if color_type_objs.leibise_rgb is not None else "",
-                    "color_picture_4": color_type_objs.jianbianse_name if color_type_objs.jianbianse_name is not None else "",
-                    "color_picture_5": color_type_objs.jianbianse_rgb if color_type_objs.jianbianse_rgb is not None else "",
-                }]
-                responses['result'] = color_list_pic
+            if color_code_str:
+                color_code_set = json.loads(color_code_str)
+                color_code = list(color_code_set)[0]
+                color_type_objs = models.TotalColor.objects.filter(color_name=color_code).first()
+                if color_type_objs:
+                    color_list_pic = [{
+                        "color_code": color_type_objs.color_name,
+                        "color_list": json.loads(color_type_objs.color_rgb),
+                        "color_name": color_type_objs.hubuse_name if color_type_objs.hubuse_name is not None else "",
+                        "color_picture_1": color_type_objs.hubuse_rgb if color_type_objs.hubuse_rgb is not None else "",
+                        "color_picture_2": color_type_objs.leibise_name if color_type_objs.leibise_name is not None else "",
+                        "color_picture_3": color_type_objs.leibise_rgb if color_type_objs.leibise_rgb is not None else "",
+                        "color_picture_4": color_type_objs.jianbianse_name if color_type_objs.jianbianse_name is not None else "",
+                        "color_picture_5": color_type_objs.jianbianse_rgb if color_type_objs.jianbianse_rgb is not None else "",
+                    }]
+                    responses['result'] = color_list_pic
+                else:
+                    responses['result'] = []
             else:
                 responses['result'] = []
         except Exception as e:
