@@ -2,6 +2,7 @@ __author__ = 'Yan.zhe 2021.09.28'
 
 from rest_framework.views import APIView
 from django.http import JsonResponse
+from django.core.paginator import Paginator
 from zyjwechat import settings
 from wechat import models
 from django.db.models import Q
@@ -43,9 +44,9 @@ def md5(invitation_code) -> object:
     return md5_object.hexdigest()
 
 
-import calendar;
+import calendar
 
-import time;
+import time
 
 ts = calendar.timegm(time.gmtime())
 
@@ -3451,19 +3452,38 @@ class AllColors(APIView):
         }
         try:
             color_type = request._request.POST.get('color_type')
-            color_type_objs = models.TotalColor.objects.filter(color_type=color_type).all()
-            color_list = []
-            for color_type_obj in color_type_objs:
-                color_name = color_type_obj.color_name
-                color_rgb = json.loads(color_type_obj.color_rgb)
-                color_list.append({
-                            "color_name": color_name,
-                            "color_list": color_rgb,
-                        })
+            page_number = request._request.POST.get('page', 1)  # 默认为第1页
+            per_page = request._request.POST.get('per_page', 10)  # 默认每页10个项
+
+            color_type_objs = models.TotalColor.objects.filter(color_type=color_type).values('color_name', 'color_rgb')
+
+            # 使用Paginator进行分页
+            paginator = Paginator(color_type_objs, per_page)
+            current_page = paginator.get_page(page_number)
+
+            # 创建分页后的颜色列表
+            color_list = [
+                {
+                    "color_name": obj['color_name'],
+                    "color_list": json.loads(obj['color_rgb']),
+                }
+                for obj in current_page
+            ]
+
+            # 分页信息
+            pagination_data = {
+                'has_next': current_page.has_next(),
+                'has_previous': current_page.has_previous(),
+                'num_pages': paginator.num_pages,
+                'current_page': current_page.number
+            }
+
             responses['result'] = color_list
+            responses['pagination'] = pagination_data  # 将分页信息添加到响应中
         except Exception as e:
             responses['code'] = 3002
             responses['message'] = "请求异常"
+
         return JsonResponse(responses)
 
 
