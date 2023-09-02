@@ -3462,13 +3462,17 @@ class AllColors(APIView):
             current_page = paginator.get_page(page_number)
 
             # 创建分页后的颜色列表
-            color_list = [
-                {
-                    "color_name": obj['color_name'],
-                    "color_list": json.loads(obj['color_rgb']),
-                }
-                for obj in current_page
-            ]
+            if int(page_number) <= paginator.num_pages or int(page_number) < 1:
+                color_list = [
+                    {
+                        "color_name": obj['color_name'],
+                        "color_list": json.loads(obj['color_rgb']),
+                    }
+                    for obj in current_page
+                ]
+                responses['result'] = color_list
+            else:
+                responses['result'] = []
 
             # 分页信息
             pagination_data = {
@@ -3477,8 +3481,6 @@ class AllColors(APIView):
                 'num_pages': paginator.num_pages,
                 'current_page': current_page.number
             }
-
-            responses['result'] = color_list
             responses['pagination'] = pagination_data  # 将分页信息添加到响应中
         except Exception as e:
             responses['code'] = 3002
