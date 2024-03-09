@@ -776,6 +776,8 @@ class Result(APIView):
 # noinspection PyProtectedMember,PyMethodMayBeStatic,PyBroadException,PyUnresolvedReferences
 class Banner(APIView):
 
+    authentication_classes = []
+
     def post(self, request):
         responses = {
             'code': 1000,
